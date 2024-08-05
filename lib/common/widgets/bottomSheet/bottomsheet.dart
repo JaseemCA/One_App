@@ -1,5 +1,8 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
+import 'package:oneappcounter/core/config/color/appcolors.dart';
 
 class BottomSheetContent extends StatefulWidget {
   const BottomSheetContent({super.key});
@@ -34,11 +37,16 @@ class BottomSheetContentState extends State<BottomSheetContent> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final Color backgroundColor = isDarkMode
+        ? Appcolors.bottomsheetDarkcolor
+        : Appcolors.cardDetailTextColor;
+
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
       child: Container(
         height: 400,
-        color: Colors.white,
+        color: backgroundColor,
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
         child: Column(
           children: [
@@ -88,10 +96,11 @@ class BottomSheetContentState extends State<BottomSheetContent> {
             ),
             const SizedBox(height: 20),
             CustomElevatedButton(
-                text: "Save",
-                onPressed: () {
-                  Navigator.pop(context);
-                })
+              text: "Save",
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
           ],
         ),
       ),
@@ -145,12 +154,14 @@ class BottomSheetContentState extends State<BottomSheetContent> {
                     ),
                     const SizedBox(height: 20),
                     Align(
-                        alignment: Alignment.bottomRight,
-                        child: CustomElevatedButton(
-                            text: "OK",
-                            onPressed: () {
-                              Navigator.pop(context);
-                            })),
+                      alignment: Alignment.bottomRight,
+                      child: CustomElevatedButton(
+                        text: "OK",
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
                   ],
                 ),
               );

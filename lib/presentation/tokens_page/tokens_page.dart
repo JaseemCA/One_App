@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:oneappcounter/common/color/appcolors.dart';
+import 'package:oneappcounter/core/config/color/appcolors.dart';
 import 'package:oneappcounter/common/widgets/tab_bar/custom_tab_bar.dart';
 
 class TokensPage extends StatefulWidget {
@@ -12,12 +12,15 @@ class TokensPage extends StatefulWidget {
 class _HomeScreenState extends State<TokensPage> {
   @override
   Widget build(BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return DefaultTabController(
       length: 5,
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: Appcolors.appcolor,
+          backgroundColor: isDarkMode
+              ? Appcolors.bottomsheetDarkcolor
+              : Appcolors.appBackgrondcolor,
           title: const Text(
             "Tokens",
             style: TextStyle(

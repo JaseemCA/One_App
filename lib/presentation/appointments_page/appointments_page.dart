@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:oneappcounter/common/color/appcolors.dart';
+import 'package:oneappcounter/core/config/color/appcolors.dart';
 import 'package:oneappcounter/common/widgets/tab_bar/custom_tab_bar.dart'; // Import the custom tab bar
 
 class AppointmentsPage extends StatefulWidget {
@@ -12,12 +12,15 @@ class AppointmentsPage extends StatefulWidget {
 class _AppointmentsPageState extends State<AppointmentsPage> {
   @override
   Widget build(BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: Appcolors.appcolor,
+          backgroundColor: isDarkMode
+              ? Appcolors.bottomsheetDarkcolor
+              : Appcolors.appBackgrondcolor,
           title: const Text(
             "Appointments",
             style: TextStyle(

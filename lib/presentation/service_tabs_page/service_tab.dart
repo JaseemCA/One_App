@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:oneappcounter/common/color/appcolors.dart';
+import 'package:oneappcounter/core/config/color/appcolors.dart';
 import 'package:oneappcounter/common/widgets/bottomSheet/bottomsheet.dart';
 
 class ServiceTabs extends StatefulWidget {
@@ -20,10 +20,13 @@ class _ServiceTabsState extends State<ServiceTabs> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Appcolors.appcolor,
+        backgroundColor: isDarkMode
+            ? Appcolors.bottomsheetDarkcolor
+            : Appcolors.appBackgrondcolor,
         title: const Text(
           "Service Tabs",
           style: TextStyle(
@@ -32,7 +35,7 @@ class _ServiceTabsState extends State<ServiceTabs> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
-        backgroundColor: Appcolors.buttoncolor,
+        backgroundColor: Appcolors.buttonColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(50),
         ),

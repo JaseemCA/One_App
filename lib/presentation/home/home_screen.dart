@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:oneappcounter/common/color/appcolors.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
+import 'package:oneappcounter/common/widgets/one_app_logo/one_app_logo.dart';
+import 'package:oneappcounter/core/config/color/appcolors.dart';
+import 'package:oneappcounter/core/config/theme/bloc/theme_cubit.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,18 +20,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    // final Color backgroundColor = isDarkMode
+    // ? Appcolors.bottomsheetDarkcolor
+    // : Appcolors.appBackgrondcolor;
+
     return Scaffold(
       appBar: AppBar(
+        elevation: 2,
         leadingWidth: 180,
-        backgroundColor: Appcolors.appcolor,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 20),
-          child: SvgPicture.asset(
-            "assets/images/logoWhite.svg",
-            height: 130,
-            width: 130,
-          ),
-        ),
+        backgroundColor: isDarkMode
+            ? Appcolors.bottomsheetDarkcolor
+            : Appcolors.appBackgrondcolor,
+        leading: const Padding(
+            padding: EdgeInsets.only(left: 20),
+            child: OneAppLogo(
+              height: 30,
+            )),
         toolbarHeight: 70,
         actions: [
           IconButton(
@@ -68,15 +75,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       title: Text('Settings'),
                     ),
                   ),
-                  PopupMenuItem<String>(
+                  const PopupMenuItem<String>(
                     value: 'theme',
                     child: ListTile(
-                      leading: const Icon(Icons.mode_night_outlined),
-                      title: const Text('Theme'),
-                      onTap: () {
-                        Navigator.pop(context); // Close the menu
-                        _showThemeDialog(); // Show the theme selection dialog
-                      },
+                      leading: Icon(Icons.mode_night_outlined),
+                      title: Text('Theme'),
                     ),
                   ),
                   const PopupMenuItem<String>(
@@ -89,23 +92,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
                 elevation: 8.0,
               ).then((value) {
-                // Handle the selected menu option
-                if (value != null) {
-                  switch (value) {
-                    case 'settings':
-                      // Navigate to settings
-                      // print('Settings selected');
-                      break;
-                    case 'theme':
-                      // Change theme
-                      // print('Theme selected');
-                      break;
-                    case 'logout':
-                      // Perform logout
-                      // print('Logout selected');
-                      break;
-                  }
+                if (value == 'theme') {
+                  _showThemeDialog();
                 }
+                // Handle other menu options
               });
             },
           ),
@@ -176,10 +166,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 18, vertical: 10)),
                     child: Text(
-                      "Expected Ending Time:$selectedTime",
+                      "Expected Ending Time: $selectedTime",
                       style: const TextStyle(
                         fontSize: 18,
-                        color: Appcolors.buttoncolor,
+                        color: Appcolors.buttonColor,
                       ),
                     ),
                   ),
@@ -187,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   CustomElevatedButton(
                       text: "HOLD",
                       onPressed: () {
-                        // Navigator.pop(context);
+                        // Add your logic here
                       })
                 ],
               ),
@@ -231,7 +221,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 selectedTime = DateFormat('hh:mm a').format(dateTime);
               });
               Navigator.pop(context);
-              // selectedTime = DateFormat('hh:mm a').format(dateTime);
             },
           ),
         ],
@@ -248,46 +237,53 @@ class _HomeScreenState extends State<HomeScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final currentThemeMode = context.read<ThemeCubit>().state;
         return SimpleDialog(
           title: const Text('Theme'),
           children: [
             ListTile(
+              onTap: () {
+                context.read<ThemeCubit>().updateTheme(ThemeMode.light);
+                Navigator.pop(context);
+              },
               title: const Text('Light'),
               leading: Radio(
                 value: ThemeMode.light,
+                groupValue: currentThemeMode,
                 onChanged: (ThemeMode? mode) {
-                 
+                  context.read<ThemeCubit>().updateTheme(mode!);
                   Navigator.pop(context);
                 },
-                groupValue: Theme.of(context).brightness == Brightness.light
-                    ? ThemeMode.light
-                    : ThemeMode.dark,
               ),
             ),
             ListTile(
+              onTap: () {
+                context.read<ThemeCubit>().updateTheme(ThemeMode.dark);
+                Navigator.pop(context);
+              },
               title: const Text('Dark'),
               leading: Radio(
                 value: ThemeMode.dark,
+                groupValue: currentThemeMode,
                 onChanged: (ThemeMode? mode) {
-                  // Handle theme change
+                  context.read<ThemeCubit>().updateTheme(mode!);
                   Navigator.pop(context);
                 },
-                groupValue: Theme.of(context).brightness == Brightness.dark
-                    ? ThemeMode.dark
-                    : ThemeMode.light,
               ),
             ),
             ListTile(
+              onTap: () {
+                context.read<ThemeCubit>().updateTheme(ThemeMode.system);
+                Navigator.pop(context);
+              },
               title: const Text('System'),
               leading: Radio(
                 value: ThemeMode.system,
+                groupValue: currentThemeMode,
                 onChanged: (ThemeMode? mode) {
-                  // Handle theme change
+                  context.read<ThemeCubit>().updateTheme(mode!);
                   Navigator.pop(context);
                 },
-                groupValue: Theme.of(context).brightness == Brightness.light
-                    ? ThemeMode.system
-                    : ThemeMode.dark,
               ),
             ),
             TextButton(

@@ -34,7 +34,7 @@ class BottomNavbarState extends State<BottomNavbar>
         ],
       ),
       bottomNavigationBar: Container(
-        color: Colors.white,
+        color: Theme.of(context).bottomNavigationBarTheme.backgroundColor,
         height: 70,
         child: TabBar(
           controller: _tabController,
@@ -61,14 +61,16 @@ class BottomNavbarState extends State<BottomNavbar>
         children: [
           Icon(
             icon,
-            color: isSelected ? Colors.black : Colors.grey,
+            color: Theme.of(context).bottomNavigationBarTheme.selectedItemColor,
             size: isSelected ? 30 : 24,
           ),
           if (isSelected)
             Text(
               text,
-              style: const TextStyle(
-                color: Colors.black,
+              style: TextStyle(
+                color: Theme.of(context)
+                    .bottomNavigationBarTheme
+                    .selectedItemColor,
                 fontSize: 10,
               ),
             ),

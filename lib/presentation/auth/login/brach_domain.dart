@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:oneappcounter/common/color/appcolors.dart';
+import 'package:oneappcounter/core/config/color/appcolors.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/common/widgets/textfield/custom_text_field.dart';
 import 'package:oneappcounter/presentation/auth/login/loginpage.dart';
@@ -11,7 +11,7 @@ class BranchDomainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Appcolors.appcolor,
+      backgroundColor: Appcolors.appBackgrondcolor,
       body: Column(
         children: [
           Expanded(
@@ -39,6 +39,7 @@ class BranchDomainPage extends StatelessWidget {
                       prefixIcon: Icons.link,
                     )),
                 CustomElevatedButton(
+                    backgroundColor: Appcolors.buttonColor,
                     text: "CONNECT",
                     onPressed: () {
                       Navigator.push(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:oneappcounter/common/color/appcolors.dart';
+import 'package:oneappcounter/core/config/color/appcolors.dart';
 import 'package:oneappcounter/common/widgets/bottom_navbar/bottom_navbar.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/common/widgets/textfield/custom_text_field.dart';
@@ -13,7 +13,7 @@ class Loginpage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Appcolors.appcolor,
+        backgroundColor: Appcolors.appBackgrondcolor,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
@@ -22,7 +22,7 @@ class Loginpage extends StatelessWidget {
         ),
         elevation: 0,
       ),
-      backgroundColor: Appcolors.appcolor,
+      backgroundColor: Appcolors.appBackgrondcolor,
       body: Column(
         children: [
           Expanded(
@@ -56,6 +56,7 @@ class Loginpage extends StatelessWidget {
                       prefixIcon: Icons.lock),
                 ),
                 CustomElevatedButton(
+                    backgroundColor: Appcolors.buttonColor,
                     text: "LOGIN",
                     onPressed: () {
                       Navigator.push(
