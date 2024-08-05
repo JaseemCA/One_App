@@ -21,6 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     // final Color backgroundColor = isDarkMode
     // ? Appcolors.bottomsheetDarkcolor
     // : Appcolors.appBackgrondcolor;
@@ -108,6 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showBottomSheet() {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       isScrollControlled: true,
       context: context,
@@ -120,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
             child: Container(
               height: 420,
-              color: Colors.white,
+              color: isDarkMode ? Appcolors.bottomsheetDarkcolor : Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -155,7 +157,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ElevatedButton(
                     onPressed: _showTimePicker,
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
+                        backgroundColor: isDarkMode
+                            ? Appcolors.bottomsheetDarkcolor
+                            : Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5),
                           side: const BorderSide(
@@ -167,9 +171,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             horizontal: 18, vertical: 10)),
                     child: Text(
                       "Expected Ending Time: $selectedTime",
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
-                        color: Appcolors.buttonColor,
+                        color: isDarkMode
+                            ? Appcolors.materialIconButtonDark
+                            : Appcolors.buttonColor,
                       ),
                     ),
                   ),

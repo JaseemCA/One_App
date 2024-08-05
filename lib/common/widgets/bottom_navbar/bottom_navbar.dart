@@ -34,7 +34,7 @@ class BottomNavbarState extends State<BottomNavbar>
         ],
       ),
       bottomNavigationBar: Container(
-        color: Theme.of(context).bottomNavigationBarTheme.backgroundColor,
+        // color: Theme.of(context).bottomNavigationBarTheme.backgroundColor,
         height: 70,
         child: TabBar(
           controller: _tabController,

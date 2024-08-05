@@ -11,10 +11,10 @@ class AppTheme {
       selectedItemColor: Colors.white,
       unselectedItemColor: Colors.white54,
     ),
-    
-    bottomSheetTheme: const BottomSheetThemeData(
-      backgroundColor: Colors.transparent,
-    ),
+
+    // bottomSheetTheme: const BottomSheetThemeData(
+    //   backgroundColor: Colors.transparent,
+    // ),
   );
 
   static final lightTheme = ThemeData(
@@ -30,9 +30,6 @@ class AppTheme {
       elevation: 10,
       selectedItemColor: Colors.black,
       unselectedItemColor: Colors.black45,
-    ),
-    bottomSheetTheme: const BottomSheetThemeData(
-      backgroundColor: Colors.transparent,
     ),
   );
 }
