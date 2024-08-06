@@ -7,6 +7,7 @@ class CustomElevatedButton extends StatelessWidget {
   final Color? backgroundColor;
   final Color textColor;
   final double fontSize;
+  final double? textSize;
 
   const CustomElevatedButton({
     super.key,
@@ -15,6 +16,7 @@ class CustomElevatedButton extends StatelessWidget {
     this.backgroundColor,
     this.textColor = Colors.white,
     this.fontSize = 17,
+    this.textSize,
   });
 
   @override
@@ -39,7 +41,7 @@ class CustomElevatedButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 5),
         child: Text(
           text,
-          style: TextStyle(fontSize: fontSize, color: textColor),
+          style: TextStyle(fontSize: textSize ?? fontSize, color: textColor),
         ),
       ),
     );

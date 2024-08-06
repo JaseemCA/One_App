@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/core/config/color/appcolors.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -111,11 +112,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      child: const Text('APPLY'),
-                    ),
-                  )
+                      child: CustomElevatedButton(
+                    text: "APPLY",
+                    onPressed: () {},
+                    fontSize: 12,
+                  ))
                 ],
               ),
               const SizedBox(height: 25),
