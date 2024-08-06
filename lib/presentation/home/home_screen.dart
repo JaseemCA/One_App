@@ -6,6 +6,7 @@ import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/common/widgets/one_app_logo/one_app_logo.dart';
 import 'package:oneappcounter/core/config/color/appcolors.dart';
 import 'package:oneappcounter/core/config/theme/bloc/theme_cubit.dart';
+import 'package:oneappcounter/presentation/settings_page/settings_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -69,11 +70,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 context: context,
                 position: const RelativeRect.fromLTRB(70, 0, 0, 0),
                 items: [
-                  const PopupMenuItem<String>(
+                  PopupMenuItem<String>(
                     value: 'settings',
                     child: ListTile(
-                      leading: Icon(Icons.settings),
-                      title: Text('Settings'),
+                      leading: const Icon(Icons.settings),
+                      title: const Text('Settings'),
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    const SettingsScreen()));
+                      },
                     ),
                   ),
                   const PopupMenuItem<String>(

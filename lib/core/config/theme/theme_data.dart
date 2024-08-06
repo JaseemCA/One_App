@@ -10,11 +10,7 @@ class AppTheme {
       elevation: 10,
       selectedItemColor: Colors.white,
       unselectedItemColor: Colors.white54,
-    ),
-
-    // bottomSheetTheme: const BottomSheetThemeData(
-    //   backgroundColor: Colors.transparent,
-    // ),
+    ), 
   );
 
   static final lightTheme = ThemeData(
@@ -57,3 +53,8 @@ MaterialColor createMaterialColor(Color color) {
 
   return MaterialColor(color.value, swatch);
 }
+
+
+const Divider divider = Divider(
+  height: 8.0,
+);

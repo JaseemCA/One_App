@@ -35,7 +35,9 @@ class _ServiceTabsState extends State<ServiceTabs> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
-        backgroundColor: Appcolors.buttonColor,
+        backgroundColor: isDarkMode
+            ? Appcolors.materialIconButtonDark
+            : Appcolors.buttonColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(50),
         ),
