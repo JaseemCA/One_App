@@ -18,4 +18,5 @@ class Appcolors {
   static const Color warningLight = Color(0xfffaad14);
   static const Color highPriorityDark = Color(0xff64fedc);
   static const Color materialIconButtonDark = Color(0xff52a18e);
+  
 }

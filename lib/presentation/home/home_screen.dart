@@ -28,95 +28,100 @@ class _HomeScreenState extends State<HomeScreen> {
     // : Appcolors.appBackgrondcolor;
 
     return Scaffold(
-      appBar: AppBar(
-        elevation: 2,
-        leadingWidth: 180,
-        backgroundColor: isDarkMode
-            ? Appcolors.bottomsheetDarkcolor
-            : Appcolors.appBackgrondcolor,
-        leading: const Padding(
-            padding: EdgeInsets.only(left: 20),
-            child: OneAppLogo(
-              height: 30,
-            )),
-        toolbarHeight: 70,
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.refresh,
-              color: Colors.white,
-              size: 30,
+        appBar: AppBar(
+          elevation: 2,
+          leadingWidth: 180,
+          backgroundColor: isDarkMode
+              ? Appcolors.bottomsheetDarkcolor
+              : Appcolors.appBackgrondcolor,
+          leading: const Padding(
+              padding: EdgeInsets.only(left: 20),
+              child: OneAppLogo(
+                height: 30,
+              )),
+          toolbarHeight: 70,
+          actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.refresh,
+                color: Colors.white,
+                size: 30,
+              ),
+              onPressed: () {},
             ),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.lock,
-              color: Colors.white,
-              size: 30,
+            IconButton(
+              icon: const Icon(
+                Icons.lock,
+                color: Colors.white,
+                size: 30,
+              ),
+              onPressed: () {
+                holdshowBottomSheet();
+              },
             ),
-            onPressed: () {
-              _showBottomSheet();
-            },
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.more_vert,
-              color: Colors.white,
-              size: 30,
+            IconButton(
+              icon: const Icon(
+                Icons.more_vert,
+                color: Colors.white,
+                size: 30,
+              ),
+              onPressed: () {
+                showMenu(
+                  context: context,
+                  position: const RelativeRect.fromLTRB(70, 0, 0, 0),
+                  items: [
+                    PopupMenuItem<String>(
+                      value: 'settings',
+                      child: ListTile(
+                        leading: const Icon(Icons.settings),
+                        title: const Text('Settings'),
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      const SettingsScreen()));
+                        },
+                      ),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'theme',
+                      child: ListTile(
+                        leading: Icon(Icons.mode_night_outlined),
+                        title: Text('Theme'),
+                      ),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'logout',
+                      child: ListTile(
+                        leading: Icon(Icons.logout),
+                        title: Text('Logout'),
+                      ),
+                    ),
+                  ],
+                  elevation: 8.0,
+                ).then((value) {
+                  if (value == 'theme') {
+                    _showThemeDialog();
+                  }
+                  // Handle other menu options
+                });
+              },
             ),
-            onPressed: () {
-              showMenu(
-                context: context,
-                position: const RelativeRect.fromLTRB(70, 0, 0, 0),
-                items: [
-                  PopupMenuItem<String>(
-                    value: 'settings',
-                    child: ListTile(
-                      leading: const Icon(Icons.settings),
-                      title: const Text('Settings'),
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    const SettingsScreen()));
-                      },
-                    ),
-                  ),
-                  const PopupMenuItem<String>(
-                    value: 'theme',
-                    child: ListTile(
-                      leading: Icon(Icons.mode_night_outlined),
-                      title: Text('Theme'),
-                    ),
-                  ),
-                  const PopupMenuItem<String>(
-                    value: 'logout',
-                    child: ListTile(
-                      leading: Icon(Icons.logout),
-                      title: Text('Logout'),
-                    ),
-                  ),
-                ],
-                elevation: 8.0,
-              ).then((value) {
-                if (value == 'theme') {
-                  _showThemeDialog();
-                }
-                // Handle other menu options
-              });
-            },
+          ],
+        ),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            // Placeholder for refresh functionality
+            // await refreshFunction(context);
+          },
+          child: Stack(
+            children: [ListView(), buildNonGridScreen()],
           ),
-        ],
-      ),
-      body: const Center(
-        child: Text("home"),
-      ),
-    );
+        ));
   }
 
-  void _showBottomSheet() {
+  void holdshowBottomSheet() {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       isScrollControlled: true,
@@ -307,6 +312,408 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         );
       },
+    );
+  }
+
+  Widget buildNonGridScreen() {
+    return Stack(
+      children: [
+        Column(
+          children: [
+            Column(
+              children: [
+                StatefulBuilder(
+                    builder: (BuildContext context, StateSetter tabsetState) {
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 15, 10, 10),
+                    child: Row(
+                      children: [
+                        const Expanded(
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    'Services: ',
+                                    style: TextStyle(
+                                      height: 1,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      'Service Placeholder',
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      softWrap: false,
+                                      style: TextStyle(
+                                        height: 1,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Text(
+                                    'Counter: ',
+                                    style: TextStyle(
+                                      height: 1,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      'Counter Placeholder',
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      softWrap: false,
+                                      style: TextStyle(
+                                        height: 1,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        IconButton(
+                          onPressed: () {},
+                          icon: const Icon(
+                            Icons.edit_note,
+                            size: 25,
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                }),
+                const Divider(),
+              ],
+            ),
+            SizedBox(
+              child: Column(
+                children: [
+                  Container(
+                    child: buildTokenPart(),
+                  ), // Placeholder for _buildTokenPart()
+                  const Divider(
+                    height: 40,
+                  ), // kDivider replaced with Divider()
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: CustomElevatedButton(
+                                onPressed: () {}, // Disabled button
+                                text: "SERVE",
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: CustomElevatedButton(
+                                onPressed: () {}, // Disabled button
+                                text: 'RECALL',
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: CustomElevatedButton(
+                                onPressed: () {}, // Disabled button
+                                text: 'NO SHOW',
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: CustomElevatedButton(
+                                onPressed: () {}, // Disabled button
+                                text: 'CALL NEXT',
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: CustomElevatedButton(
+                                  onPressed: () {}, // Disabled button
+                                  text: 'HOLD TOKEN'),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Row(
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8.0,
+                                vertical: 3.0,
+                              ),
+                              child: Text(
+                                'Select Service to transfer',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+              child: SizedBox(
+                child: LayoutBuilder(builder: (context, constraints) {
+                  return Column(
+                    children: [
+                      getTransferButtons(),
+                    ], // Placeholder for _getTransferButtons()
+                  );
+                }),
+              ),
+            ),
+          ],
+        ),
+        Container(), // Placeholder for the Positioned widget
+      ],
+    );
+  }
+
+  Widget buildTokenPart() {
+    // Placeholder values for UI demonstration
+    String tokenNumber = 'Token Number';
+    String servedTime = '';
+    String tokenStatus = 'Serving';
+    Color statusColor = Colors.green;
+    String customerDetails = 'Customer Details';
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  // Placeholder for onTap action
+                },
+                onLongPress: () {
+                  // Placeholder for onLongPress action
+                },
+                child: Text(
+                  tokenNumber,
+                  style: const TextStyle(
+                    fontSize: 45,
+                    fontWeight: FontWeight.bold,
+                    height: 1,
+                  ),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Placeholder for Priority Text
+                  Text(
+                    'H', // or 'L', 'N' based on priority
+                    style: TextStyle(
+                      color: Colors.green.shade600,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  // Placeholder for Served Time or Streamed Time
+                  Text(
+                    servedTime.isEmpty ? '00:00:00' : servedTime,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      height: 1,
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  // Placeholder for Token Status
+                  Text(
+                    tokenStatus,
+                    style: TextStyle(
+                      color: statusColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      height: 1,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 7),
+              // Placeholder for Customer Details
+              Text(
+                customerDetails,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w400,
+                  height: 1,
+                ),
+              ),
+            ],
+          ),
+        ),
+        IconButton(
+          onPressed: () {
+            remarhowBottomSheet();
+          },
+          icon: const Icon(Icons.notes),
+          iconSize: 25,
+        ),
+      ],
+    );
+  }
+
+  void remarhowBottomSheet() {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+            child: Container(
+              height: 420,
+              color: isDarkMode ? Appcolors.bottomsheetDarkcolor : Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      // This Spacer will push the Text widget to the center
+                      const Spacer(),
+                      const Text(
+                        'Remarks',
+                        style: TextStyle(
+                            fontSize: 25, fontWeight: FontWeight.w400),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        onPressed: () {
+                          // Navigator.pop();
+                        },
+                        icon: const Icon(Icons.close),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+                  // GestureDetector(
+                  //   child: const TextField(
+                  //     decoration: InputDecoration(
+                  //       border: OutlineInputBorder(),
+                  //       suffixIcon: Icon(Icons.arrow_drop_down),
+                  //     ),
+                  //   ),
+                  // ),
+                  const SizedBox(height: 25),
+                  GestureDetector(
+                    child: const TextField(
+                      decoration: InputDecoration(),
+                    ),
+                  ),
+                  const SizedBox(height: 25),
+
+                  const SizedBox(height: 30),
+                  CustomElevatedButton(
+                      text: "Save",
+                      onPressed: () {
+                        // Add your logic here
+                      })
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget getTransferButtons() {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    // Undo Transfer Button
+    Widget allServicesButton = OutlinedButton(
+      onPressed: null, // Placeholder for onPressed action
+      style: OutlinedButton.styleFrom(
+        shape: const RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.all(Radius.zero), // Makes the button rectangular
+        ),
+      ),
+      child: Text(
+        'TRANSFER TO (Show All services)',
+        style: TextStyle(
+          fontSize: 18,
+          color: isDarkMode
+              ? Appcolors.materialIconButtonDark
+              : Appcolors.buttonColor,
+        ),
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+
+    // Custom Elevated Button
+    Widget customButton = CustomElevatedButton(
+      text: "Doctor name ",
+      onPressed: () {},
+    );
+
+    // Combine the custom button and the all services button row
+    return Column(
+      children: [
+        customButton,
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            const SizedBox(width: 10),
+            Expanded(child: allServicesButton),
+          ],
+        ),
+      ],
     );
   }
 }
