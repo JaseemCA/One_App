@@ -34,6 +34,7 @@ class BottomNavbarState extends State<BottomNavbar>
         ],
       ),
       bottomNavigationBar: SizedBox(
+       
         height: 70,
         child: TabBar(
           controller: _tabController,

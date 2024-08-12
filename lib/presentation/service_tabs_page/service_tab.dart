@@ -34,7 +34,9 @@ class _ServiceTabsState extends State<ServiceTabs> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          _showBottomSheet();
+        },
         backgroundColor: isDarkMode
             ? Appcolors.materialIconButtonDark
             : Appcolors.buttonColor,

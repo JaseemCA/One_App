@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:oneappcounter/core/config/color/appcolors.dart';
-import 'package:oneappcounter/common/widgets/bottom_navbar/bottom_navbar.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/common/widgets/textfield/custom_text_field.dart';
 import 'package:oneappcounter/common/widgets/bottomSheet/bottomsheet.dart';
+import 'package:oneappcounter/routes.dart';
 
 class Loginpage extends StatelessWidget {
   const Loginpage({super.key});
@@ -59,11 +59,7 @@ class Loginpage extends StatelessWidget {
                     backgroundColor: Appcolors.buttonColor,
                     text: "LOGIN",
                     onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  const BottomNavbar()));
+                      Navigator.pushNamed(context, Routes.bottomNavBar.route);
                     }),
               ],
             ),

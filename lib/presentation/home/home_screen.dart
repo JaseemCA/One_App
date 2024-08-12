@@ -102,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   elevation: 8.0,
                 ).then((value) {
                   if (value == 'theme') {
-                    _showThemeDialog();
+                    showThemeDialog();
                   }
                   // Handle other menu options
                 });
@@ -252,7 +252,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showThemeDialog() {
+  void showThemeDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -616,7 +616,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
             child: Container(
-              height: 420,
+              height: 400,
               color: isDarkMode ? Appcolors.bottomsheetDarkcolor : Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
               child: Column(
@@ -640,8 +640,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-
-                  const SizedBox(height: 20),
+                  // SizedBox(
+                  //   height: 40,
+                  // ),
+                  // const SizedBox(height: 0),
                   // GestureDetector(
                   //   child: const TextField(
                   //     decoration: InputDecoration(
@@ -650,15 +652,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   //     ),
                   //   ),
                   // ),
-                  const SizedBox(height: 25),
+                  // const SizedBox(height: 25),
                   GestureDetector(
                     child: const TextField(
+                      minLines: 9, // Set the minimum number of lines
+                      maxLines: 20,
                       decoration: InputDecoration(),
                     ),
                   ),
-                  const SizedBox(height: 25),
 
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 10),
                   CustomElevatedButton(
                       text: "Save",
                       onPressed: () {

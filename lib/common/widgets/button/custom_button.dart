@@ -3,7 +3,7 @@ import 'package:oneappcounter/core/config/color/appcolors.dart';
 
 class CustomElevatedButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final Color? backgroundColor;
   final Color textColor;
   final double fontSize;
@@ -12,7 +12,7 @@ class CustomElevatedButton extends StatelessWidget {
   const CustomElevatedButton({
     super.key,
     required this.text,
-    required this.onPressed,
+    this.onPressed,
     this.backgroundColor,
     this.textColor = Colors.white,
     this.fontSize = 17,
