@@ -38,7 +38,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:oneappcounter/bloc/branch_domain/bloc/branc_domain_event.dart';
 import 'package:oneappcounter/bloc/branch_domain/bloc/branc_domain_state.dart';
-import 'package:oneappcounter/services/networking_service.dart';
 import 'package:oneappcounter/services/storage_service.dart';
 
 class BranchDomainBloc extends Bloc<BranchDomainEvent, BranchDomainState> {
