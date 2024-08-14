@@ -7,9 +7,7 @@ import 'package:oneappcounter/services/networking_service.dart';
 import 'package:oneappcounter/services/utility_services.dart';
 
 class NoInternetScreen extends StatelessWidget {
-  const NoInternetScreen({
-    super.key,
-  });
+  const NoInternetScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -66,24 +64,8 @@ class NoInternetScreen extends StatelessWidget {
                   ),
                   CustomElevatedButton(
                     text: 'Retry',
-                    //  onPressed: () => _retryConnection(context),
-                    // UtilityService.showLoadingAlert(context);
-                    // // bool isConnected = NetworkingService;
-
-                    // if () {
-                    //   Navigator.pushNamedAndRemoveUntil(
-                    //     context,
-                    //     Routes.splashScreen.route,
-                    //     (route) => false,
-                    //   );
-                    // } else {
-                    //   UtilityService.toast(
-                    //     context,
-                    //     'Not able to connect',
-                    //   );
-                    //   Navigator.pop(context);
-                    // }
-                  )
+                    onPressed: () => _retryConnection(context),
+                  ),
                 ],
               ),
             ),
@@ -94,23 +76,26 @@ class NoInternetScreen extends StatelessWidget {
     );
   }
 
-  //  Future<void> _retryConnection(BuildContext context) async {
-  //   UtilityService.showLoadingAlert(context);
+  Future<void> _retryConnection(BuildContext context) async {
+    UtilityService.showLoadingAlert(context);
 
-  //   bool isConnected = await NetworkingService.checkInternetConnection(); // Ensure this method is available
+    bool isConnected = await NetworkingService.checkInternetConnection();
 
-  //   if (isConnected) {
-  //     Navigator.pushNamedAndRemoveUntil(
-  //       context,
-  //       Routes.splashScreen.route,
-  //       (route) => false,
-  //     );
-  //   } else {
-  //     UtilityService.toast(
-  //       context,
-  //       'Not able to connect',
-  //     );
-  //     Navigator.pop(context);
-  //   }
-  // }
+    if (isConnected) {
+      Navigator.pushNamedAndRemoveUntil(
+        // ignore: use_build_context_synchronously
+        context,
+        AppRoutes.splashScreen,
+        (route) => false,
+      );
+    } else {
+      UtilityService.toast(
+        // ignore: use_build_context_synchronously
+        context,
+        'Not able to connect',
+      );
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
+    }
+  }
 }

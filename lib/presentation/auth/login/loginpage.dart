@@ -59,7 +59,7 @@ class Loginpage extends StatelessWidget {
                     backgroundColor: Appcolors.buttonColor,
                     text: "LOGIN",
                     onPressed: () {
-                      Navigator.pushNamed(context, Routes.bottomNavBar.route);
+                      Navigator.pushNamed(context, AppRoutes.bottomNavBar);
                     }),
               ],
             ),

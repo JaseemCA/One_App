@@ -5,25 +5,19 @@ import 'package:oneappcounter/presentation/auth/login/loginpage.dart';
 import 'package:oneappcounter/presentation/no_internet/no_internet_screen.dart';
 import 'package:oneappcounter/presentation/splash/splash_screen.dart';
 
-class Routes {
-  static final Route splashScreen = Route('splash_screen');
-  static final Route domainScreen = Route('domain_page');
-  static final Route loginScreen = Route('login_page');
-  static final Route bottomNavBar = Route('bottom_navbar');
-  static final Route noInternetScreen = Route('no_internet_screen');
-
-}
-
-class Route {
-  final String route;
-
-  Route(this.route);
+class AppRoutes {
+  static const String splashScreen = 'splash_screen';
+  static const String domainScreen = 'domain_page';
+  static const String loginScreen = 'login_page';
+  static const String bottomNavBar = 'bottom_navbar';
+  
+  static const String noInternetScreen = 'no_internet_screen';
 }
 
 Map<String, Widget Function(BuildContext)> routes = {
-  Routes.splashScreen.route: (context) => const SplashScreen(),
-  Routes.domainScreen.route: (context) => const BranchDomainPage(),
-  Routes.loginScreen.route: (context) => const Loginpage(),
-  Routes.bottomNavBar.route: (context) => const BottomNavbar(),
-  Routes.noInternetScreen.route: (context) => const NoInternetScreen()
+  AppRoutes.splashScreen: (context) => const SplashScreen(),
+  AppRoutes.domainScreen: (context) => const DomainScreen(),
+  AppRoutes.loginScreen: (context) => const Loginpage(),
+  AppRoutes.bottomNavBar: (context) => const BottomNavbar(),
+  AppRoutes.noInternetScreen: (context) => const NoInternetScreen(),
 };

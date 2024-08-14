@@ -1,70 +1,87 @@
-
-
 import 'package:dio/dio.dart';
 import 'package:oneappcounter/services/storage_service.dart';
- // Import your cubit
 
 class NetworkingService {
-  final NetworkingCubit networkingCubit;
+  static String? domainUrl;
+  static String? apiDomainUrl;
+  static String? accessToken;
+  static String defaultUrl = 'https://www.oneapp.life';
+  static String defaultApiUrl = 'https://www.oneapp.life/api';
 
-  NetworkingService(this.networkingCubit);
-
-  Future<dynamic> getHttp(
+  static Future<dynamic> getHttp(
     String path, {
     bool useAsFullPath = false,
     Map<String, dynamic> data = const {},
   }) async {
     try {
-      String? apiDomainUrl = networkingCubit.state.apiDomainUrl;
       if (!useAsFullPath) {
         if (apiDomainUrl != null) {
-          path = '$apiDomainUrl/$path';
+          path = '${apiDomainUrl!}/$path';
+        } else {
+          path = '$defaultApiUrl/$path';
         }
       }
 
-      var response = await Dio().get(path,
-          queryParameters: data,
-          options: Options(
-            headers: _getHeaders(token: networkingCubit.state.accessToken),
-          ));
+      var response = await Dio().get(
+        path,
+        queryParameters: data,
+        options: Options(
+          headers: _getHeaders(token: accessToken),
+        ),
+      );
       return response;
     } catch (e) {
       return e;
     }
   }
 
-  Future<dynamic> postHttp(
-      {required String path,
-      required Map<String, dynamic> data,
-      bool addToken = true}) async {
+  static Future<dynamic> postHttp({
+    required String path,
+    required Map<String, dynamic> data,
+    bool addToken = true,
+  }) async {
     try {
-      String? apiDomainUrl = networkingCubit.state.apiDomainUrl;
-      String path0 = '$apiDomainUrl/$path';
-      return await Dio().post(path0,
-          data: data,
-          options: Options(
-              headers: _getHeaders(token: addToken ? networkingCubit.state.accessToken : null)));
+      String fullPath =
+          apiDomainUrl != null ? '$apiDomainUrl/$path' : '$defaultApiUrl/$path';
+      return await Dio().post(
+        fullPath,
+        data: data,
+        options: Options(
+          headers: _getHeaders(token: addToken ? accessToken : null),
+        ),
+      );
     } catch (e) {
       return e;
     }
   }
 
-  Future<dynamic> deleteHttp({required String path}) async {
+  static Future<bool> setSavedValues() async {
+    domainUrl = await StorageService.getSavedValue(key: 'domain_url');
+    if (domainUrl != null) {
+      apiDomainUrl = await StorageService.getSavedValue(key: 'api_domain_url');
+      accessToken = await StorageService.getSavedValue(key: 'access_token');
+      apiDomainUrl ??= '$domainUrl/api';
+      return true;
+    }
+    return false;
+  }
+
+  static Future<dynamic> deleteHttp({required String path}) async {
     try {
-      String? apiDomainUrl = networkingCubit.state.apiDomainUrl;
-      if (apiDomainUrl != null) {
-        path = '$apiDomainUrl/$path';
-      }
-      return await Dio().delete(path,
-          options: Options(
-            headers: _getHeaders(token: networkingCubit.state.accessToken),
-          ));
+      String fullPath =
+          apiDomainUrl != null ? '$apiDomainUrl/$path' : '$defaultApiUrl/$path';
+      return await Dio().delete(
+        fullPath,
+        options: Options(
+          headers: _getHeaders(token: accessToken),
+        ),
+      );
     } catch (e) {
       return e;
     }
   }
 
-  Future<bool> checkInternetConnection() async {
+  static Future<bool> checkInternetConnection() async {
     try {
       Response response = await getHttp(
           'https://www.oneapp.life/api/check-internet',
@@ -78,26 +95,26 @@ class NetworkingService {
     return false;
   }
 
-  Future<bool> checkSubscription() async {
+  static Future<bool> checkSubscription() async {
     try {
       Response response = await getHttp('time');
-      if (response.statusCode == 200) {
-        return true;
-      }
-      return false;
+      return response.statusCode == 200;
     } catch (e) {
       return false;
     }
   }
 
-  Map<String, String> _getHeaders({String? token}) {
+  static Map<String, String> _getHeaders({String? token}) {
     if (token != null) {
       return {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token'
+        'Authorization': 'Bearer $token',
       };
     }
-    return {'Accept': 'application/json', 'Content-Type': 'application/json'};
+    return {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    };
   }
 }
