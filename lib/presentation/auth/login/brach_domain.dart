@@ -1,11 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:oneappcounter/bloc/branch_domain/bloc/branc_domain_bloc.dart';
 import 'package:oneappcounter/bloc/branch_domain/bloc/branc_domain_event.dart';
 import 'package:oneappcounter/bloc/branch_domain/bloc/branc_domain_state.dart';
+import 'package:oneappcounter/common/widgets/one_app_logo/one_app_logo.dart';
 import 'package:oneappcounter/core/config/color/appcolors.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/common/widgets/textfield/custom_text_field.dart';
@@ -71,11 +70,7 @@ class _DomainScreenState extends State<DomainScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        SvgPicture.asset(
-                          "assets/images/logoWhite.svg",
-                          height: 50,
-                          width: 50,
-                        ),
+                        const OneAppLogo(),
                         const SizedBox(height: 10),
                         const Text(
                           'ENTER YOUR BRANCH DOMAIN',
@@ -220,46 +215,5 @@ class _DomainScreenState extends State<DomainScreen> {
       AppRoutes.loginScreen,
       (route) => false,
     );
-
-    // if (domainUrl.isNotEmpty) {
-    //   if (domainUrl.substring(0, 8) != 'https://' &&
-    //       domainUrl.substring(0, 7) != 'http://') {
-    //     domainUrl = 'https://' + domainUrl;
-    //   }
-    //   if (Uri.parse(domainUrl).isAbsolute) {
-    //     if (await AuthService.validateDomain(domainUrl)) {
-    //       await StorageService.saveValue(key: 'domain_url', value: domainUrl);
-    //       await StorageService.saveValue(
-    //           key: 'api_domain_url', value: '$domainUrl/api');
-    //       await NetworkingService.setSavedValues();
-    //       await AuthService.clearLoginToken();
-    //       Navigator.pushNamedAndRemoveUntil(
-    //         context,
-    //         Routes.loginScreen.route,
-    //         (route) => false,
-    //       );
-    //     } else {
-    //       Navigator.pop(context);
-    //       UtilityService.toast(
-    //         context,
-    //         'Something went wrong, failed to verify domain address',
-    //       );
-    //     }
-    //   } else {
-    //     Navigator.pop(context);
-    //     UtilityService.toast(
-    //       context,
-    //       'Not a valid URL',
-    //     );
-    //   }
-
-    //   /// if failed to login
-    // } else {
-    //   Navigator.pop(context);
-    //   UtilityService.toast(
-    //     context,
-    //     'Please enter domain URL',
-    //   );
-    // }
   }
 }

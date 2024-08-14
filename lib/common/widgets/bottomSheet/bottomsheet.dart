@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/core/config/color/appcolors.dart';
@@ -54,10 +52,10 @@ class BottomSheetContentState extends State<BottomSheetContent> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  padding: EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
                     'Select Services And Counter',
-                    style: TextStyle(fontSize: 22),
+                    style: TextStyle(fontSize: 20),
                   ),
                 ),
                 IconButton(

@@ -26,6 +26,7 @@ class ClockService {
   static Future<void> _emitTime() async {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       try {
+        // ignore: no_leading_underscores_for_local_identifiers
         DateTime? _now = _time?.add(const Duration(seconds: 1));
         _time = _now;
         late String formattedTime;

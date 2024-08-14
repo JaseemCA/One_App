@@ -34,7 +34,6 @@ class BottomNavbarState extends State<BottomNavbar>
         ],
       ),
       bottomNavigationBar: SizedBox(
-       
         height: 70,
         child: TabBar(
           controller: _tabController,
@@ -71,7 +70,7 @@ class BottomNavbarState extends State<BottomNavbar>
                 color: Theme.of(context)
                     .bottomNavigationBarTheme
                     .selectedItemColor,
-                fontSize: 10,
+                fontSize: 9,
               ),
             ),
         ],

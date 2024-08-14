@@ -1,13 +1,35 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:oneappcounter/common/widgets/one_app_logo/one_app_logo.dart';
 import 'package:oneappcounter/core/config/color/appcolors.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/common/widgets/textfield/custom_text_field.dart';
 import 'package:oneappcounter/common/widgets/bottomSheet/bottomsheet.dart';
+import 'package:oneappcounter/model/user_credential.dart';
 import 'package:oneappcounter/routes.dart';
+import 'package:oneappcounter/services/auth_service.dart';
+import 'package:oneappcounter/services/networking_service.dart';
+import 'package:oneappcounter/services/utility_services.dart';
 
-class Loginpage extends StatelessWidget {
+class Loginpage extends StatefulWidget {
   const Loginpage({super.key});
+
+  @override
+  State<Loginpage> createState() => _LoginpageState();
+}
+
+class _LoginpageState extends State<Loginpage> {
+  final _emailTextController = TextEditingController();
+
+  final _passwordTextController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailTextController.dispose();
+    _passwordTextController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +39,7 @@ class Loginpage extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushNamed(context, AppRoutes.domainScreen);
           },
         ),
         elevation: 0,
@@ -29,38 +51,40 @@ class Loginpage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Align(
-                  alignment: Alignment.center,
-                  child: SvgPicture.asset(
-                    "assets/images/logoWhite.svg",
-                    height: 50,
-                    width: 50,
+                const Align(alignment: Alignment.center, child: OneAppLogo()),
+                const SizedBox(height: 10),
+                Text(
+                  NetworkingService.domainUrl ?? '',
+                  style: const TextStyle(
+                    color: Appcolors.activeFieldColor,
+                    decoration: TextDecoration.none,
                   ),
                 ),
-                const Text(
-                  " ",
-                  style: TextStyle(color: Colors.white, fontSize: 17),
-                ),
-                const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                     child: CustomTextField(
                         labelText: "Email",
+                        controller: _emailTextController,
                         hintText: "username@domain.com",
                         prefixIcon: Icons.mail)),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: CustomTextField(
                       labelText: "Password",
+                      controller: _passwordTextController,
                       hintText: "P@ssWorD",
                       obscureText: true,
+                      onFieldSubmitted: (_) => loginUser(),
                       prefixIcon: Icons.lock),
                 ),
                 CustomElevatedButton(
                     backgroundColor: Appcolors.buttonColor,
                     text: "LOGIN",
                     onPressed: () {
-                      Navigator.pushNamed(context, AppRoutes.bottomNavBar);
-                    }),
+                      loginUser();
+                    })
               ],
             ),
           ),
@@ -123,5 +147,34 @@ class Loginpage extends StatelessWidget {
       context: context,
       builder: (context) => const BottomSheetContent(),
     );
+  }
+
+  loginUser() async {
+    UtilityService.showLoadingAlert(context);
+    String email = (_emailTextController.text).trim();
+    String password = (_passwordTextController.text).trim();
+
+    if (email.isNotEmpty && password.isNotEmpty) {
+      bool loginSuccess = await AuthService.loginToDomain(
+        userdata: UserCredential(email: email, password: password),
+      );
+
+      if (!mounted) return;
+
+      Navigator.pop(context);
+
+      if (loginSuccess) {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppRoutes.bottomNavBar,
+          (route) => false,
+        );
+      } else {
+        UtilityService.toast(context, "Can't authenticate user");
+      }
+    } else {
+      Navigator.pop(context);
+      UtilityService.toast(context, 'All fields are required');
+    }
   }
 }
