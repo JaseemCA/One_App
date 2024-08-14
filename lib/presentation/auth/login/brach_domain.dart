@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,6 +9,10 @@ import 'package:oneappcounter/bloc/branch_domain/bloc/branc_domain_state.dart';
 import 'package:oneappcounter/core/config/color/appcolors.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/common/widgets/textfield/custom_text_field.dart';
+import 'package:oneappcounter/routes.dart';
+import 'package:oneappcounter/services/auth_service.dart';
+import 'package:oneappcounter/services/networking_service.dart';
+import 'package:oneappcounter/services/storage_service.dart';
 
 import 'package:oneappcounter/services/utility_services.dart';
 
@@ -18,22 +24,24 @@ class DomainScreen extends StatefulWidget {
 }
 
 class _DomainScreenState extends State<DomainScreen> {
-  // final _domainUrlTextController = TextEditingController();
+  final _domainUrlTextController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    setDomainValue();
+  }
 
   @override
-  Widget build(BuildContext context) {
-    return const DomainView();
+  void dispose() {
+    _domainUrlTextController.dispose();
+    super.dispose();
   }
-}
 
-class DomainView extends StatelessWidget {
-  const DomainView({super.key});
-
-  // setDomainValue() {
-  //   if (NetworkingService.domainUrl != null) {
-  //     _domainUrlTextController.text = NetworkingService.domainUrl!;
-  //   }
-  // }
+  setDomainValue() {
+    if (NetworkingService.domainUrl != null) {
+      _domainUrlTextController.text = NetworkingService.domainUrl!;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,11 +92,16 @@ class DomainView extends StatelessWidget {
                           child: CustomTextField(
                             hintText: "http://branch-..",
                             labelText: "Branch Domain",
-                            prefixIcon: Icons.link,
+                            keyboardType: TextInputType.url,
+                            controller: _domainUrlTextController,
+                            prefixIcon: Icons.link_outlined,
                             onChanged: (value) {
                               context
                                   .read<BranchDomainBloc>()
                                   .add(DomainUpdated(value));
+                            },
+                            onFieldSubmitted: (_) {
+                              buttonClicked();
                             },
                           ),
                         ),
@@ -96,16 +109,11 @@ class DomainView extends StatelessWidget {
                         BlocBuilder<BranchDomainBloc, BranchDomainState>(
                           builder: (context, state) {
                             return CustomElevatedButton(
-                              backgroundColor: Appcolors.buttonColor,
-                              text: "CONNECT",
-                              onPressed: state is BranchDomainValid
-                                  ? () {
-                                      context
-                                          .read<BranchDomainBloc>()
-                                          .add(SubmitDomain(state.domain));
-                                    }
-                                  : null,
-                            );
+                                backgroundColor: Appcolors.buttonColor,
+                                text: "CONNECT",
+                                onPressed: () {
+                                  buttonClicked();
+                                });
                           },
                         ),
                       ],
@@ -167,5 +175,91 @@ class DomainView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void buttonClicked() async {
+    UtilityService.showLoadingAlert(context);
+    String domainUrl = _domainUrlTextController.text.trim();
+
+    if (domainUrl.isEmpty) {
+      Navigator.pop(context);
+      UtilityService.toast(context, 'Please enter domain URL');
+
+      return;
+    }
+
+    if (domainUrl.substring(0, 8) != 'https://' &&
+        domainUrl.substring(0, 7) != 'http://') {
+      domainUrl = 'https://$domainUrl';
+    }
+
+    if (!Uri.parse(domainUrl).isAbsolute) {
+      Navigator.pop(context);
+      UtilityService.toast(context, 'Not a valid URL');
+
+      return;
+    }
+
+    if (!await AuthService.validateDomain(domainUrl)) {
+      Navigator.pop(context);
+      UtilityService.toast(
+        context,
+        'Something went wrong, failed to verify domain address',
+      );
+
+      return;
+    }
+
+    await StorageService.saveValue(key: 'domain_url', value: domainUrl);
+    await StorageService.saveValue(
+        key: 'api_domain_url', value: '$domainUrl/api');
+    await NetworkingService.setSavedValues();
+    await AuthService.clearLoginToken();
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      AppRoutes.loginScreen,
+      (route) => false,
+    );
+
+    // if (domainUrl.isNotEmpty) {
+    //   if (domainUrl.substring(0, 8) != 'https://' &&
+    //       domainUrl.substring(0, 7) != 'http://') {
+    //     domainUrl = 'https://' + domainUrl;
+    //   }
+    //   if (Uri.parse(domainUrl).isAbsolute) {
+    //     if (await AuthService.validateDomain(domainUrl)) {
+    //       await StorageService.saveValue(key: 'domain_url', value: domainUrl);
+    //       await StorageService.saveValue(
+    //           key: 'api_domain_url', value: '$domainUrl/api');
+    //       await NetworkingService.setSavedValues();
+    //       await AuthService.clearLoginToken();
+    //       Navigator.pushNamedAndRemoveUntil(
+    //         context,
+    //         Routes.loginScreen.route,
+    //         (route) => false,
+    //       );
+    //     } else {
+    //       Navigator.pop(context);
+    //       UtilityService.toast(
+    //         context,
+    //         'Something went wrong, failed to verify domain address',
+    //       );
+    //     }
+    //   } else {
+    //     Navigator.pop(context);
+    //     UtilityService.toast(
+    //       context,
+    //       'Not a valid URL',
+    //     );
+    //   }
+
+    //   /// if failed to login
+    // } else {
+    //   Navigator.pop(context);
+    //   UtilityService.toast(
+    //     context,
+    //     'Please enter domain URL',
+    //   );
+    // }
   }
 }

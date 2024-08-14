@@ -1,5 +1,6 @@
 import 'package:oneappcounter/model/splash_init_response.dart';
 import 'package:oneappcounter/services/auth_service.dart';
+import 'package:oneappcounter/services/clock_service.dart';
 import 'package:oneappcounter/services/networking_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -29,6 +30,8 @@ class SplashScreenService {
           if (AuthService.loginData != null &&
               AuthService.loginData!.accessToken.isNotEmpty) {
             await AuthService.updateBranchDetails();
+            await ClockService.updateDateTime();
+
             splashInitResponse = SplashInitResponse(
               processed: true,
               decideLocation: 'home',
