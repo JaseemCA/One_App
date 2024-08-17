@@ -45,6 +45,10 @@ dependencies:
   equatable: ^2.0.5
   shimmer: ^3.0.0
   package_info_plus: ^8.0.2
+  dropdown_search: ^5.0.6
+  device_info_plus: ^10.1.2
+  sizer: ^3.0.0
+  
 
 dev_dependencies:
   flutter_test:

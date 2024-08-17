@@ -594,7 +594,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         IconButton(
           onPressed: () {
-            remarhowBottomSheet();
+            remarkhowBottomSheet();
           },
           icon: const Icon(Icons.notes),
           iconSize: 25,
@@ -603,7 +603,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void remarhowBottomSheet() {
+  void remarkhowBottomSheet() {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       isScrollControlled: true,

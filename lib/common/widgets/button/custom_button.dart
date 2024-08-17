@@ -8,6 +8,7 @@ class CustomElevatedButton extends StatelessWidget {
   final Color textColor;
   final double fontSize;
   final double? textSize;
+  final Widget? child;
 
   const CustomElevatedButton({
     super.key,
@@ -17,6 +18,7 @@ class CustomElevatedButton extends StatelessWidget {
     this.textColor = Colors.white,
     this.fontSize = 17,
     this.textSize,
+    this.child,
   });
 
   @override

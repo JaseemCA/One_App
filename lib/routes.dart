@@ -10,7 +10,7 @@ class AppRoutes {
   static const String domainScreen = 'domain_page';
   static const String loginScreen = 'login_page';
   static const String bottomNavBar = 'bottom_navbar';
-  
+
   static const String noInternetScreen = 'no_internet_screen';
 }
 
@@ -18,6 +18,6 @@ Map<String, Widget Function(BuildContext)> routes = {
   AppRoutes.splashScreen: (context) => const SplashScreen(),
   AppRoutes.domainScreen: (context) => const DomainScreen(),
   AppRoutes.loginScreen: (context) => const Loginpage(),
-  AppRoutes.bottomNavBar: (context) => const BottomNavbar(),
+  AppRoutes.bottomNavBar: (context) => const BottomTabScreen(),
   AppRoutes.noInternetScreen: (context) => const NoInternetScreen(),
 };

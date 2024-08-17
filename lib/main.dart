@@ -26,8 +26,8 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => ThemeCubit()),
-         BlocProvider<BranchDomainBloc>(create: (context) => BranchDomainBloc()),
-        
+        BlocProvider<BranchDomainBloc>(create: (context) => BranchDomainBloc()),
+
         // Provide NetworkingCubit here
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(

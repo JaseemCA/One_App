@@ -27,6 +27,7 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
               color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 24,
+              
             ),
           ),
           // Use the CustomTabBar here

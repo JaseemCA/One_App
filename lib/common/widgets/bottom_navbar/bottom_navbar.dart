@@ -1,86 +1,261 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:oneappcounter/presentation/appointments_page/appointments_page.dart';
 import 'package:oneappcounter/presentation/home/home_screen.dart';
 import 'package:oneappcounter/presentation/service_tabs_page/service_tab.dart';
 import 'package:oneappcounter/presentation/tokens_page/tokens_page.dart';
+import 'package:oneappcounter/services/counter_setting_service.dart';
+import 'package:oneappcounter/services/general_data_seevice.dart';
 
-class BottomNavbar extends StatefulWidget {
-  const BottomNavbar({super.key});
+class BottomTabScreen extends StatefulWidget {
+  const BottomTabScreen({super.key});
 
   @override
-  BottomNavbarState createState() => BottomNavbarState();
+  State<BottomTabScreen> createState() => _BottomTabScreen();
 }
 
-class BottomNavbarState extends State<BottomNavbar>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _BottomTabScreen extends State<BottomTabScreen> {
+  int _currentIndex = 1;
+  bool _iniBuild = true;
+  final bool _isSetStateEventFromTabs = false;
+  // static bool loadingVisibleForEvent = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 4, vsync: this, initialIndex: 3);
-  }
+  late StreamSubscription isSettingsChanged;
+  late StreamSubscription showLoadingOnreload;
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   isSettingsChanged = SocketService
+  //       .settingsPageRebuildRequiredController.stream
+  //       .listen((event) {
+  //     if (event is bool && event) {
+  //       BlocProvider.of<SettingsBloc>(context).add(SettingsEventUpdated());
+  //     }
+  //   });
+  //   showLoadingOnreload =
+  //       GeneralDataService.reloadingDataController.stream.listen((event) {
+  //     if (!loadingVisibleForEvent && event) {
+  //       loadingVisibleForEvent = true;
+  //       UtilityService.showLoadingAlert(context);
+  //     }
+  //     if (loadingVisibleForEvent && !event) {
+  //       loadingVisibleForEvent = false;
+  //       Navigator.pop(context);
+  //     }
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: TabBarView(
-        controller: _tabController,
-        children: const [
-          AppointmentsPage(),
-          HomeScreen(),
-          TokensPage(),
-          ServiceTabs(),
-        ],
-      ),
-      bottomNavigationBar: SizedBox(
-        height: 70,
-        child: TabBar(
-          controller: _tabController,
-          indicator: const BoxDecoration(),
-          onTap: (index) {
-            setState(() {});
-          },
-          tabs: [
-            _buildTab(0, Icons.calendar_today, 'Appointments'),
-            _buildTab(1, Icons.home, 'Home'),
-            _buildTab(2, Icons.assignment_outlined, 'Tokens'),
-            _buildTab(3, Icons.backup_table_sharp, 'Tabs'),
-          ],
-        ),
+      body: _decideSelectedPage(),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        elevation: 10,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        items: _getTabItems(),
       ),
     );
   }
 
-  Widget _buildTab(int index, IconData icon, String text) {
-    bool isSelected = _tabController.index == index;
-    return Tab(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: Theme.of(context).bottomNavigationBarTheme.selectedItemColor,
-            size: isSelected ? 30 : 24,
+  List<BottomNavigationBarItem> _getTabItems() {
+    List<BottomNavigationBarItem> navItems = [];
+
+    if (CounterSettingService.counterSettings?.hideSideMenu != true &&
+        (CounterSettingService.counterSettings?.hideTodayAppointments != true ||
+            CounterSettingService.counterSettings?.hideCancelledAppointments !=
+                true)) {
+      navItems.add(
+        const BottomNavigationBarItem(
+          icon: Icon(
+            Icons.calendar_today_outlined,
+            size: 25,
           ),
-          if (isSelected)
-            Text(
-              text,
-              style: TextStyle(
-                color: Theme.of(context)
-                    .bottomNavigationBarTheme
-                    .selectedItemColor,
-                fontSize: 9,
-              ),
-            ),
-        ],
+          activeIcon: Icon(Icons.calendar_today_rounded),
+          label: 'Appointments',
+        ),
+      );
+    }
+
+    navItems.add(
+      const BottomNavigationBarItem(
+        icon: Icon(
+          Icons.home_outlined,
+          size: 25,
+        ),
+        activeIcon: Icon(
+          Icons.home,
+          size: 25,
+        ),
+        label: 'Home',
       ),
     );
+
+    if (CounterSettingService.counterSettings?.hideSideMenu != true &&
+        !(CounterSettingService.counterSettings?.hideCalled == true &&
+            CounterSettingService.counterSettings?.hideCancelled == true &&
+            CounterSettingService.counterSettings?.hideHoldedQueue == true &&
+            CounterSettingService.counterSettings?.hideHoldedTokens == true &&
+            CounterSettingService.counterSettings?.hideNextToCall == true)) {
+      navItems.add(const BottomNavigationBarItem(
+        icon: Icon(
+          Icons.assignment_outlined,
+          size: 25,
+        ),
+        activeIcon: Icon(
+          Icons.assignment,
+          size: 25,
+        ),
+        label: 'Tokens',
+      ));
+    }
+    navItems.add(
+      const BottomNavigationBarItem(
+        icon: Icon(
+          Icons.backup_table_sharp,
+          size: 25,
+        ),
+        activeIcon: Icon(
+          Icons.backup_table_sharp,
+          size: 25,
+        ),
+        label: 'Tabs',
+      ),
+    );
+    return navItems;
   }
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+  Widget _decideSelectedPage() {
+    if (GeneralDataService.getTabs().isEmpty) {
+      _currentIndex = 3;
+    }
+    updateIndexInitValue();
+
+    switch (_currentIndex) {
+      case 0:
+        {
+          if (CounterSettingService.counterSettings?.hideSideMenu == true ||
+              (CounterSettingService.counterSettings?.hideTodayAppointments ==
+                      true &&
+                  CounterSettingService
+                          .counterSettings?.hideCancelledAppointments ==
+                      true)) {
+            return const HomeScreen();
+          }
+          return const AppointmentsPage();
+        }
+      case 1:
+        {
+          if (CounterSettingService.counterSettings?.hideSideMenu == true ||
+              ((CounterSettingService.counterSettings?.hideCalled == true &&
+                      CounterSettingService.counterSettings?.hideCancelled ==
+                          true &&
+                      CounterSettingService.counterSettings?.hideHoldedQueue ==
+                          true &&
+                      CounterSettingService.counterSettings?.hideHoldedTokens ==
+                          true &&
+                      CounterSettingService.counterSettings?.hideNextToCall ==
+                          true &&
+                      CounterSettingService.counterSettings
+                              ?.hideServedAndTransferredInCalled ==
+                          true &&
+                      CounterSettingService
+                              .counterSettings?.hideServedInCalled ==
+                          true) &&
+                  (CounterSettingService
+                              .counterSettings?.hideTodayAppointments ==
+                          true &&
+                      CounterSettingService
+                              .counterSettings?.hideCancelledAppointments ==
+                          true))) {
+            return ServiceCounterTab();
+          } else if (CounterSettingService.counterSettings?.hideSideMenu !=
+                  true &&
+              (CounterSettingService.counterSettings?.hideTodayAppointments ==
+                      true &&
+                  CounterSettingService
+                          .counterSettings?.hideCancelledAppointments ==
+                      true)) {
+            return const TokensPage();
+          }
+          return const HomeScreen();
+        }
+      case 2:
+        {
+          if (CounterSettingService.counterSettings?.hideTodayAppointments == true &&
+                  CounterSettingService
+                          .counterSettings?.hideCancelledAppointments ==
+                      true ||
+              (CounterSettingService.counterSettings?.hideCalled == true &&
+                  CounterSettingService.counterSettings?.hideCancelled ==
+                      true &&
+                  CounterSettingService.counterSettings?.hideHoldedQueue ==
+                      true &&
+                  CounterSettingService.counterSettings?.hideHoldedTokens ==
+                      true &&
+                  CounterSettingService.counterSettings?.hideNextToCall ==
+                      true &&
+                  CounterSettingService
+                          .counterSettings?.hideServedAndTransferredInCalled ==
+                      true &&
+                  CounterSettingService.counterSettings?.hideServedInCalled ==
+                      true)) {
+            return ServiceCounterTab();
+          }
+          return const TokensPage();
+        }
+      case 3:
+        {
+          return ServiceCounterTab();
+        }
+      default:
+        return const HomeScreen();
+    }
+  }
+
+  void updateIndexInitValue() {
+    if (_iniBuild) {
+      _iniBuild = false;
+      int tabsLength = _getTabItems().length;
+      if (GeneralDataService.getTabs().isNotEmpty &&
+          GeneralDataService.getTabs()
+              .asMap()
+              .containsKey(GeneralDataService.currentServiceCounterTabIndex) &&
+          GeneralDataService.getTabs()[
+                  GeneralDataService.currentServiceCounterTabIndex]
+              .services
+              .isNotEmpty) {
+        if (_isSetStateEventFromTabs) {
+          _currentIndex = tabsLength - 1;
+        } else {
+          if (tabsLength == 2) {
+            _currentIndex = 0;
+          } else if (tabsLength == 3) {
+            if ((CounterSettingService.counterSettings?.hideTodayAppointments ==
+                    true &&
+                CounterSettingService
+                        .counterSettings?.hideCancelledAppointments ==
+                    true)) {
+              ///hided appointmnets tab so home is.
+
+              _currentIndex = 0;
+            } else {
+              ///call is hided.
+              _currentIndex = 1;
+            }
+          } else if (tabsLength == 4) {
+            _currentIndex = 1;
+          }
+        }
+      } else {
+        _currentIndex = tabsLength - 1;
+      }
+    }
   }
 }

@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:oneappcounter/model/formated_time.dart';
 import 'package:oneappcounter/services/networking_service.dart';
 
-
 class ClockService {
   static StreamController<FormattedTime> dateTimeController =
       StreamController<FormattedTime>.broadcast();

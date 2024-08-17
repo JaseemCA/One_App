@@ -42,8 +42,8 @@ class UtilityService {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(100),
-                color: Colors.black.withOpacity(
-                    0.7), // Added background color for better visibility
+                // color: Colors.black.withOpacity(
+                //     0.7), // Added background color for better visibility
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
