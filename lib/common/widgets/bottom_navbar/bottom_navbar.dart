@@ -1,12 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:oneappcounter/bloc/bloc/settings_bloc_bloc.dart';
+import 'package:oneappcounter/bloc/bloc/settings_bloc_event.dart';
+import 'package:oneappcounter/bloc/bloc/settings_bloc_state.dart';
+
 import 'package:oneappcounter/presentation/appointments_page/appointments_page.dart';
 import 'package:oneappcounter/presentation/home/home_screen.dart';
 import 'package:oneappcounter/presentation/service_tabs_page/service_tab.dart';
 import 'package:oneappcounter/presentation/tokens_page/tokens_page.dart';
 import 'package:oneappcounter/services/counter_setting_service.dart';
 import 'package:oneappcounter/services/general_data_seevice.dart';
+import 'package:oneappcounter/services/socket_services.dart';
+import 'package:oneappcounter/services/utility_services.dart';
 
 class BottomTabScreen extends StatefulWidget {
   const BottomTabScreen({super.key});
@@ -18,49 +25,82 @@ class BottomTabScreen extends StatefulWidget {
 class _BottomTabScreen extends State<BottomTabScreen> {
   int _currentIndex = 1;
   bool _iniBuild = true;
-  final bool _isSetStateEventFromTabs = false;
-  // static bool loadingVisibleForEvent = false;
+  bool _isSetStateEventFromTabs = false;
+  static bool loadingVisibleForEvent = false;
 
   late StreamSubscription isSettingsChanged;
   late StreamSubscription showLoadingOnreload;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   isSettingsChanged = SocketService
-  //       .settingsPageRebuildRequiredController.stream
-  //       .listen((event) {
-  //     if (event is bool && event) {
-  //       BlocProvider.of<SettingsBloc>(context).add(SettingsEventUpdated());
-  //     }
-  //   });
-  //   showLoadingOnreload =
-  //       GeneralDataService.reloadingDataController.stream.listen((event) {
-  //     if (!loadingVisibleForEvent && event) {
-  //       loadingVisibleForEvent = true;
-  //       UtilityService.showLoadingAlert(context);
-  //     }
-  //     if (loadingVisibleForEvent && !event) {
-  //       loadingVisibleForEvent = false;
-  //       Navigator.pop(context);
-  //     }
-  //   });
-  // }
+  @override
+  void initState() {
+    super.initState();
+    isSettingsChanged = SocketService
+        .settingsPageRebuildRequiredController.stream
+        .listen((event) {
+      if (event is bool && event) {
+        BlocProvider.of<SettingsBloc>(context).add(SettingsEventUpdated());
+      }
+    });
+    showLoadingOnreload =
+        GeneralDataService.reloadingDataController.stream.listen((event) {
+      if (!loadingVisibleForEvent && event) {
+        loadingVisibleForEvent = true;
+        UtilityService.showLoadingAlert(context);
+      }
+      if (loadingVisibleForEvent && !event) {
+        loadingVisibleForEvent = false;
+        Navigator.pop(context);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _decideSelectedPage(),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        elevation: 10,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: _getTabItems(),
-      ),
+    UtilityService.updateThemeInfo(context);
+    return BlocConsumer<SettingsBloc, SettingsState>(
+      listenWhen: (previous, current) {
+        if ((previous is SettingsStateUpdating &&
+                current is SettingsStateUpdated) ||
+            (previous is SettingsStateInit &&
+                current is SwitchToHomePageState)) {
+          return true;
+        }
+        return false;
+      },
+      listener: (context, state) {
+        if (state is SettingsStateUpdated) {
+          _isSetStateEventFromTabs = state.isServiceTabPage;
+        } else if (state is SwitchToHomePageState) {
+          _isSetStateEventFromTabs = false;
+        }
+      },
+      buildWhen: (previous, current) {
+        if ((previous is SettingsStateUpdating &&
+                current is SettingsStateUpdated) ||
+            (previous is SettingsStateInit &&
+                current is SwitchToHomePageState)) {
+          _iniBuild = true;
+          return true;
+        }
+        return false;
+      },
+      builder: (context, state) {
+        return Scaffold(
+          body: _decideSelectedPage(),
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            elevation: 10,
+            onTap: (index) {
+              if (mounted) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              }
+            },
+            items: _getTabItems(),
+          ),
+        );
+      },
     );
   }
 
@@ -174,7 +214,7 @@ class _BottomTabScreen extends State<BottomTabScreen> {
                       CounterSettingService
                               .counterSettings?.hideCancelledAppointments ==
                           true))) {
-            return ServiceCounterTab();
+            return const ServiceCounterTab();
           } else if (CounterSettingService.counterSettings?.hideSideMenu !=
                   true &&
               (CounterSettingService.counterSettings?.hideTodayAppointments ==
@@ -206,13 +246,13 @@ class _BottomTabScreen extends State<BottomTabScreen> {
                       true &&
                   CounterSettingService.counterSettings?.hideServedInCalled ==
                       true)) {
-            return ServiceCounterTab();
+            return const ServiceCounterTab();
           }
           return const TokensPage();
         }
       case 3:
         {
-          return ServiceCounterTab();
+          return const ServiceCounterTab();
         }
       default:
         return const HomeScreen();

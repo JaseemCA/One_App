@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:oneappcounter/bloc/bloc/settings_bloc_bloc.dart';
 import 'package:oneappcounter/bloc/branch_domain/bloc/branc_domain_bloc.dart';
 import 'package:oneappcounter/core/config/theme/bloc/theme_cubit.dart';
 import 'package:oneappcounter/core/config/theme/theme_data.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => ThemeCubit()),
         BlocProvider<BranchDomainBloc>(create: (context) => BranchDomainBloc()),
+        BlocProvider<SettingsBloc>(create: (context) => SettingsBloc()),
 
         // Provide NetworkingCubit here
       ],

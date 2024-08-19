@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -66,6 +67,9 @@ class GeneralDataService {
   static List<ServiceCounterTabModel> getTabs() {
     return _allServiceCounterTabs;
   }
+
+  static StreamController<bool> reloadingDataController =
+      StreamController<bool>.broadcast();
 
   static List<ServiceModel> getActiveServices() {
     return activeServices;

@@ -5,7 +5,6 @@ import 'package:oneappcounter/common/widgets/one_app_logo/one_app_logo.dart';
 import 'package:oneappcounter/core/config/color/appcolors.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/common/widgets/textfield/custom_text_field.dart';
-import 'package:oneappcounter/common/widgets/bottomSheet/bottomsheet.dart';
 import 'package:oneappcounter/model/user_credential.dart';
 import 'package:oneappcounter/routes.dart';
 import 'package:oneappcounter/services/auth_service.dart';
@@ -142,12 +141,12 @@ class _LoginpageState extends State<Loginpage> {
     );
   }
 
-  void showBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => const BottomSheetContent(),
-    );
-  }
+  // void showBottomSheet(BuildContext context) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     builder: (context) => const BottomSheetContent(),
+  //   );
+  // }
 
   loginUser() async {
     UtilityService.showLoadingAlert(context);
