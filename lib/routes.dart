@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:oneappcounter/common/widgets/bottom_navbar/bottom_navbar.dart';
-import 'package:oneappcounter/presentation/auth/login/brach_domain.dart';
+import 'package:oneappcounter/presentation/auth/branch_domain/brach_domain.dart';
 import 'package:oneappcounter/presentation/auth/login/loginpage.dart';
 import 'package:oneappcounter/presentation/no_internet/no_internet_screen.dart';
 import 'package:oneappcounter/presentation/splash/splash_screen.dart';

@@ -2,8 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
-import 'package:oneappcounter/bloc/bloc/settings_bloc_bloc.dart';
+import 'package:oneappcounter/bloc/app_update/bloc/app_update_bloc.dart';
+import 'package:oneappcounter/bloc/appointment_page/bloc/appointment_bloc.dart';
+import 'package:oneappcounter/bloc/call/bloc/call_bloc.dart';
+import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_bloc.dart';
 import 'package:oneappcounter/bloc/branch_domain/bloc/branc_domain_bloc.dart';
+import 'package:oneappcounter/bloc/tocken_page/bloc/tocken_bloc.dart';
 import 'package:oneappcounter/core/config/theme/bloc/theme_cubit.dart';
 import 'package:oneappcounter/core/config/theme/theme_data.dart';
 import 'package:oneappcounter/routes.dart';
@@ -29,6 +33,12 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => ThemeCubit()),
         BlocProvider<BranchDomainBloc>(create: (context) => BranchDomainBloc()),
         BlocProvider<SettingsBloc>(create: (context) => SettingsBloc()),
+         BlocProvider<AppUpdateBloc>(create: (context) => AppUpdateBloc()),
+    
+        BlocProvider<CallBloc>(create: (context) => CallBloc()),
+        BlocProvider<TokenPageBloc>(create: (context) => TokenPageBloc()),
+        BlocProvider<AppointmentPageBloc>(
+            create: (context) => AppointmentPageBloc()),
 
         // Provide NetworkingCubit here
       ],

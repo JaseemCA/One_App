@@ -1,7 +1,7 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:oneappcounter/bloc/bloc/settings_bloc_event.dart';
-import 'package:oneappcounter/bloc/bloc/settings_bloc_state.dart';
+import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_event.dart';
+import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_state.dart';
 
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {

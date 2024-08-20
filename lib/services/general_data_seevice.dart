@@ -486,4 +486,39 @@ class GeneralDataService {
     }
     // await SocketService.connectAfterSwitch();
   }
+
+  static Future<void> reloadData({bool sendEvents = false}) async {
+    if (sendEvents == true) {
+      reloadingDataController.add(true);
+    }
+
+    await initServiceAndCounterData();
+    await getLastToken();
+    await getTodayTokenDetails();
+
+    if (sendEvents == true) {
+      reloadingDataController.add(false);
+    }
+  }
+
+  static Future<void> queueHolded(QueueModel queue) async {
+    int index = todaysQueue.indexWhere((element) => element.id == queue.id);
+    if (index >= 0) {
+      todaysQueue.removeAt(index);
+    }
+    int indexOfHolded =
+        holdedQueue.indexWhere((element) => element.id == queue.id);
+    if (indexOfHolded < 0) {
+      holdedQueue.add(queue);
+    }
+  }
+
+  static Future<void> updateTodayCalledTokens(TokenModel token) async {
+    int index =
+        todayCalledTokens.indexWhere((element) => element.id == token.id);
+    if (index >= 0) {
+      todayCalledTokens[index] = token;
+    }
+  }
+
 }

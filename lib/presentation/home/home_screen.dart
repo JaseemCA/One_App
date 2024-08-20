@@ -1,12 +1,24 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_bloc.dart';
+import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_event.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/common/widgets/one_app_logo/one_app_logo.dart';
 import 'package:oneappcounter/core/config/color/appcolors.dart';
 import 'package:oneappcounter/core/config/theme/bloc/theme_cubit.dart';
+import 'package:oneappcounter/extention/string_casing_extention.dart';
+import 'package:oneappcounter/model/tocken_model.dart';
+import 'package:oneappcounter/presentation/popUp/add_service.dart.dart';
+import 'package:oneappcounter/presentation/popUp/customer_tocken_details.dart';
 import 'package:oneappcounter/presentation/settings_page/settings_page.dart';
+import 'package:oneappcounter/services/clock_service.dart';
+import 'package:oneappcounter/services/counter_setting_service.dart';
+import 'package:oneappcounter/services/general_data_seevice.dart';
+import 'package:oneappcounter/services/utility_services.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,8 +28,27 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  StateSetter? lockServiceButtonState;
+
+  StateSetter? unlockServiceButtonState;
+
   DateTime dateTime = DateTime.now();
   String selectedTime = '';
+  TokenModel? selectedToken;
+  late BuildContext _context;
+
+  void rebuildHoldUnholdButtons() {
+    lockServiceButtonState != null
+        ? lockServiceButtonState!(
+            () {},
+          )
+        : null;
+    unlockServiceButtonState != null
+        ? unlockServiceButtonState!(
+            () {},
+          )
+        : null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +78,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.white,
                 size: 30,
               ),
-              onPressed: () {},
+              onPressed: () async {
+                await refreshFunction(context);
+              },
             ),
             IconButton(
               icon: const Icon(
@@ -328,12 +361,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.fromLTRB(10, 15, 10, 10),
                     child: Row(
                       children: [
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             children: [
                               Row(
                                 children: [
-                                  Text(
+                                  const Text(
                                     'Services: ',
                                     style: TextStyle(
                                       height: 1,
@@ -343,11 +376,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   Expanded(
                                     child: Text(
-                                      'Service Placeholder',
+                                      GeneralDataService
+                                              .currentServiceCounterTab
+                                              ?.serviceString ??
+                                          '',
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                       softWrap: false,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         height: 1,
                                         fontSize: 16,
                                       ),
@@ -355,10 +391,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                   )
                                 ],
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               Row(
                                 children: [
-                                  Text(
+                                  const Text(
                                     'Counter: ',
                                     style: TextStyle(
                                       height: 1,
@@ -368,11 +404,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   Expanded(
                                     child: Text(
-                                      'Counter Placeholder',
+                                      GeneralDataService
+                                              .currentServiceCounterTab
+                                              ?.counterString ??
+                                          '',
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                       softWrap: false,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         height: 1,
                                         fontSize: 16,
                                       ),
@@ -385,7 +424,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(width: 5),
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            await _editServiceAndCounterTabDetails(tabsetState);
+                          },
                           icon: const Icon(
                             Icons.edit_note,
                             size: 25,
@@ -515,12 +556,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildTokenPart() {
-    // Placeholder values for UI demonstration
-    String tokenNumber = 'Token Number';
-    String servedTime = '';
-    String tokenStatus = 'Serving';
-    Color statusColor = Colors.green;
-    String customerDetails = 'Customer Details';
+    TokenModel? token = selectedToken ?? GeneralDataService.lastCalledToken;
+    String servedTime = GeneralDataService.lastCalledToken?.servedTime ?? '';
+
+    if (token != null && servedTime.isEmpty) {
+      ClockService.initaiateTimeDiffreneceEmitting(startedAt: token.startedAt);
+    }
+    if ((GeneralDataService.lastCalledToken != null &&
+        GeneralDataService.lastCalledToken?.status == 'no-show')) {
+      servedTime = ClockService.getTimeDifference(
+        startedAt: token?.startedAt ?? '',
+        nowPassed: token?.endedAt,
+      );
+    }
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -529,14 +577,64 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             children: [
               GestureDetector(
-                onTap: () {
-                  // Placeholder for onTap action
-                },
-                onLongPress: () {
-                  // Placeholder for onLongPress action
-                },
+                onTap: token != null
+                    ? () {
+                        // showTokenDetails(token, context);
+                      }
+                    : null,
+                onLongPress: (token?.queueId != null &&
+                        (token?.queue['queue_service_details'] != null ||
+                            token?.queue['phone'] != null))
+                    ? () {
+                        showBottomSheet(
+                          backgroundColor: Colors.transparent,
+                          context: context,
+                          builder: (context) {
+                            return CustomerTockenDetails(
+                              serviceDetails:
+                                  token?.queue['queue_service_details'] ?? [],
+                              phone: token?.queue['phone'] != null
+                                  ? '+${token?.queue['calling_code']} ${token?.queue['phone']}'
+                                  : null,
+                              email: token?.queue['email'] != null
+                                  ? '${token?.queue['email']}'
+                                  : null,
+                              name: token?.queue['name'] != null
+                                  ? '${token?.queue['name']}'
+                                  : null,
+                            );
+                          },
+                        );
+                      }
+                    : (token?.queueppointmentId != null &&
+                            (token?.queueppointment['queue_service_details'] !=
+                                    null ||
+                                token?.queueppointment['phone'] != null))
+                        ? () {
+                            showBottomSheet(
+                              backgroundColor: Colors.transparent,
+                              context: context,
+                              builder: (context) {
+                                return CustomerTockenDetails(
+                                  serviceDetails: token?.queue[
+                                          'queue_appointment_details'] ??
+                                      [],
+                                  phone: token?.queue['phone'] != null
+                                      ? '+${token?.queue['calling_code']} ${token?.queue['phone']}'
+                                      : null,
+                                  email: token?.queue['email'] != null
+                                      ? '${token?.queue['email']}'
+                                      : null,
+                                  name: token?.queue['name'] != null
+                                      ? '${token?.queue['name']}'
+                                      : null,
+                                );
+                              },
+                            );
+                          }
+                        : null,
                 child: Text(
-                  tokenNumber,
+                  token?.tokenNumber ?? 'NIL',
                   style: const TextStyle(
                     fontSize: 45,
                     fontWeight: FontWeight.bold,
@@ -547,31 +645,85 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Placeholder for Priority Text
-                  Text(
-                    'H', // or 'L', 'N' based on priority
-                    style: TextStyle(
-                      color: Colors.green.shade600,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  CounterSettingService.counterSettings?.showPriority == true
+                      ? ((token?.queueId != null &&
+                                  token?.queue['priority'] == 1) ||
+                              (token?.queueppointmentId != null &&
+                                  token?.queueppointment['priority'] == 1))
+                          ? Text(
+                              'H',
+                              style: TextStyle(
+                                color: Colors.green.shade600,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
+                          : ((token?.queueId != null &&
+                                      token?.queue['priority'] == 3) ||
+                                  (token?.queueppointmentId != null &&
+                                      token?.queueppointment['priority'] == 3))
+                              ? Text(
+                                  'L',
+                                  style: TextStyle(
+                                    color: Colors.red.shade600,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                              : ((token?.queueId != null &&
+                                          token?.queue['priority'] == 2) ||
+                                      (token?.queueppointmentId != null &&
+                                          token?.queueppointment['priority'] ==
+                                              2))
+                                  ? Text(
+                                      'N',
+                                      style: TextStyle(
+                                        color: Colors.blue.shade600,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  : Container()
+                      : Container(),
+                  SizedBox(
+                    width:
+                        CounterSettingService.counterSettings?.showPriority ==
+                                true
+                            ? 20
+                            : 0,
                   ),
-                  const SizedBox(width: 20),
-                  // Placeholder for Served Time or Streamed Time
-                  Text(
-                    servedTime.isEmpty ? '00:00:00' : servedTime,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      height: 1,
-                    ),
+                  servedTime.isEmpty
+                      ? StreamBuilder(
+                          stream:
+                              ClockService.lastStopWatchTimerController.stream,
+                          builder: (context, value) {
+                            return Text(
+                              token != null && value.data is String
+                                  ? value.data as String
+                                  : '',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                height: 1,
+                              ),
+                            );
+                          },
+                        )
+                      : Text(
+                          token != null ? servedTime : '',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            height: 1,
+                          ),
+                        ),
+                  const SizedBox(
+                    width: 20,
                   ),
-                  const SizedBox(width: 20),
-                  // Placeholder for Token Status
                   Text(
-                    tokenStatus,
+                    token != null ? token.status.toTitleCase() : '',
                     style: TextStyle(
-                      color: statusColor,
+                      color: token?.statusColor ?? Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       height: 1,
@@ -580,9 +732,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               const SizedBox(height: 7),
-              // Placeholder for Customer Details
               Text(
-                customerDetails,
+                token != null
+                    ? token.queueId != null && token.queue['customer'] != null
+                        ? "${token.queue['customer']['name'] != null && token.queue['customer']['name'] != 'gqZaT' ? token.queue['customer']['name'] + ' | ' : ''} +${token.queue['calling_code']} ${token.queue['customer']['phone']}"
+                        : token.queueppointmentId != null &&
+                                token.queueppointment['customer'] != null
+                            ? '${token.queueppointment['customer']['name'] != null && token.queueppointment['customer']['name'] != 'gqZaT' ? token.queueppointment['customer']['name'] + ' | ' : ''} +${token.queueppointment['calling_code']} ${token.queueppointment['customer']['phone']}'
+                            : ''
+                    : '',
                 style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w400,
@@ -602,6 +760,98 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
   }
+
+  // Widget buildTokenPart() {
+  //   // Placeholder values for UI demonstration
+  //   String tokenNumber = 'Token Number';
+  //   // String servedTime = '';
+  //   String tokenStatus = 'Serving';
+  //   Color statusColor = Colors.green;
+  //   String customerDetails = 'Customer Details';
+
+  //   TokenModel? token = selectedToken ?? GeneralDataService.lastCalledToken;
+  //       String servedTime = GeneralDataService.lastCalledToken?.servedTime ?? '';
+
+  //   return Row(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Expanded(
+  //         child: Column(
+  //           children: [
+  //             GestureDetector(
+  //               onTap: () {
+  //                 // Placeholder for onTap action
+  //               },
+  //               onLongPress: () {
+  //                 // Placeholder for onLongPress action
+  //               },
+  //               child: Text(
+  //                 tokenNumber,
+  //                 style: const TextStyle(
+  //                   fontSize: 45,
+  //                   fontWeight: FontWeight.bold,
+  //                   height: 1,
+  //                 ),
+  //               ),
+  //             ),
+  //             Row(
+  //               mainAxisAlignment: MainAxisAlignment.center,
+  //               children: [
+  //                 // Placeholder for Priority Text
+  //                 Text(
+  //                   'H', // or 'L', 'N' based on priority
+  //                   style: TextStyle(
+  //                     color: Colors.green.shade600,
+  //                     fontSize: 20,
+  //                     fontWeight: FontWeight.bold,
+  //                   ),
+  //                 ),
+  //                 const SizedBox(width: 20),
+  //                 // Placeholder for Served Time or Streamed Time
+  //                 Text(
+  //                   servedTime.isEmpty ? '00:00:00' : servedTime,
+  //                   style: const TextStyle(
+  //                     fontSize: 18,
+  //                     fontWeight: FontWeight.bold,
+  //                     height: 1,
+  //                   ),
+  //                 ),
+  //                 const SizedBox(width: 20),
+  //                 // Placeholder for Token Status
+  //                 Text(
+  //                   tokenStatus,
+  //                   style: TextStyle(
+  //                     color: statusColor,
+  //                     fontSize: 18,
+  //                     fontWeight: FontWeight.bold,
+  //                     height: 1,
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //             const SizedBox(height: 7),
+  //             // Placeholder for Customer Details
+  //             Text(
+  //               customerDetails,
+  //               style: const TextStyle(
+  //                 fontSize: 17,
+  //                 fontWeight: FontWeight.w400,
+  //                 height: 1,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //       IconButton(
+  //         onPressed: () {
+  //           remarkhowBottomSheet();
+  //         },
+  //         icon: const Icon(Icons.notes),
+  //         iconSize: 25,
+  //       ),
+  //     ],
+  //   );
+  // }
 
   void remarkhowBottomSheet() {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -718,5 +968,56 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ],
     );
+  }
+
+  Future<void> _editServiceAndCounterTabDetails(
+      StateSetter tabsetState) async {
+    UtilityService.showLoadingAlert(_context);
+    await GeneralDataService.initServiceAndCounterData();
+    Navigator.pop(_context);
+    showDialog(
+        context: _context,
+        builder: (context) {
+          return SetNewServiceTab(
+            editableService: GeneralDataService.currentServiceCounterTab,
+            editingIndex: GeneralDataService.currentServiceCounterTabIndex,
+          );
+        }).then((value) => tabsetState(
+          () {},
+        ));
+  }
+  
+  // void showTokenDetails(TokenModel? token, BuildContext context) {
+  //   int? id = token?.queueId ?? token?.queueppointmentId;
+  //   UtilityService.showLoadingAlert(context);
+  //   CallService.getCustomerFlow(
+  //     id: id ?? 0,
+  //     isQueue: token?.queueId != null ? true : false,
+  //   ).then((value) {
+  //     Navigator.pop(context);
+  //     if (value is bool && value == false) {
+  //       UtilityService.toast(
+  //         context,
+  //         translate("Something went wrong, can't fetch details"),
+  //       );
+  //       return;
+  //     }
+  //     showBottomSheet(
+  //         backgroundColor: Colors.transparent,
+  //         context: context,
+  //         builder: (context) {
+  //           return CustomerFlowDetails(
+  //             customerFlow: value,
+  //             tokenNumber: token?.tokenNumber ?? '',
+  //           );
+  //         });
+  //   });
+
+  Future<void> refreshFunction(BuildContext context) async {
+    UtilityService.showLoadingAlert(context);
+    await GeneralDataService.reloadData();
+    Navigator.pop(context);
+    BlocProvider.of<SettingsBloc>(context).add(HomePageSettingsChangedEvent());
+    rebuildHoldUnholdButtons();
   }
 }
