@@ -558,8 +558,8 @@ class _HomeScreenState extends State<TokensPage> {
     var res = await CallService.recallToken(id: tokenId);
     Navigator.pop(context);
     if (res is TokenModel) {
-      ///switch to home page.
-      ///
+      
+      
       BlocProvider.of<SettingsBloc>(context).add(SwitchToHomePageEvent());
       return;
     }
