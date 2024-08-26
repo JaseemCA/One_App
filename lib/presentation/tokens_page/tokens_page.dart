@@ -10,12 +10,14 @@ import 'package:oneappcounter/bloc/tocken_page/bloc/tocken_event.dart';
 import 'package:oneappcounter/bloc/tocken_page/bloc/tocken_state.dart';
 import 'package:oneappcounter/common/widgets/button/count_down_button.dart';
 import 'package:oneappcounter/core/config/color/appcolors.dart';
+import 'package:oneappcounter/extention/string_casing_extention.dart';
 import 'package:oneappcounter/model/queue_model.dart';
 import 'package:oneappcounter/model/tocken_model.dart';
 import 'package:oneappcounter/presentation/popUp/customer_flow_details.dart';
 import 'package:oneappcounter/services/call_service.dart';
 import 'package:oneappcounter/services/counter_setting_service.dart';
 import 'package:oneappcounter/services/general_data_seevice.dart';
+import 'package:oneappcounter/services/socket_services.dart';
 import 'package:oneappcounter/services/utility_services.dart';
 
 class TokensPage extends StatefulWidget {
@@ -58,19 +60,28 @@ class _HomeScreenState extends State<TokensPage> {
     }
   }
 
-  // @override
-  // void initState() {
-  //   super.initState();
+  @override
+  void initState() {
+    super.initState();
+    rebuildListener = SocketService.tokensPageRebuildRequiredController.stream
+        .listen((event) {
+      if (event is bool && event) {
+        emitRebuildEvent();
+      }
+    });
+  }
 
-  //   // SocketService.registerEvents(isAll: true);
+ @override
+  void dispose() {
+    // try {
+    //   SocketService.destorySocket();
+    // } catch (_) {}
 
-  //   rebuildListener = SocketService.tokensPageRebuildRequiredController.stream
-  //       .listen((event) {
-  //     if (event is bool && event) {
-  //       emitRebuildEvent();
-  //     }
-  //   });
-  // }
+    try {
+      rebuildListener.cancel();
+    } catch (_) {}
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,25 +99,12 @@ class _HomeScreenState extends State<TokensPage> {
             maxLines: 1,
             style: const TextStyle(overflow: TextOverflow.ellipsis),
           ),
-
           bottom: TabBar(
+            tabAlignment: TabAlignment.start,
             tabs: _getTabs(),
             labelPadding: const EdgeInsets.symmetric(horizontal: 12),
             isScrollable: true,
           ),
-
-          // bottom: const CustomTabBar(
-          //   alignment: TabAlignment.start,
-          //   tabCount: 5,
-          //   tabLabels: [
-          //     "TO CALL",
-          //     "CALLED",
-          //     "HOLDED TOKEN",
-          //     "CANCELLED",
-          //     "HOLDED QUEUE"
-          //   ],
-          //   isScrolable: true,
-          // ),
         ),
         body: RefreshIndicator(
           onRefresh: () async {
@@ -173,26 +171,26 @@ class _HomeScreenState extends State<TokensPage> {
     if (CounterSettingService.counterSettings?.hideNextToCall != true) {
       content.add(_buildToCallTabView(UtilityService.isDarkTheme));
     }
-    // if (CounterSettingService.counterSettings?.hideCalled != true) {
-    //   _content.add(
-    //     _buildCalledTabView(UtilityService.isDarkTheme),
-    //   );
-    // }
-    // if (CounterSettingService.counterSettings?.hideHoldedTokens != true) {
-    //   _content.add(
-    //     _buildHoldedTokenTabView(UtilityService.isDarkTheme),
-    //   );
-    // }
-    // if (CounterSettingService.counterSettings?.hideCancelled != true) {
-    //   _content.add(
-    //     _buildCancelledTabView(UtilityService.isDarkTheme),
-    //   );
-    // }
-    // if (CounterSettingService.counterSettings?.hideHoldedQueue != true) {
-    //   _content.add(
-    //     _buildHoldedQueueTabView(UtilityService.isDarkTheme),
-    //   );
-    // }
+    if (CounterSettingService.counterSettings?.hideCalled != true) {
+      content.add(
+        _buildCalledTabView(UtilityService.isDarkTheme),
+      );
+    }
+    if (CounterSettingService.counterSettings?.hideHoldedTokens != true) {
+      content.add(
+        _buildHoldedTokenTabView(UtilityService.isDarkTheme),
+      );
+    }
+    if (CounterSettingService.counterSettings?.hideCancelled != true) {
+      content.add(
+        _buildCancelledTabView(UtilityService.isDarkTheme),
+      );
+    }
+    if (CounterSettingService.counterSettings?.hideHoldedQueue != true) {
+      content.add(
+        _buildHoldedQueueTabView(UtilityService.isDarkTheme),
+      );
+    }
     return content;
   }
 
@@ -415,6 +413,841 @@ class _HomeScreenState extends State<TokensPage> {
                               ),
                             ),
                             Expanded(
+                              child: SizedBox(
+                                height: 50,
+                                child: IconButton(
+                                  onPressed: () async {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text(
+                                                  ('Cancel'),
+                                                ),
+                                              ),
+                                              TextButton(
+                                                onPressed: () async {
+                                                  UtilityService
+                                                      .showLoadingAlert(
+                                                          context);
+                                                  var response =
+                                                      await CallService
+                                                          .cancelQueueItem(
+                                                              queueId:
+                                                                  queue.id);
+                                                  Navigator.pop(context);
+                                                  if (response is bool &&
+                                                      response) {
+                                                    ///rebuild this ..
+                                                    ///
+                                                    if (CounterSettingService
+                                                            .counterSettings
+                                                            ?.hideNextToCall !=
+                                                        true) {
+                                                      BlocProvider.of<
+                                                                  TokenPageBloc>(
+                                                              context)
+                                                          .add(
+                                                              RebuildToCallEvent());
+                                                    }
+
+                                                    ///rebuild holded queue tab...
+                                                    ///
+                                                    if (CounterSettingService
+                                                            .counterSettings
+                                                            ?.hideCancelled !=
+                                                        true) {
+                                                      BlocProvider.of<
+                                                                  TokenPageBloc>(
+                                                              context)
+                                                          .add(
+                                                              RebuildCancelledEvent());
+                                                    }
+                                                    Navigator.pop(context);
+                                                    return;
+                                                  }
+                                                  UtilityService.toast(
+                                                    context,
+                                                    ("Something went wrong"),
+                                                  );
+                                                },
+                                                child: const Text(
+                                                  ('Continue'),
+                                                ),
+                                              ),
+                                            ],
+                                            title:
+                                                const Text(('Cancel Token?')),
+                                            content: Text(
+                                                "${('Do you want to cancel token')} (${queue.tokenNumber}) ?"),
+                                          );
+                                        });
+                                  },
+                                  icon: const Icon(Icons.close_outlined),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+        );
+      },
+    );
+  }
+
+  Widget _buildCalledTabView(bool isDarkTheme) {
+    return BlocBuilder<TokenPageBloc, TokenPageState>(
+      buildWhen: (previous, current) {
+        if (previous is RebuildInitState && current is RebuildCalledTabState) {
+          return true;
+        }
+        return false;
+      },
+      builder: (context, state) {
+        return RefreshIndicator(
+          onRefresh: () async {
+            refreshFunction(context);
+          },
+          child: GeneralDataService.todayCalledTokens.isEmpty
+              ? listViewNoDataFound()
+              : ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  itemCount: GeneralDataService.todayCalledTokens.isNotEmpty
+                      ? GeneralDataService.todayCalledTokens.length
+                      : 0,
+                  separatorBuilder: (context, index) => const Divider(),
+                  itemBuilder: (context, index) {
+                    TokenModel token =
+                        GeneralDataService.todayCalledTokens[index];
+
+                    return ListTile(
+                      onTap: () {
+                        showTokenDetails(token, context);
+                      },
+                      tileColor: ((token.queueId != null &&
+                                  token.queue['priority'] == 1) ||
+                              (token.queueppointmentId != null &&
+                                  token.queueppointment['priority'] == 1))
+                          ? UtilityService.isDarkTheme
+                              ? const Color(0xff184D47)
+                              : const Color(0xffA5F0C5)
+                          : ((token.queueId != null &&
+                                      token.queue['priority'] == 3) ||
+                                  (token.queueppointmentId != null &&
+                                      token.queueppointment['priority'] == 3))
+                              ? UtilityService.isDarkTheme
+                                  ? const Color(0xff483042)
+                                  : const Color(0xffF3DBCF)
+                              : null,
+                      leading: IconButton(
+                        onPressed: token.status == "no-show"
+                            ? () async {
+                                if ((GeneralDataService.lastCalledToken != null &&
+                                        !GeneralDataService
+                                            .lastCalledToken!.isHold &&
+                                        GeneralDataService.lastCalledToken!.status !=
+                                            'no-show') &&
+                                    CounterSettingService.counterSettings?.alertTransfer ==
+                                        true &&
+                                    (((GeneralDataService.lastCalledToken!.queue != null && GeneralDataService.lastCalledToken!.queue['is_transferred'] != true) ||
+                                        (GeneralDataService.lastCalledToken!.queueppointment != null &&
+                                            GeneralDataService.lastCalledToken!.queueppointment['is_transferred'] !=
+                                                true)))) {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: const Text(
+                                              ('Alert (Not transferred!)')),
+                                          content: Text(
+                                              '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred, Continue Calling?')}'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text(('Cancel')),
+                                            ),
+                                            CountDownButton(
+                                              onPressed: () async {
+                                                Navigator.pop(context);
+                                                _recallToken(context, token.id);
+                                              },
+                                            )
+                                          ],
+                                        );
+                                      });
+                                } else if ((GeneralDataService.lastCalledToken != null &&
+                                        !GeneralDataService
+                                            .lastCalledToken!.isHold &&
+                                        GeneralDataService.lastCalledToken!.status !=
+                                            'no-show') &&
+                                    CounterSettingService
+                                            .counterSettings?.requireTransfer ==
+                                        true &&
+                                    ((GeneralDataService.lastCalledToken!.queue != null && GeneralDataService.lastCalledToken!.queue['is_transferred'] != true) ||
+                                        (GeneralDataService.lastCalledToken!.queueppointment != null &&
+                                            GeneralDataService.lastCalledToken!.queueppointment['is_transferred'] != true))) {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title:
+                                              const Text(('Transfer is required !')),
+                                          content: Text(
+                                              '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred')}'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text(('Close')),
+                                            ),
+                                          ],
+                                        );
+                                      });
+                                } else {
+                                  _recallToken(context, token.id);
+                                }
+                              }
+                            : null,
+                        icon: Icon(
+                          Icons.replay,
+                          color: token.status == "no-show"
+                              ? isDarkTheme
+                                  ? Appcolors.materialIconButtonDark
+                                  : Colors.blueAccent
+                              : null,
+                        ),
+                      ),
+                      title: Text(
+                        token.tokenNumber,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: token.queueId != null &&
+                              token.queue['customer'] != null
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                token.queue['customer']['phone'] != null
+                                    ? Text(
+                                        '+${token.queue['calling_code']} ${token.queue['customer']['phone']}')
+                                    : Container(),
+                                token.queue['customer']['name'] != null &&
+                                        token.queue['customer']['name'] !=
+                                            'gqZaT'
+                                    ? Text(
+                                        token.queue['customer']['name'] ?? '')
+                                    : Container(),
+                              ],
+                            )
+                          : token.queueppointmentId != null &&
+                                  token.queueppointment['customer'] != null
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    token.queueppointment['customer']
+                                                ['phone'] !=
+                                            null
+                                        ? Text(
+                                            '+${token.queueppointment['calling_code']} ${token.queueppointment['customer']['phone']}')
+                                        : Container(),
+                                    token.queueppointment['customer']['name'] !=
+                                                null &&
+                                            token.queueppointment['customer']
+                                                    ['name'] !=
+                                                'gqZaT'
+                                        ? Text(token.queueppointment['customer']
+                                                ['name'] ??
+                                            '')
+                                        : Container(),
+                                  ],
+                                )
+                              : null,
+                      trailing: SizedBox(
+                        width: 30,
+                        child: token.queueId != null &&
+                                token.queue['is_transferred'] == true
+                            ? Tooltip(
+                                message: token.queue['transfer_to'] != null
+                                    ? token.queue['transfer_to']['service']
+                                        ['name']
+                                    : '',
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    makeReportWidgetFn(token, context),
+                                    SizedBox(
+                                      width: token.reportReady != null &&
+                                              token.reportReady == true
+                                          ? 25
+                                          : 0,
+                                    ),
+                                    Text(
+                                      'T',
+                                      textAlign: TextAlign.end,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: UtilityService.isDarkTheme
+                                            ? const Color(0xff177ddc)
+                                            : const Color(0xff1890ff),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 18,
+                                    ),
+                                    Text(
+                                      token.status.toTitleCase()[0],
+                                      textAlign: TextAlign.end,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: token.statusColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : token.queueppointmentId != null &&
+                                    token.queueppointment['is_transferred'] ==
+                                        true
+                                ? Tooltip(
+                                    message:
+                                        token.queueppointment['transfer_to']
+                                            ['service']['name'],
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        makeReportWidgetFn(token, context),
+                                        SizedBox(
+                                          width: token.reportReady != null &&
+                                                  token.reportReady == true
+                                              ? 25
+                                              : 0,
+                                        ),
+                                        Text(
+                                          'T',
+                                          textAlign: TextAlign.end,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            color: UtilityService.isDarkTheme
+                                                ? const Color(0xff177ddc)
+                                                : const Color(0xff1890ff),
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 18,
+                                        ),
+                                        Text(
+                                          token.status.toTitleCase()[0],
+                                          textAlign: TextAlign.end,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            color: token.statusColor,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      makeReportWidgetFn(token, context),
+                                      SizedBox(
+                                        width: token.reportReady != null &&
+                                                token.reportReady == true
+                                            ? 25
+                                            : 0,
+                                      ),
+                                      Text(
+                                        token.status.toTitleCase()[0],
+                                        textAlign: TextAlign.end,
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color: token.statusColor,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                      ),
+                    );
+                  }),
+        );
+      },
+    );
+  }
+
+  Widget _buildHoldedTokenTabView(bool isDarkTheme) {
+    return BlocBuilder<TokenPageBloc, TokenPageState>(
+      buildWhen: (previous, current) {
+        if (previous is RebuildInitState &&
+            current is RebuildHoldedTokenState) {
+          return true;
+        }
+        return false;
+      },
+      builder: (context, state) {
+        return RefreshIndicator(
+          onRefresh: () async {
+            refreshFunction(context);
+          },
+          child: GeneralDataService.todayCalledHolded.isEmpty
+              ? listViewNoDataFound()
+              : ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  itemCount: GeneralDataService.todayCalledHolded.isNotEmpty
+                      ? GeneralDataService.todayCalledHolded.length
+                      : 0,
+                  separatorBuilder: (context, index) => const Divider(),
+                  itemBuilder: (context, index) {
+                    TokenModel token =
+                        GeneralDataService.todayCalledHolded[index];
+                    return ListTile(
+                      onTap: () {
+                        showTokenDetails(token, context);
+                      },
+                      tileColor: ((token.queueId != null &&
+                                  token.queue['priority'] == 1) ||
+                              (token.queueppointmentId != null &&
+                                  token.queueppointment['priority'] == 1))
+                          ? UtilityService.isDarkTheme
+                              ? const Color(0xff184D47)
+                              : const Color(0xffA5F0C5)
+                          : ((token.queueId != null &&
+                                      token.queue['priority'] == 3) ||
+                                  (token.queueppointmentId != null &&
+                                      token.queueppointment['priority'] == 3))
+                              ? UtilityService.isDarkTheme
+                                  ? const Color(0xff483042)
+                                  : const Color(0xffF3DBCF)
+                              : null,
+                      leading: IconButton(
+                        onPressed: () {
+                          if ((GeneralDataService.lastCalledToken != null &&
+                                  !GeneralDataService.lastCalledToken!.isHold &&
+                                  GeneralDataService.lastCalledToken!.status !=
+                                      'no-show') &&
+                              CounterSettingService.counterSettings?.alertTransfer ==
+                                  true &&
+                              (((GeneralDataService.lastCalledToken!.queue != null && GeneralDataService.lastCalledToken!.queue['is_transferred'] != true) ||
+                                  (GeneralDataService.lastCalledToken!.queueppointment != null &&
+                                      GeneralDataService.lastCalledToken!.queueppointment['is_transferred'] !=
+                                          true)))) {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text(('Alert (Not transferred!)')),
+                                    content: Text(
+                                        '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred, Continue Calling?')}'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text(('Cancel')),
+                                      ),
+                                      CountDownButton(
+                                        onPressed: () async {
+                                          Navigator.pop(context);
+                                          (context, token);
+                                        },
+                                      )
+                                    ],
+                                  );
+                                });
+                          } else if ((GeneralDataService.lastCalledToken != null &&
+                                  !GeneralDataService.lastCalledToken!.isHold &&
+                                  GeneralDataService.lastCalledToken!.status !=
+                                      'no-show') &&
+                              CounterSettingService.counterSettings?.requireTransfer ==
+                                  true &&
+                              ((GeneralDataService.lastCalledToken!.queue != null &&
+                                      GeneralDataService.lastCalledToken!
+                                              .queue['is_transferred'] !=
+                                          true) ||
+                                  (GeneralDataService.lastCalledToken!.queueppointment != null &&
+                                      GeneralDataService.lastCalledToken!.queueppointment['is_transferred'] != true))) {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text(('Transfer is required !')),
+                                    content: Text(
+                                        '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred')}'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text(('Close')),
+                                      ),
+                                    ],
+                                  );
+                                });
+                          } else {
+                            _callUnholdToken(context, token);
+                          }
+                        },
+                        icon: Icon(
+                          Icons.play_circle,
+                          color: isDarkTheme
+                              ? Appcolors.materialIconButtonDark
+                              : Colors.blueAccent,
+                        ),
+                      ),
+                      title: Text(
+                        token.tokenNumber,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: token.queueId != null &&
+                              token.queue['customer'] != null
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                token.queue['customer']['phone'] != null
+                                    ? Text(
+                                        '+${token.queue['calling_code']} ${token.queue['customer']['phone']}')
+                                    : Container(),
+                                token.queue['customer']['name'] != null
+                                    ? Text(
+                                        token.queue['customer']['name'] ?? '')
+                                    : Container(),
+                              ],
+                            )
+                          : token.queueppointmentId != null &&
+                                  token.queueppointment['customer'] != null
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    token.queueppointment['customer']
+                                                ['phone'] !=
+                                            null
+                                        ? Text(
+                                            "+${token.queueppointment['calling_code']} ${token.queueppointment['customer']['phone']}")
+                                        : Container(),
+                                    token.queueppointment['customer']['name'] !=
+                                            null
+                                        ? Text(token.queueppointment['customer']
+                                                ['name'] ??
+                                            '')
+                                        : Container(),
+                                  ],
+                                )
+                              : null,
+                    );
+                  }),
+        );
+      },
+    );
+  }
+
+  Widget _buildCancelledTabView(bool isDarkTheme) {
+    return BlocBuilder<TokenPageBloc, TokenPageState>(
+      buildWhen: (previous, current) {
+        if (previous is RebuildInitState && current is RebuildCancelledState) {
+          return true;
+        }
+        return false;
+      },
+      builder: (context, state) {
+        return RefreshIndicator(
+          onRefresh: () async {
+            refreshFunction(context);
+          },
+          child: GeneralDataService.todaysQueueCancelled.isEmpty
+              ? listViewNoDataFound()
+              : ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  itemCount: GeneralDataService.todaysQueueCancelled.isNotEmpty
+                      ? GeneralDataService.todaysQueueCancelled.length
+                      : 0,
+                  separatorBuilder: (context, index) => const Divider(),
+                  itemBuilder: (context, index) {
+                    QueueModel queue =
+                        GeneralDataService.todaysQueueCancelled[index];
+                    return ListTile(
+                      onTap: () {
+                        showQueueDetails(queue, context);
+                      },
+                      tileColor: queue.priority == 1
+                          ? UtilityService.isDarkTheme
+                              ? const Color(0xff184D47)
+                              : const Color(0xffA5F0C5)
+                          : queue.priority == 3
+                              ? UtilityService.isDarkTheme
+                                  ? const Color(0xff483042)
+                                  : const Color(0xffF3DBCF)
+                              : null,
+                      title: Text(
+                        queue.tokenNumber,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: (queue.phone != null || queue.name != null)
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                queue.phone != null
+                                    ? Text(queue.phone ?? '')
+                                    : Container(),
+                                queue.name != null
+                                    ? Text(queue.name ?? '')
+                                    : Container(),
+                              ],
+                            )
+                          : null,
+                      trailing: SizedBox(
+                        width: 30,
+                        child: IconButton(
+                            onPressed: () async {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text(('Cancel')),
+                                        ),
+                                        TextButton(
+                                          onPressed: () async {
+                                            UtilityService.showLoadingAlert(
+                                                context);
+                                            var res = await CallService
+                                                .addCancelledTokenToQueue(
+                                                    queueId: queue.id);
+                                            Navigator.pop(context);
+                                            if (res is bool && res) {
+                                              Navigator.pop(context);
+
+                                              ///rebuid this..
+                                              ///
+
+                                              if (CounterSettingService
+                                                      .counterSettings
+                                                      ?.hideCancelled !=
+                                                  true) {
+                                                BlocProvider.of<TokenPageBloc>(
+                                                        context)
+                                                    .add(
+                                                        RebuildCancelledEvent());
+                                              }
+
+                                              ///rebuild to call
+                                              ///
+                                              if (CounterSettingService
+                                                      .counterSettings
+                                                      ?.hideNextToCall !=
+                                                  true) {
+                                                BlocProvider.of<TokenPageBloc>(
+                                                        context)
+                                                    .add(RebuildToCallEvent());
+                                              }
+                                              return;
+                                            }
+                                            UtilityService.toast(context,
+                                                ('Something went wrong'));
+                                          },
+                                          child: const Text(('Continue')),
+                                        )
+                                      ],
+                                      title: const Text(
+                                          ('Adding Cancelled Token To Queue')),
+                                      content: Text(
+                                          '${('Do you want to add canceled token')} ${queue.tokenNumber}?'),
+                                    );
+                                  });
+                            },
+                            icon: const Icon(Icons.done)),
+                      ),
+                    );
+                  }),
+        );
+      },
+    );
+  }
+
+  Widget _buildHoldedQueueTabView(bool isDarkTheme) {
+    return BlocBuilder<TokenPageBloc, TokenPageState>(
+      buildWhen: (previous, current) {
+        if (previous is RebuildInitState &&
+            current is RebuildHoldedQueueState) {
+          return true;
+        }
+        return false;
+      },
+      builder: (context, state) {
+        return RefreshIndicator(
+          onRefresh: () async {
+            refreshFunction(context);
+          },
+          child: GeneralDataService.holdedQueue.isEmpty
+              ? listViewNoDataFound()
+              : ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  itemCount: GeneralDataService.holdedQueue.isNotEmpty
+                      ? GeneralDataService.holdedQueue.length
+                      : 0,
+                  separatorBuilder: (context, index) => const Divider(),
+                  itemBuilder: (context, index) {
+                    QueueModel queue = GeneralDataService.holdedQueue[index];
+                    return ListTile(
+                      onTap: () {
+                        showQueueDetails(queue, context);
+                      },
+                      tileColor: queue.priority == 1
+                          ? UtilityService.isDarkTheme
+                              ? const Color(0xff184D47)
+                              : const Color(0xffA5F0C5)
+                          : queue.priority == 3
+                              ? UtilityService.isDarkTheme
+                                  ? const Color(0xff483042)
+                                  : const Color(0xffF3DBCF)
+                              : null,
+                      leading: IconButton(
+                        onPressed: () async {
+                          UtilityService.showLoadingAlert(context);
+                          var response = await CallService.callTokenFromQueue(
+                              queueId: queue.id);
+                          Navigator.pop(context);
+                          if (response is TokenModel) {
+                            BlocProvider.of<SettingsBloc>(context)
+                                .add(SwitchToHomePageEvent());
+                            return;
+                          }
+                          UtilityService.toast(
+                              context, ('Something went wrong'));
+                        },
+                        icon: Icon(
+                          Icons.call,
+                          color: isDarkTheme
+                              ? Appcolors.materialIconButtonDark
+                              : Colors.blueAccent,
+                        ),
+                      ),
+                      title: Text(
+                        queue.tokenNumber,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: (queue.phone != null || queue.name != null)
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                queue.phone != null
+                                    ? Text(queue.phone ?? '')
+                                    : Container(),
+                                queue.name != null
+                                    ? Text(queue.name ?? '')
+                                    : Container(),
+                              ],
+                            )
+                          : null,
+                      trailing: SizedBox(
+                        width: 30,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: IconButton(
+                                  onPressed: () async {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            actions: [
+                                              TextButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: const Text(('Cancel'))),
+                                              TextButton(
+                                                  onPressed: () async {
+                                                    UtilityService
+                                                        .showLoadingAlert(
+                                                            context);
+                                                    var response =
+                                                        await CallService
+                                                            .unholdQueueToken(
+                                                                queueId:
+                                                                    queue.id);
+                                                    Navigator.pop(context);
+                                                    if (response is bool &&
+                                                        response) {
+                                                      Navigator.pop(context);
+
+                                                      ///rebuild this
+                                                      ///
+                                                      if (CounterSettingService
+                                                              .counterSettings
+                                                              ?.hideHoldedQueue !=
+                                                          true) {
+                                                        BlocProvider.of<
+                                                                    TokenPageBloc>(
+                                                                context)
+                                                            .add(
+                                                                RebuildHoldedQueueEvent());
+                                                      }
+
+                                                      ///rebuild to call
+                                                      ///
+                                                      if (CounterSettingService
+                                                              .counterSettings
+                                                              ?.hideHoldedQueue !=
+                                                          true) {
+                                                        BlocProvider.of<
+                                                                    TokenPageBloc>(
+                                                                context)
+                                                            .add(
+                                                                RebuildHoldedQueueEvent());
+                                                      }
+                                                      return;
+                                                    }
+                                                  },
+                                                  child: const Text(('Continue'))),
+                                            ],
+                                            title: const Text(('Unholding Token')),
+                                            content: Text(
+                                                '${('Do you want to unhold token')} ${queue.tokenNumber}?'),
+                                          );
+                                        });
+                                  },
+                                  icon: const Icon(Icons.play_arrow)),
+                            ),
+                            Expanded(
                               child: IconButton(
                                 onPressed: () async {
                                   showDialog(
@@ -431,56 +1264,54 @@ class _HomeScreenState extends State<TokensPage> {
                                               ),
                                             ),
                                             TextButton(
-                                              onPressed: () async {
-                                                UtilityService.showLoadingAlert(
-                                                    context);
-                                                var response = await CallService
-                                                    .cancelQueueItem(
-                                                        queueId: queue.id);
-                                                Navigator.pop(context);
-                                                if (response is bool &&
-                                                    response) {
-                                                  ///rebuild this ..
-                                                  ///
-                                                  if (CounterSettingService
-                                                          .counterSettings
-                                                          ?.hideNextToCall !=
-                                                      true) {
-                                                    BlocProvider.of<
-                                                                TokenPageBloc>(
-                                                            context)
-                                                        .add(
-                                                            RebuildToCallEvent());
-                                                  }
-
-                                                  ///rebuild holded queue tab...
-                                                  ///
-                                                  if (CounterSettingService
-                                                          .counterSettings
-                                                          ?.hideCancelled !=
-                                                      true) {
-                                                    BlocProvider.of<
-                                                                TokenPageBloc>(
-                                                            context)
-                                                        .add(
-                                                            RebuildCancelledEvent());
-                                                  }
+                                                onPressed: () async {
+                                                  UtilityService
+                                                      .showLoadingAlert(
+                                                          context);
+                                                  var response =
+                                                      await CallService
+                                                          .cancelQueueItem(
+                                                              queueId:
+                                                                  queue.id);
                                                   Navigator.pop(context);
-                                                  return;
-                                                }
-                                                UtilityService.toast(
-                                                  context,
-                                                  ("Something went wrong"),
-                                                );
-                                              },
-                                              child: const Text(
-                                                ('Continue'),
-                                              ),
-                                            ),
+                                                  if (response is bool &&
+                                                      response) {
+                                                    ///rebuild this ..
+                                                    ///
+                                                    if (CounterSettingService
+                                                            .counterSettings
+                                                            ?.hideHoldedQueue !=
+                                                        true) {
+                                                      BlocProvider.of<
+                                                                  TokenPageBloc>(
+                                                              context)
+                                                          .add(
+                                                              RebuildHoldedQueueEvent());
+                                                    }
+
+                                                    ///rebuild holded queue tab...
+                                                    ///
+                                                    if (CounterSettingService
+                                                            .counterSettings
+                                                            ?.hideCancelled !=
+                                                        true) {
+                                                      BlocProvider.of<
+                                                                  TokenPageBloc>(
+                                                              context)
+                                                          .add(
+                                                              RebuildCancelledEvent());
+                                                    }
+                                                    Navigator.pop(context);
+                                                    return;
+                                                  }
+                                                  UtilityService.toast(context,
+                                                      ("Something went wrong"));
+                                                },
+                                                child: const Text(('Continue')))
                                           ],
                                           title: const Text(('Cancel Token?')),
                                           content: Text(
-                                              "${('Do you want to cancel token')} (${queue.tokenNumber}) ?"),
+                                              "${('Do you want to cancel token')}(${queue.tokenNumber})?"),
                                         );
                                       });
                                 },
@@ -514,6 +1345,143 @@ class _HomeScreenState extends State<TokensPage> {
     );
   }
 
+  void showTokenDetails(TokenModel token, BuildContext context) {
+    int? id = token.queueId ?? token.queueppointmentId;
+    UtilityService.showLoadingAlert(context);
+    CallService.getCustomerFlow(
+      id: id ?? 0,
+      isQueue: token.queueId != null ? true : false,
+    ).then((value) {
+      Navigator.pop(context);
+      if (value is bool && value == false) {
+        UtilityService.toast(
+          context,
+          ("Something went wrong, can't fetch details"),
+        );
+        return;
+      }
+      showBottomSheet(
+          backgroundColor: Colors.transparent,
+          context: context,
+          builder: (context) {
+            return CustomerFlowDetails(
+              customerFlow: value,
+              tokenNumber: token.tokenNumber,
+            );
+          });
+    });
+  }
+
+  void _callUnholdToken(BuildContext context, TokenModel token) {
+    UtilityService.showLoadingAlert(context);
+    CallService.unholdToken(id: token.id).then((value) {
+      Navigator.pop(context);
+      if (value is! TokenModel) {
+        UtilityService.toast(context, ('Something went wrong'));
+        return;
+      }
+      BlocProvider.of<SettingsBloc>(context).add(SwitchToHomePageEvent());
+    });
+  }
+Future<void> callToken(
+      {required BuildContext context, required int id}) async {
+    UtilityService.showLoadingAlert(context);
+    var response = await CallService.callTokenFromQueue(queueId: id);
+    Navigator.pop(context);
+    if (response is TokenModel) {
+      BlocProvider.of<SettingsBloc>(context).add(SwitchToHomePageEvent());
+      return;
+    }
+    UtilityService.toast(context, ('Something went wrong'));
+  }
+
+  Future<void> _recallToken(BuildContext context, int tokenId) async {
+    UtilityService.showLoadingAlert(context);
+    var res = await CallService.recallToken(id: tokenId);
+    Navigator.pop(context);
+    if (res is TokenModel) {
+      BlocProvider.of<SettingsBloc>(context).add(SwitchToHomePageEvent());
+      return;
+    }
+    UtilityService.toast(context, ("Something went wrong"));
+  }
+
+  Future<void> markReportReadyFn(BuildContext context, TokenModel token) async {
+    bool showonDisplay = false;
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(
+                    context,
+                  );
+                },
+                child: const Text(
+                  ('Close'),
+                ),
+              ),
+              TextButton(
+                onPressed: () async {
+                  UtilityService.showLoadingAlert(context);
+                  if (await CallService.markReportReady(
+                      callId: token.id, showOnDisplay: showonDisplay)) {
+                    Navigator.pop(context);
+
+                    Navigator.pop(context);
+
+                    UtilityService.toast(
+                      context,
+                      ('Updated'),
+                    );
+                    emitRebuildEvent();
+                    return;
+                  }
+                  Navigator.pop(context);
+                  UtilityService.toast(
+                    context,
+                    ('Something went wrong'),
+                  );
+                },
+                child: const Text(('Yes')),
+              )
+            ],
+            content: SizedBox(
+              height: 15,
+              child: Column(
+                children: [
+                  Text(
+                    '${('Mark Report Ready on')} ${token.tokenNumber}',
+                    style: const TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(('Show on Display')),
+                      StatefulBuilder(builder:
+                          (BuildContext context, StateSetter checkBoxSetState) {
+                        return Checkbox(
+                          value: showonDisplay,
+                          onChanged: (value) {
+                            checkBoxSetState(() {
+                              showonDisplay = value ?? false;
+                            });
+                          },
+                        );
+                      }),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
   void showQueueDetails(QueueModel queue, BuildContext context) {
     int? id = queue.id;
     UtilityService.showLoadingAlert(context);
@@ -541,28 +1509,36 @@ class _HomeScreenState extends State<TokensPage> {
     });
   }
 
-  Future<void> callToken(
-      {required BuildContext context, required int id}) async {
-    UtilityService.showLoadingAlert(context);
-    var response = await CallService.callTokenFromQueue(queueId: id);
-    Navigator.pop(context);
-    if (response is TokenModel) {
-      BlocProvider.of<SettingsBloc>(context).add(SwitchToHomePageEvent());
-      return;
-    }
-    UtilityService.toast(context, ('Something went wrong'));
+  
+
+  Widget makeReportWidgetFn(TokenModel token, BuildContext context) {
+    return token.reportReady != null
+        ? token.reportReady != true
+            ? TextButton(
+                onPressed: () async {
+                  await markReportReadyFn(context, token);
+                },
+                child: const Text(
+                  'R',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+            : const Text(
+                'R',
+                style: TextStyle(
+                  color: Colors.green,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              )
+        : Container();
   }
 
-  Future<void> _recallToken(BuildContext context, int tokenId) async {
-    UtilityService.showLoadingAlert(context);
-    var res = await CallService.recallToken(id: tokenId);
-    Navigator.pop(context);
-    if (res is TokenModel) {
-      
-      
-      BlocProvider.of<SettingsBloc>(context).add(SwitchToHomePageEvent());
-      return;
-    }
-    UtilityService.toast(context, ("Something went wrong"));
-  }
+
+
+
 }
