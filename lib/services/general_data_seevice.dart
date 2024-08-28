@@ -22,6 +22,7 @@ import 'package:oneappcounter/model/today_tocken_details_model.dart';
 import 'package:oneappcounter/services/counter_setting_service.dart';
 import 'package:oneappcounter/services/networking_service.dart';
 import 'package:oneappcounter/services/set_device_service.dart';
+import 'package:oneappcounter/services/socket_services.dart';
 import 'package:oneappcounter/services/storage_service.dart';
 
 class GeneralDataService {
@@ -55,8 +56,8 @@ class GeneralDataService {
     await resetIndex();
     await getLastToken();
     await getTodayTokenDetails();
-    // await SocketService().initliseSocket();
-    // await SocketService.registerEvents(isAll: true);
+    await SocketService().initliseSocket();
+    await SocketService.registerEvents(isAll: true);
   }
 
   static Future<void> _getThemeModeData() async {
@@ -161,9 +162,9 @@ class GeneralDataService {
     _allServiceCounterTabs[index] = currentServiceCounterTab!;
     await _saveTabDetailsToStorage();
     await CounterSettingService.updateCounterSettings();
-    // await getLastToken();
-    // await getTodayTokenDetails();
-    // await reloadData();
+    await getLastToken();
+    await getTodayTokenDetails();
+    await reloadData();
   }
 
   static Future<void> _saveTabDetailsToStorage() async {
@@ -288,7 +289,7 @@ class GeneralDataService {
       return true;
     } else {
       if (_allServiceCounterTabs.isNotEmpty &&
-          _allServiceCounterTabs
+          _allServiceCounterTabs 
               .asMap()
               .containsKey(currentServiceCounterTabIndex)) {
         const String path = 'call/get/last_token';
@@ -518,6 +519,114 @@ class GeneralDataService {
         todayCalledTokens.indexWhere((element) => element.id == token.id);
     if (index >= 0) {
       todayCalledTokens[index] = token;
+    }
+  }
+
+
+
+  static Future<void> updateChangeInTab(int serviceId) async {
+    for (var i = 0; i < _allServiceCounterTabs.length; i++) {
+      ServiceCounterTabModel currentTab = _allServiceCounterTabs[i];
+      if (!currentTab.selected &&
+          currentTab.services.map((e) => e.id).toList().contains(serviceId)) {
+        String title = currentTab.serviceString.replaceAll("*", "");
+        ServiceCounterTabModel newTab = ServiceCounterTabModel(
+          services: currentTab.services,
+          counter: currentTab.counter,
+          counterSettings: currentTab.counterSettings,
+          selected: currentTab.selected,
+          serviceString: "* $title",
+          counterString: currentTab.counterString,
+        );
+        _allServiceCounterTabs[i] = newTab;
+      }
+    }
+  }
+
+  static Future<void> queueCancelled(QueueModel queue) async {
+    try {
+      todaysQueue.removeAt(
+          todaysQueue.indexWhere((element) => element.id == queue.id));
+    } catch (_) {}
+    try {
+      todaysQueueCancelled.removeAt(
+          todaysQueueCancelled.indexWhere((element) => element.id == queue.id));
+    } catch (_) {}
+
+    try {
+      holdedQueue.removeAt(
+          holdedQueue.indexWhere((element) => element.id == queue.id));
+    } catch (_) {}
+    todaysQueueCancelled.add(queue);
+  }
+ static Future<void> updateTransferTokenDetails(TokenModel token,
+      {Map<String, dynamic>? transferTO}) async {
+    if (transferTO != null) {
+      Map<String, dynamic> queueData = {};
+      if (token.queueId != null) {
+        queueData = token.queue!;
+        queueData['transfer_to'] = transferTO;
+      } else if (token.queueppointmentId != null) {
+        queueData = token.queueppointment;
+        queueData['transfer_to'] = transferTO;
+      }
+
+      TokenModel updateToken = TokenModel(
+        counterppDeviceUserId: token.counterppDeviceUserId,
+        counterId: token.counterId,
+        id: token.id,
+        isHold: token.isHold,
+        now: token.now,
+        queue: token.queueId != null ? queueData : null,
+        queueppointment: token.queueppointmentId != null ? queueData : null,
+        queueppointmentId: token.queueppointmentId,
+        queueId: token.queueId,
+        referenceId: token.referenceId,
+        reportReady: token.reportReady,
+        reportReadyt: token.reportReadyt,
+        reportReadyTime: token.reportReadyTime,
+        servedTime: token.servedTime,
+        serviceId: token.serviceId,
+        startedAt: token.startedAt,
+        endedAt: token.endedAt,
+        status: token.status,
+        statusColor: token.statusColor,
+        token: token.token,
+        tokenNumber: token.tokenNumber,
+        turnroundTime: token.turnroundTime,
+        userId: token.userId,
+        updatedt: token.updatedt,
+        voiceNumber: token.voiceNumber,
+        waitingTime: token.waitingTime,
+        user: token.user,
+      );
+      await updateTokenDetails(updateToken);
+      return;
+    }
+    await updateTokenDetails(token);
+    return;
+  }
+ static Future<void> updateTokenDetails(TokenModel token) async {
+    int index =
+        todayCalledTokens.indexWhere((element) => element.id == token.id);
+    if (index >= 0) {
+      todayCalledTokens[index] = token;
+    }
+    if (lastCalledToken?.id == token.id) {
+      lastCalledToken = token;
+    }
+  }
+
+  static Future<void> updateServiceDetails(ServiceModel service) async {
+    int index =
+        activeServices.indexWhere((element) => element.id == service.id);
+    if (index >= 0) {
+      activeServices[index] = service;
+      await selectThisTab(
+        index: currentServiceCounterTabIndex,
+        thisTab: _allServiceCounterTabs[currentServiceCounterTabIndex],
+        switchToSameTab: true,
+      );
     }
   }
 

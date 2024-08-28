@@ -55,6 +55,17 @@ class _BottomTabScreen extends State<BottomTabScreen> {
   }
 
   @override
+  void dispose() {
+    try {
+      isSettingsChanged.cancel();
+    } catch (_) {}
+    try {
+      showLoadingOnreload.cancel();
+    } catch (_) {}
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     UtilityService.updateThemeInfo(context);
     return BlocConsumer<SettingsBloc, SettingsState>(
@@ -255,7 +266,9 @@ class _BottomTabScreen extends State<BottomTabScreen> {
           return const ServiceCounterTab();
         }
       default:
-        return const HomeScreen();
+        {
+          return const HomeScreen();
+        }
     }
   }
 
@@ -282,11 +295,8 @@ class _BottomTabScreen extends State<BottomTabScreen> {
                 CounterSettingService
                         .counterSettings?.hideCancelledAppointments ==
                     true)) {
-              ///hided appointmnets tab so home is.
-
               _currentIndex = 0;
             } else {
-              ///call is hided.
               _currentIndex = 1;
             }
           } else if (tabsLength == 4) {

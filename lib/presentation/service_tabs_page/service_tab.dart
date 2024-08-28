@@ -28,26 +28,55 @@ class _ServiceCounterTabState extends State<ServiceCounterTab> {
     _handleInitialData();
   }
 
-  void _handleInitialData() {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (GeneralDataService.getTabs().isEmpty) {
-        // Show popup if there are no tabs
-        await _showAddTabPopup(context);
-      } else if (GeneralDataService.getTabs()[
-              GeneralDataService.currentServiceCounterTabIndex]
-          .services
-          .isEmpty) {
-        // Show popup if the current tab has no services
-        await _showAddTabPopup(
-          context,
-          editableService: GeneralDataService.getTabs()[
-              GeneralDataService.currentServiceCounterTabIndex],
-          editingIndex: GeneralDataService.currentServiceCounterTabIndex,
-        );
+  // void _handleInitialData() {
+  //   WidgetsBinding.instance.addPostFrameCallback((_) async {
+  //     if (GeneralDataService.getTabs().isEmpty) {
+
+  //       await _showAddTabPopup(context);
+  //     } else if (GeneralDataService.getTabs()[
+  //             GeneralDataService.currentServiceCounterTabIndex]
+  //         .services
+  //         .isEmpty) {
+  //       // Show popup if the current tab has no services
+  //       await _showAddTabPopup(
+  //         context,
+  //         editableService: GeneralDataService.getTabs()[
+  //             GeneralDataService.currentServiceCounterTabIndex],
+  //         editingIndex: GeneralDataService.currentServiceCounterTabIndex,
+  //       );
+  //     }
+  //   });
+  // }
+void _handleInitialData() {
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    // Check if widget is still mounted
+    if (!mounted) return;
+
+    // Fetch tabs from the service
+    final tabs = GeneralDataService.getTabs();
+
+    if (tabs.isEmpty) {
+      // Show popup if there are no tabs
+      await _showAddTabPopup(context);
+    } else {
+      final currentTabIndex = GeneralDataService.currentServiceCounterTabIndex;
+
+      // Check if currentTabIndex is within the bounds of tabs
+      if (currentTabIndex >= 0 && currentTabIndex < tabs.length) {
+        final currentTab = tabs[currentTabIndex];
+
+        if (currentTab.services.isEmpty) {
+          // Show popup if the current tab has no services
+          await _showAddTabPopup(
+            context,
+            editableService: currentTab,
+            editingIndex: currentTabIndex,
+          );
+        }
       }
-    });
-  }
- 
+    }
+  });
+}
 
   @override
   Widget build(BuildContext context) {

@@ -71,12 +71,8 @@ class _HomeScreenState extends State<TokensPage> {
     });
   }
 
- @override
+  @override
   void dispose() {
-    // try {
-    //   SocketService.destorySocket();
-    // } catch (_) {}
-
     try {
       rebuildListener.cancel();
     } catch (_) {}
@@ -97,11 +93,16 @@ class _HomeScreenState extends State<TokensPage> {
           title: Text(
             '${('Tokens')} (${GeneralDataService.currentServiceCounterTab?.serviceString})',
             maxLines: 1,
-            style: const TextStyle(overflow: TextOverflow.ellipsis),
+            style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                overflow: TextOverflow.ellipsis,
+                color: Colors.white),
           ),
           bottom: TabBar(
             tabAlignment: TabAlignment.start,
             tabs: _getTabs(),
+            labelColor: Colors.white,
+            unselectedLabelColor: const Color.fromARGB(255, 216, 214, 214),
             labelPadding: const EdgeInsets.symmetric(horizontal: 12),
             isScrollable: true,
           ),
@@ -129,7 +130,9 @@ class _HomeScreenState extends State<TokensPage> {
       content.add(
         const Tab(
           child: FittedBox(
-            child: Text("TO CALL"),
+            child: Text(
+              "TO CALL",
+            ),
           ),
         ),
       );
@@ -600,8 +603,8 @@ class _HomeScreenState extends State<TokensPage> {
                                       context: context,
                                       builder: (context) {
                                         return AlertDialog(
-                                          title:
-                                              const Text(('Transfer is required !')),
+                                          title: const Text(
+                                              ('Transfer is required !')),
                                           content: Text(
                                               '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred')}'),
                                           actions: [
@@ -855,7 +858,8 @@ class _HomeScreenState extends State<TokensPage> {
                                 context: context,
                                 builder: (context) {
                                   return AlertDialog(
-                                    title: const Text(('Alert (Not transferred!)')),
+                                    title: const Text(
+                                        ('Alert (Not transferred!)')),
                                     content: Text(
                                         '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred, Continue Calling?')}'),
                                     actions: [
@@ -890,7 +894,8 @@ class _HomeScreenState extends State<TokensPage> {
                                 context: context,
                                 builder: (context) {
                                   return AlertDialog(
-                                    title: const Text(('Transfer is required !')),
+                                    title:
+                                        const Text(('Transfer is required !')),
                                     content: Text(
                                         '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred')}'),
                                     actions: [
@@ -1193,7 +1198,8 @@ class _HomeScreenState extends State<TokensPage> {
                                                   onPressed: () {
                                                     Navigator.pop(context);
                                                   },
-                                                  child: const Text(('Cancel'))),
+                                                  child:
+                                                      const Text(('Cancel'))),
                                               TextButton(
                                                   onPressed: () async {
                                                     UtilityService
@@ -1237,9 +1243,11 @@ class _HomeScreenState extends State<TokensPage> {
                                                       return;
                                                     }
                                                   },
-                                                  child: const Text(('Continue'))),
+                                                  child:
+                                                      const Text(('Continue'))),
                                             ],
-                                            title: const Text(('Unholding Token')),
+                                            title:
+                                                const Text(('Unholding Token')),
                                             content: Text(
                                                 '${('Do you want to unhold token')} ${queue.tokenNumber}?'),
                                           );
@@ -1383,7 +1391,8 @@ class _HomeScreenState extends State<TokensPage> {
       BlocProvider.of<SettingsBloc>(context).add(SwitchToHomePageEvent());
     });
   }
-Future<void> callToken(
+
+  Future<void> callToken(
       {required BuildContext context, required int id}) async {
     UtilityService.showLoadingAlert(context);
     var response = await CallService.callTokenFromQueue(queueId: id);
@@ -1489,27 +1498,59 @@ Future<void> callToken(
       id: id,
       isQueue: true,
     ).then((value) {
-      Navigator.pop(context);
+      Navigator.pop(context); // Close the loading dialog
       if (value is bool && value == false) {
         UtilityService.toast(
           context,
-          ("Something went wrong, can't fetch details"),
+          "Something went wrong, can't fetch details",
         );
         return;
       }
-      showBottomSheet(
-          backgroundColor: Colors.transparent,
-          context: context,
-          builder: (context) {
-            return CustomerFlowDetails(
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) {
+          return FractionallySizedBox(
+            heightFactor: 0.75, // 75% of the screen height
+            child: CustomerFlowDetails(
               customerFlow: value,
               tokenNumber: queue.tokenNumber,
-            );
-          });
+            ),
+          );
+        },
+      );
+    }).catchError((e) {
+      Navigator.pop(context); // Ensure the loading dialog is closed on error
+      UtilityService.toast(context, "An error occurred: $e");
     });
   }
 
-  
+  // void showQueueDetails(QueueModel queue, BuildContext context) {
+  //   int? id = queue.id;
+  //   UtilityService.showLoadingAlert(context);
+  //   CallService.getCustomerFlow(
+  //     id: id,
+  //     isQueue: true,
+  //   ).then((value) {
+  //     Navigator.pop(context);
+  //     if (value is bool && value == false) {
+  //       UtilityService.toast(
+  //         context,
+  //         ("Something went wrong, can't fetch details"),
+  //       );
+  //       return;
+  //     }
+  //     showBottomSheet(
+  //         backgroundColor: Colors.transparent,
+  //         context: context,
+  //         builder: (context) {
+  //           return CustomerFlowDetails(
+  //             customerFlow: value,
+  //             tokenNumber: queue.tokenNumber,
+  //           );
+  //         });
+  //   });
+  // }
 
   Widget makeReportWidgetFn(TokenModel token, BuildContext context) {
     return token.reportReady != null
@@ -1537,8 +1578,4 @@ Future<void> callToken(
               )
         : Container();
   }
-
-
-
-
 }

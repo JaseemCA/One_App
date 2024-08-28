@@ -1,9 +1,15 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:oneappcounter/bloc/app_update/bloc/app_update_bloc.dart';
+import 'package:oneappcounter/bloc/app_update/bloc/app_update_event.dart';
 import 'package:oneappcounter/common/widgets/one_app_logo/one_app_logo.dart';
 import 'package:oneappcounter/core/config/color/appcolors.dart';
 import 'package:oneappcounter/model/splash_init_response.dart';
 import 'package:oneappcounter/routes.dart';
 import 'package:oneappcounter/services/splash_services.dart';
+import 'package:oneappcounter/services/utility_services.dart';
 import 'package:shimmer/shimmer.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -27,7 +33,8 @@ class SplashScreenState extends State<SplashScreen> {
     // Initialize the data using SplashScreenService
     SplashInitResponse response =
         await SplashScreenService.initData(shortestScreenSize);
-
+    UtilityService.updateThemeInfo(context);
+    BlocProvider.of<AppUpdateBloc>(context).add(CheckForUpdate());
     // Handle the navigation based on the response
     if (mounted) {
       _navigateBasedOnResponse(response);
@@ -80,9 +87,19 @@ class SplashScreenState extends State<SplashScreen> {
             (route) => false,
           );
         }
-        break;
+      // break;
     }
   }
+
+  //   Future<void> homePage() async {
+  //   // await LanguageService.changeLocaleFn(context);
+  //  Navigator.pushNamedAndRemoveUntil(
+  //           context,
+  //           AppRoutes.bottomNavBar,
+  //           (route) => false,
+  //         );
+  // }
+
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +108,7 @@ class SplashScreenState extends State<SplashScreen> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Shimmer.fromColors(
               baseColor: Colors.white,
