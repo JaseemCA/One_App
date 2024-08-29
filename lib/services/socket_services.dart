@@ -386,4 +386,14 @@ static Future<void> connectAfterSwitch() async {
     registerEvents(isAll: false);
   }
       
+
+ static Future<void> destorySocket() async {
+    try {
+      _isDisposed = true;
+      _leaveChannels(leaveAll: true);
+      echo.disconnect();
+    } catch (_) {}
+  }
+
+
 }

@@ -1,11 +1,17 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:oneappcounter/bloc/call/bloc/call_bloc.dart';
+import 'package:oneappcounter/bloc/call/bloc/call_event.dart';
+import 'package:oneappcounter/bloc/call/bloc/call_state.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_bloc.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_event.dart';
+import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_state.dart';
+import 'package:oneappcounter/common/widgets/button/count_down_button.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/common/widgets/one_app_logo/one_app_logo.dart';
 import 'package:oneappcounter/core/config/color/appcolors.dart';
@@ -13,11 +19,16 @@ import 'package:oneappcounter/core/config/theme/bloc/theme_cubit.dart';
 import 'package:oneappcounter/extention/string_casing_extention.dart';
 import 'package:oneappcounter/model/tocken_model.dart';
 import 'package:oneappcounter/presentation/popUp/add_service.dart.dart';
+import 'package:oneappcounter/presentation/popUp/customer_flow_details.dart';
 import 'package:oneappcounter/presentation/popUp/customer_tocken_details.dart';
 import 'package:oneappcounter/presentation/settings_page/settings_page.dart';
+import 'package:oneappcounter/routes.dart';
+import 'package:oneappcounter/services/auth_service.dart';
+import 'package:oneappcounter/services/call_service.dart';
 import 'package:oneappcounter/services/clock_service.dart';
 import 'package:oneappcounter/services/counter_setting_service.dart';
 import 'package:oneappcounter/services/general_data_seevice.dart';
+import 'package:oneappcounter/services/socket_services.dart';
 import 'package:oneappcounter/services/utility_services.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -31,11 +42,67 @@ class _HomeScreenState extends State<HomeScreen> {
   StateSetter? lockServiceButtonState;
 
   StateSetter? unlockServiceButtonState;
+  late StreamSubscription homePageRebuild;
+  late StreamSubscription appBarRebuild;
+  static bool isBuildPending = false;
 
   DateTime dateTime = DateTime.now();
   String selectedTime = '';
   TokenModel? selectedToken;
   late BuildContext _context;
+
+  @override
+  void initState() {
+    super.initState();
+
+    ClockService.updateDateTime();
+
+    // SocketService.registerEvents(isAll: true);
+
+    homePageRebuild =
+        SocketService.homePageRebuildRequiredController.stream.listen((event) {
+      if (event is bool && event && isBuildPending == false) {
+        BlocProvider.of<SettingsBloc>(context)
+            .add(HomePageSettingsChangedEvent());
+      }
+    });
+    appBarRebuild = SocketService.homePageAppBarRebuildRequiredController.stream
+        .listen((event) {
+      if (event is bool && event) {
+        rebuildHoldUnholdButtons();
+      }
+    });
+  }
+
+  bool isAllServiceOnHold() {
+    var items = GeneralDataService.getTabs()[
+            GeneralDataService.currentServiceCounterTabIndex]
+        .services
+        .where((element) => element.isHold == true)
+        .toList();
+    return items.length ==
+            GeneralDataService.getTabs()[
+                    GeneralDataService.currentServiceCounterTabIndex]
+                .services
+                .length
+        ? true
+        : false;
+  }
+
+  bool isAllServiceOnUnhold() {
+    var items = GeneralDataService.getTabs()[
+            GeneralDataService.currentServiceCounterTabIndex]
+        .services
+        .where((element) => element.isHold == !true)
+        .toList();
+    return items.length ==
+            GeneralDataService.getTabs()[
+                    GeneralDataService.currentServiceCounterTabIndex]
+                .services
+                .length
+        ? true
+        : false;
+  }
 
   void rebuildHoldUnholdButtons() {
     lockServiceButtonState != null
@@ -51,6 +118,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void dispose() {
+    // try {
+    //   SocketService.destorySocket();
+    // } catch (_) {}
+    try {
+      homePageRebuild.cancel();
+    } catch (_) {}
+
+    try {
+      appBarRebuild.cancel();
+    } catch (_) {}
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
@@ -59,99 +142,166 @@ class _HomeScreenState extends State<HomeScreen> {
     // : Appcolors.appBackgrondcolor;
 
     return Scaffold(
-        appBar: AppBar(
-          elevation: 2,
-          leadingWidth: 180,
-          backgroundColor: isDarkMode
-              ? Appcolors.bottomsheetDarkcolor
-              : Appcolors.appBackgrondcolor,
-          leading: const Padding(
-              padding: EdgeInsets.only(left: 20),
-              child: OneAppLogo(
-                height: 30,
-              )),
-          toolbarHeight: 70,
-          actions: [
-            IconButton(
-              icon: const Icon(
-                Icons.refresh,
-                color: Colors.white,
-                size: 30,
-              ),
-              onPressed: () async {
-                await refreshFunction(context);
-              },
+      appBar: AppBar(
+        elevation: 2,
+        leadingWidth: 180,
+        backgroundColor: isDarkMode
+            ? Appcolors.bottomsheetDarkcolor
+            : Appcolors.appBackgrondcolor,
+        leading: const Padding(
+            padding: EdgeInsets.only(left: 20),
+            child: OneAppLogo(
+              height: 30,
+            )),
+        toolbarHeight: 70,
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.refresh,
+              color: Colors.white,
+              size: 30,
             ),
-            IconButton(
-              icon: const Icon(
-                Icons.lock,
-                color: Colors.white,
-                size: 30,
-              ),
-              onPressed: () {
-                holdshowBottomSheet();
-              },
-            ),
-            IconButton(
-              icon: const Icon(
-                Icons.more_vert,
-                color: Colors.white,
-                size: 30,
-              ),
-              onPressed: () {
-                showMenu(
-                  context: context,
-                  position: const RelativeRect.fromLTRB(70, 0, 0, 0),
-                  items: [
-                    PopupMenuItem<String>(
-                      value: 'settings',
-                      child: ListTile(
-                        leading: const Icon(Icons.settings),
-                        title: const Text('Settings'),
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      const SettingsScreen()));
-                        },
-                      ),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'theme',
-                      child: ListTile(
-                        leading: Icon(Icons.mode_night_outlined),
-                        title: Text('Theme'),
-                      ),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'logout',
-                      child: ListTile(
-                        leading: Icon(Icons.logout),
-                        title: Text('Logout'),
-                      ),
-                    ),
-                  ],
-                  elevation: 8.0,
-                ).then((value) {
-                  if (value == 'theme') {
-                    showThemeDialog();
-                  }
-                  // Handle other menu options
-                });
-              },
-            ),
-          ],
-        ),
-        body: RefreshIndicator(
-          onRefresh: () async {
-            // Placeholder for refresh functionality
-            // await refreshFunction(context);
-          },
-          child: Stack(
-            children: [ListView(), buildNonGridScreen()],
+            onPressed: () async {
+              await refreshFunction(context);
+            },
           ),
-        ));
+          IconButton(
+            icon: const Icon(
+              Icons.lock,
+              color: Colors.white,
+              size: 30,
+            ),
+            onPressed: () {
+              holdshowBottomSheet();
+            },
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.more_vert,
+              color: Colors.white,
+              size: 30,
+            ),
+            onPressed: () {
+              showMenu(
+                context: context,
+                position: const RelativeRect.fromLTRB(70, 0, 0, 0),
+                items: [
+                  PopupMenuItem<String>(
+                    value: 'settings',
+                    child: ListTile(
+                      leading: const Icon(Icons.settings),
+                      title: const Text('Settings'),
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    const SettingsScreen()));
+                      },
+                    ),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'theme',
+                    child: ListTile(
+                      leading: Icon(Icons.mode_night_outlined),
+                      title: Text('Theme'),
+                    ),
+                  ),
+                  PopupMenuItem<String>(
+                    value: 'logout',
+                    child: ListTile(
+                      leading: const Icon(Icons.logout),
+                      title: const Text('Logout'),
+                      onTap: () async {
+                        UtilityService.showLoadingAlert(context);
+                        if (await AuthService.logoutUser()) {
+                          Navigator.pop(context);
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            AppRoutes.loginScreen,
+                            (route) => false,
+                          );
+                          return;
+                        }
+                        UtilityService.toast(context, ('Something went wrong'));
+                      },
+                    ),
+                  ),
+                ],
+                elevation: 8.0,
+              ).then((value) {
+                if (value == 'theme') {
+                  showThemeDialog();
+                }
+                // Handle other menu options
+              });
+            },
+          ),
+        ],
+      ),
+      body: BlocBuilder<SettingsBloc, SettingsState>(
+        buildWhen: (previous, current) {
+          if (previous is SettingsStateUpdating &&
+              current is HomePageSettingsState) {
+            // log('inside bloc builder');
+            return true;
+          }
+          return false;
+        },
+        builder: (context, state) {
+          return BlocBuilder<CallBloc, CallState>(
+              buildWhen: (previous, current) {
+            if (previous is CallNextTokenStartedState &&
+                current is CallNextTokenCompletedState) {
+              return true;
+            }
+            return false;
+          }, builder: (context, state) {
+            return RefreshIndicator(
+              onRefresh: () async {
+                refreshFunction(context);
+              },
+              child: Stack(
+                children: [
+                  ListView(),
+                  getScreen(),
+                ],
+              ),
+            );
+          });
+        },
+      ),
+    );
+  }
+
+  Widget getScreen() {
+    if (selectedToken != null) {
+      return buildNonGridScreen();
+    } else if ((CounterSettingService.counterSettings?.enableGridView == true &&
+        ((CounterSettingService.counterSettings?.autoGridViewAfterTransfer !=
+                    true &&
+                GeneralDataService.lastCalledToken?.status == 'served') ||
+            (GeneralDataService.lastCalledToken?.status == 'no-show' &&
+                CounterSettingService
+                        .counterSettings?.autoGridViewAfterNoShow ==
+                    true) ||
+            (CounterSettingService.counterSettings?.autoGridViewAfterHold ==
+                    true &&
+                GeneralDataService.lastCalledToken?.isHold == true) ||
+            (CounterSettingService.counterSettings?.autoGridViewAfterTransfer ==
+                        true &&
+                    (GeneralDataService.lastCalledToken?.queueId != null &&
+                        GeneralDataService
+                            .lastCalledToken?.queue['is_transferred']) ||
+                (GeneralDataService.lastCalledToken?.queueppointmentId !=
+                        null &&
+                    GeneralDataService
+                        .lastCalledToken?.queueppointment['is_transferred'])) ||
+            GeneralDataService.lastCalledToken == null))) {
+      return buildGridScreen();
+    } else {
+      return buildNonGridScreen();
+    }
   }
 
   void holdshowBottomSheet() {
@@ -348,7 +498,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget buildGridScreen() {
+    return const Center(
+      child: Text("grid view"),
+    );
+  }
+
   Widget buildNonGridScreen() {
+    TokenModel? token = selectedToken ?? GeneralDataService.lastCalledToken;
+
     return Stack(
       children: [
         Column(
@@ -444,7 +602,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Container(
                     child: buildTokenPart(),
-                  ), // Placeholder for _buildTokenPart()
+                  ), 
                   const Divider(
                     height: 40,
                   ), // kDivider replaced with Divider()
@@ -456,7 +614,34 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: CustomElevatedButton(
-                                onPressed: () {}, // Disabled button
+                                onPressed: CounterSettingService.counterSettings
+                                                ?.alwaysDisableServeBtn !=
+                                            true &&
+                                        token?.status == 'serving' &&
+                                        !isAllServiceOnHold() &&
+                                        token?.isHold != true
+                                    ? () async {
+                                        UtilityService.showLoadingAlert(
+                                            _context);
+                                        var response =
+                                            await CallService.serveToken();
+                                        Navigator.pop(_context);
+                                        if (response is bool && !response) {
+                                          UtilityService.toast(
+                                            _context,
+                                            ('Something went wrong'),
+                                          );
+                                        } else if (response is TokenModel) {
+                                          selectedToken = null;
+                                          UtilityService.toast(
+                                            _context,
+                                            ('Served'),
+                                          );
+                                          BlocProvider.of<CallBloc>(_context)
+                                              .add((CallNextTokenEvent()));
+                                        }
+                                      }
+                                    : null, // Disabled button
                                 text: "SERVE",
                               ),
                             ),
@@ -465,7 +650,34 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: CustomElevatedButton(
-                                onPressed: () {}, // Disabled button
+                                onPressed: CounterSettingService.counterSettings
+                                                ?.alwaysDisableRecallBtn !=
+                                            true &&
+                                        token?.status == 'serving' &&
+                                        token?.isHold != true
+                                    ? () async {
+                                        UtilityService.showLoadingAlert(
+                                            _context);
+                                        var response =
+                                            await CallService.recallToken(
+                                          id: token?.id ?? 0,
+                                        );
+                                        Navigator.pop(_context);
+                                        if (response is TokenModel) {
+                                          BlocProvider.of<CallBloc>(_context)
+                                              .add((CallNextTokenEvent()));
+                                          UtilityService.toast(
+                                            _context,
+                                            ('Recalled '),
+                                          );
+                                          return;
+                                        }
+                                        UtilityService.toast(
+                                          _context,
+                                          ('Something went wrong'),
+                                        );
+                                      }
+                                    : null, // Disabled button
                                 text: 'RECALL',
                               ),
                             ),
@@ -478,7 +690,32 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: CustomElevatedButton(
-                                onPressed: () {}, // Disabled button
+                                onPressed: CounterSettingService.counterSettings
+                                                ?.alwaysDisableNoShowBtn !=
+                                            true &&
+                                        token?.status == 'serving' &&
+                                        token?.isHold != true
+                                    ? () async {
+                                        UtilityService.showLoadingAlert(
+                                            _context);
+                                        var response =
+                                            await CallService.markTokenNoShow();
+                                        Navigator.pop(_context);
+                                        if (response is TokenModel) {
+                                          selectedToken = null;
+                                          BlocProvider.of<CallBloc>(_context)
+                                              .add((CallNextTokenEvent()));
+
+                                          UtilityService.toast(
+                                            _context,
+                                            ('Marked as No Show '),
+                                          );
+                                          return;
+                                        }
+                                        UtilityService.toast(
+                                            _context, ('Something went wrong'));
+                                      }
+                                    : null, // Disabled button
                                 text: 'NO SHOW',
                               ),
                             ),
@@ -487,7 +724,89 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: CustomElevatedButton(
-                                onPressed: () {}, // Disabled button
+                                onPressed: CounterSettingService.counterSettings
+                                                ?.alwaysDisableCallNextBtn !=
+                                            true &&
+                                        (token?.status == 'served' ||
+                                            token?.status == 'no-show' ||
+                                            token?.status == 'holded' ||
+                                            token == null ||
+                                            token.isHold == true) &&
+                                        !isAllServiceOnHold()
+                                    ? () async {
+                                        if ((token != null &&
+                                                !token.isHold &&
+                                                token.status != 'no-show') &&
+                                            CounterSettingService
+                                                    .counterSettings
+                                                    ?.alertTransfer ==
+                                                true &&
+                                            (((token.queue != null &&
+                                                    token.queue['is_transferred'] !=
+                                                        true) ||
+                                                (token.queueppointment != null &&
+                                                    token.queueppointment['is_transferred'] !=
+                                                        true)))) {
+                                          showDialog(
+                                              context: _context,
+                                              builder: (context) {
+                                                return AlertDialog(
+                                                  title: const Text(
+                                                      ('Alert (Not transferred!)')),
+                                                  content: Text(
+                                                      '${token.tokenNumber} ${('Not transferred, Continue Calling?')}'),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: const Text(
+                                                          ('Cancel')),
+                                                    ),
+                                                    CountDownButton(
+                                                      onPressed: () async {
+                                                        Navigator.pop(context);
+                                                        await _callNextToken();
+                                                      },
+                                                    )
+                                                  ],
+                                                );
+                                              });
+                                        } else if ((token != null &&
+                                                !token.isHold &&
+                                                token.status != 'no-show') &&
+                                            CounterSettingService
+                                                    .counterSettings
+                                                    ?.requireTransfer ==
+                                                true &&
+                                            ((token.queue != null && token.queue['is_transferred'] != true) ||
+                                                (token.queueppointment != null &&
+                                                    token.queueppointment['is_transferred'] !=
+                                                        true))) {
+                                          showDialog(
+                                              context: _context,
+                                              builder: (context) {
+                                                return AlertDialog(
+                                                  title: const Text(
+                                                      ('Transfer is required !')),
+                                                  content: Text(
+                                                      '${token.tokenNumber} ${('Not transferred')}'),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child:
+                                                          const Text(('Close')),
+                                                    ),
+                                                  ],
+                                                );
+                                              });
+                                        } else {
+                                          await _callNextToken();
+                                        }
+                                      }
+                                    : null, // Disabled button
                                 text: 'CALL NEXT',
                               ),
                             ),
@@ -498,11 +817,69 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: CustomElevatedButton(
-                                  onPressed: () {}, // Disabled button
-                                  text: 'HOLD TOKEN'),
-                            ),
+                                padding: const EdgeInsets.all(8.0),
+                                child: CustomElevatedButton(
+                                  onPressed: CounterSettingService
+                                                  .counterSettings
+                                                  ?.alwaysDisableHoldBtn !=
+                                              true &&
+                                          token?.status == 'serving'
+                                      ? () async {
+                                          ///hold token function.
+                                          UtilityService.showLoadingAlert(
+                                              _context);
+                                          var response =
+                                              await CallService.holdToken();
+                                          Navigator.pop(_context);
+                                          if (response is TokenModel) {
+                                            BlocProvider.of<CallBloc>(_context)
+                                                .add((CallNextTokenEvent()));
+                                            UtilityService.toast(
+                                              _context,
+                                              ('Holded'),
+                                            );
+                                            return;
+                                          }
+                                          UtilityService.toast(
+                                            _context,
+                                            ('Something Went wrong'),
+                                          );
+                                        }
+                                      : token?.isHold == true
+                                          ? () async {
+                                              ///unhold function.
+
+                                              UtilityService.showLoadingAlert(
+                                                _context,
+                                              );
+                                              var response =
+                                                  await CallService.unholdToken(
+                                                      id: token?.id ?? 0);
+                                              Navigator.pop(_context);
+                                              if (response is TokenModel) {
+                                                if (selectedToken != null) {
+                                                  selectedToken = response;
+                                                }
+                                                BlocProvider.of<CallBloc>(
+                                                        _context)
+                                                    .add(
+                                                        (CallNextTokenEvent()));
+                                                UtilityService.toast(
+                                                  _context,
+                                                  ('Unholded'),
+                                                );
+                                                return;
+                                              }
+                                              UtilityService.toast(
+                                                _context,
+                                                ('Something Went wrong'),
+                                              );
+                                            }
+                                          : null, // Disabled button
+                                  child: token?.isHold == true
+                                      ? const Text(('UNHOLD TOKEN'))
+                                      : const Text(('HOLD TOKEN')),
+                                )),
                           ),
                         ],
                       ),
@@ -543,7 +920,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   return Column(
                     children: [
                       getTransferButtons(),
-                    ], // Placeholder for _getTransferButtons()
+                    ],
                   );
                 }),
               ),
@@ -579,7 +956,7 @@ class _HomeScreenState extends State<HomeScreen> {
               GestureDetector(
                 onTap: token != null
                     ? () {
-                        // showTokenDetails(token, context);
+                        showTokenDetails(token, context);
                       }
                     : null,
                 onLongPress: (token?.queueId != null &&
@@ -761,98 +1138,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Widget buildTokenPart() {
-  //   // Placeholder values for UI demonstration
-  //   String tokenNumber = 'Token Number';
-  //   // String servedTime = '';
-  //   String tokenStatus = 'Serving';
-  //   Color statusColor = Colors.green;
-  //   String customerDetails = 'Customer Details';
-
-  //   TokenModel? token = selectedToken ?? GeneralDataService.lastCalledToken;
-  //       String servedTime = GeneralDataService.lastCalledToken?.servedTime ?? '';
-
-  //   return Row(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       Expanded(
-  //         child: Column(
-  //           children: [
-  //             GestureDetector(
-  //               onTap: () {
-  //                 // Placeholder for onTap action
-  //               },
-  //               onLongPress: () {
-  //                 // Placeholder for onLongPress action
-  //               },
-  //               child: Text(
-  //                 tokenNumber,
-  //                 style: const TextStyle(
-  //                   fontSize: 45,
-  //                   fontWeight: FontWeight.bold,
-  //                   height: 1,
-  //                 ),
-  //               ),
-  //             ),
-  //             Row(
-  //               mainAxisAlignment: MainAxisAlignment.center,
-  //               children: [
-  //                 // Placeholder for Priority Text
-  //                 Text(
-  //                   'H', // or 'L', 'N' based on priority
-  //                   style: TextStyle(
-  //                     color: Colors.green.shade600,
-  //                     fontSize: 20,
-  //                     fontWeight: FontWeight.bold,
-  //                   ),
-  //                 ),
-  //                 const SizedBox(width: 20),
-  //                 // Placeholder for Served Time or Streamed Time
-  //                 Text(
-  //                   servedTime.isEmpty ? '00:00:00' : servedTime,
-  //                   style: const TextStyle(
-  //                     fontSize: 18,
-  //                     fontWeight: FontWeight.bold,
-  //                     height: 1,
-  //                   ),
-  //                 ),
-  //                 const SizedBox(width: 20),
-  //                 // Placeholder for Token Status
-  //                 Text(
-  //                   tokenStatus,
-  //                   style: TextStyle(
-  //                     color: statusColor,
-  //                     fontSize: 18,
-  //                     fontWeight: FontWeight.bold,
-  //                     height: 1,
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //             const SizedBox(height: 7),
-  //             // Placeholder for Customer Details
-  //             Text(
-  //               customerDetails,
-  //               style: const TextStyle(
-  //                 fontSize: 17,
-  //                 fontWeight: FontWeight.w400,
-  //                 height: 1,
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //       IconButton(
-  //         onPressed: () {
-  //           remarkhowBottomSheet();
-  //         },
-  //         icon: const Icon(Icons.notes),
-  //         iconSize: 25,
-  //       ),
-  //     ],
-  //   );
-  // }
-
   void remarkhowBottomSheet() {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
@@ -890,19 +1175,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  // SizedBox(
-                  //   height: 40,
-                  // ),
-                  // const SizedBox(height: 0),
-                  // GestureDetector(
-                  //   child: const TextField(
-                  //     decoration: InputDecoration(
-                  //       border: OutlineInputBorder(),
-                  //       suffixIcon: Icon(Icons.arrow_drop_down),
-                  //     ),
-                  //   ),
-                  // ),
-                  // const SizedBox(height: 25),
                   GestureDetector(
                     child: const TextField(
                       minLines: 9, // Set the minimum number of lines
@@ -910,7 +1182,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       decoration: InputDecoration(),
                     ),
                   ),
-
                   const SizedBox(height: 10),
                   CustomElevatedButton(
                       text: "Save",
@@ -970,8 +1241,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> _editServiceAndCounterTabDetails(
-      StateSetter tabsetState) async {
+  Future<void> _editServiceAndCounterTabDetails(StateSetter tabsetState) async {
     UtilityService.showLoadingAlert(_context);
     await GeneralDataService.initServiceAndCounterData();
     Navigator.pop(_context);
@@ -986,7 +1256,6 @@ class _HomeScreenState extends State<HomeScreen> {
           () {},
         ));
   }
-  
   // void showTokenDetails(TokenModel? token, BuildContext context) {
   //   int? id = token?.queueId ?? token?.queueppointmentId;
   //   UtilityService.showLoadingAlert(context);
@@ -1019,5 +1288,43 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.pop(context);
     BlocProvider.of<SettingsBloc>(context).add(HomePageSettingsChangedEvent());
     rebuildHoldUnholdButtons();
+  }
+
+  Future<void> _callNextToken() async {
+    UtilityService.showLoadingAlert(_context);
+    var token = await CallService.callNextToken();
+    Navigator.pop(_context);
+    if (token is TokenModel) {
+      BlocProvider.of<CallBloc>(_context).add((CallNextTokenEvent()));
+    } else if (token is String) {
+      UtilityService.toast(_context, token);
+    }
+  }
+
+  void showTokenDetails(TokenModel? token, BuildContext context) {
+    int? id = token?.queueId ?? token?.queueppointmentId;
+    UtilityService.showLoadingAlert(context);
+    CallService.getCustomerFlow(
+      id: id ?? 0,
+      isQueue: token?.queueId != null ? true : false,
+    ).then((value) {
+      Navigator.pop(context);
+      if (value is bool && value == false) {
+        UtilityService.toast(
+          context,
+          ("Something went wrong, can't fetch details"),
+        );
+        return;
+      }
+      showBottomSheet(
+          backgroundColor: Colors.transparent,
+          context: context,
+          builder: (context) {
+            return CustomerFlowDetails(
+              customerFlow: value,
+              tokenNumber: token?.tokenNumber ?? '',
+            );
+          });
+    });
   }
 }

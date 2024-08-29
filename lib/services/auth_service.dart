@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:oneappcounter/model/login_response.dart';
 import 'package:oneappcounter/model/user_credential.dart';
+import 'package:oneappcounter/services/counter_setting_service.dart';
 import 'package:oneappcounter/services/networking_service.dart';
 import 'package:oneappcounter/services/storage_service.dart';
 
@@ -88,25 +89,25 @@ class AuthService {
     await StorageService.removedSavedValue(key: 'login_data');
   }
 
-  // static Future<bool> logoutUser() async {
-  //   String _url = 'auth/logout';
+  static Future<bool> logoutUser() async {
+    String url = 'auth/logout';
 
-  //   try {
-  //     final response = await NetworkingService.postHttp(
-  //       path: _url,
-  //       data: {'': ''},
-  //     );
-  //     if (response is Response && response.statusCode == 200) {
-  //       await clearLoginToken();
-  //       await CounterSettingService.clearSettingsData();
-  //       return true;
-  //     } else {
-  //       return false;
-  //     }
-  //   } catch (e) {
-  //     return false;
-  //   }
-  // }
+    try {
+      final response = await NetworkingService.postHttp(
+        path: url,
+        data: {'': ''},
+      );
+      if (response is Response && response.statusCode == 200) {
+        await clearLoginToken();
+        await CounterSettingService.clearSettingsData();
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
 
   static Future<bool> updateBranchDetails() async {
     String path = 'system_branch/${loginData?.systemBranch['id']}';

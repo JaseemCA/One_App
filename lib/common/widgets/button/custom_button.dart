@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:oneappcounter/core/config/color/appcolors.dart';
 
 class CustomElevatedButton extends StatelessWidget {
-  final String text;
+  final String? text;
   final VoidCallback? onPressed;
   final Color? backgroundColor;
   final Color textColor;
@@ -12,7 +12,7 @@ class CustomElevatedButton extends StatelessWidget {
 
   const CustomElevatedButton({
     super.key,
-    required this.text,
+    this.text,
     this.onPressed,
     this.backgroundColor,
     this.textColor = Colors.white,
@@ -41,10 +41,12 @@ class CustomElevatedButton extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 5),
-        child: Text(
-          text,
-          style: TextStyle(fontSize: textSize ?? fontSize, color: textColor),
-        ),
+        child: child ??
+            Text(
+              text ?? '',
+              style:
+                  TextStyle(fontSize: textSize ?? fontSize, color: textColor),
+            ),
       ),
     );
   }

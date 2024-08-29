@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -289,7 +288,7 @@ class GeneralDataService {
       return true;
     } else {
       if (_allServiceCounterTabs.isNotEmpty &&
-          _allServiceCounterTabs 
+          _allServiceCounterTabs
               .asMap()
               .containsKey(currentServiceCounterTabIndex)) {
         const String path = 'call/get/last_token';
@@ -522,8 +521,6 @@ class GeneralDataService {
     }
   }
 
-
-
   static Future<void> updateChangeInTab(int serviceId) async {
     for (var i = 0; i < _allServiceCounterTabs.length; i++) {
       ServiceCounterTabModel currentTab = _allServiceCounterTabs[i];
@@ -559,7 +556,8 @@ class GeneralDataService {
     } catch (_) {}
     todaysQueueCancelled.add(queue);
   }
- static Future<void> updateTransferTokenDetails(TokenModel token,
+
+  static Future<void> updateTransferTokenDetails(TokenModel token,
       {Map<String, dynamic>? transferTO}) async {
     if (transferTO != null) {
       Map<String, dynamic> queueData = {};
@@ -606,7 +604,8 @@ class GeneralDataService {
     await updateTokenDetails(token);
     return;
   }
- static Future<void> updateTokenDetails(TokenModel token) async {
+
+  static Future<void> updateTokenDetails(TokenModel token) async {
     int index =
         todayCalledTokens.indexWhere((element) => element.id == token.id);
     if (index >= 0) {
@@ -629,5 +628,4 @@ class GeneralDataService {
       );
     }
   }
-
 }

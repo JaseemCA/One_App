@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_bloc.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_event.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_state.dart';
-
 import 'package:oneappcounter/presentation/appointments_page/appointments_page.dart';
 import 'package:oneappcounter/presentation/home/home_screen.dart';
 import 'package:oneappcounter/presentation/service_tabs_page/service_tab.dart';

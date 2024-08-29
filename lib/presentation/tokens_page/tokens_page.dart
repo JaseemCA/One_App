@@ -340,7 +340,7 @@ class _HomeScreenState extends State<TokensPage> {
                             )
                           : null,
                       trailing: SizedBox(
-                        width: 30,
+                        width: 60,
                         child: Row(
                           children: [
                             Expanded(
