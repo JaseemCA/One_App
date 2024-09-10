@@ -1,5 +1,4 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -39,6 +38,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   StateSetter? lockServiceButtonState;
 
   StateSetter? unlockServiceButtonState;
@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     ClockService.updateDateTime();
 
-    // SocketService.registerEvents(isAll: true);
+    SocketService.registerEvents(isAll: true);
 
     homePageRebuild =
         SocketService.homePageRebuildRequiredController.stream.listen((event) {
@@ -119,9 +119,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    // try {
-    //   SocketService.destorySocket();
-    // } catch (_) {}
+    try {
+      SocketService.destorySocket();
+    } catch (_) {}
     try {
       homePageRebuild.cancel();
     } catch (_) {}
@@ -136,10 +136,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    // final Color backgroundColor = isDarkMode
-    // ? Appcolors.bottomsheetDarkcolor
-    // : Appcolors.appBackgrondcolor;
 
     return Scaffold(
       appBar: AppBar(
@@ -602,7 +598,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Container(
                     child: buildTokenPart(),
-                  ), 
+                  ),
                   const Divider(
                     height: 40,
                   ), // kDivider replaced with Divider()
@@ -752,16 +748,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                               builder: (context) {
                                                 return AlertDialog(
                                                   title: const Text(
-                                                      ('Alert (Not transferred!)')),
+                                                      'Alert (Not transferred!)'),
                                                   content: Text(
-                                                      '${token.tokenNumber} ${('Not transferred, Continue Calling?')}'),
+                                                      '${token.tokenNumber} Not transferred, Continue Calling?'),
                                                   actions: [
                                                     TextButton(
                                                       onPressed: () {
                                                         Navigator.pop(context);
                                                       },
-                                                      child: const Text(
-                                                          ('Cancel')),
+                                                      child:
+                                                          const Text('Cancel'),
                                                     ),
                                                     CountDownButton(
                                                       onPressed: () async {
@@ -788,16 +784,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                               builder: (context) {
                                                 return AlertDialog(
                                                   title: const Text(
-                                                      ('Transfer is required !')),
+                                                      'Transfer is required !'),
                                                   content: Text(
-                                                      '${token.tokenNumber} ${('Not transferred')}'),
+                                                      '${token.tokenNumber} Not transferred'),
                                                   actions: [
                                                     TextButton(
                                                       onPressed: () {
                                                         Navigator.pop(context);
                                                       },
                                                       child:
-                                                          const Text(('Close')),
+                                                          const Text('Close'),
                                                     ),
                                                   ],
                                                 );

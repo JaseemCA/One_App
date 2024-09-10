@@ -34,15 +34,13 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
   }
 
-
- @override
+  @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     try {
@@ -51,7 +49,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.dispose();
   }
 
-   @override
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
@@ -76,8 +74,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         BlocProvider(create: (_) => ThemeCubit()),
         BlocProvider<BranchDomainBloc>(create: (context) => BranchDomainBloc()),
         BlocProvider<SettingsBloc>(create: (context) => SettingsBloc()),
-         BlocProvider<AppUpdateBloc>(create: (context) => AppUpdateBloc()),
-    
+        BlocProvider<AppUpdateBloc>(create: (context) => AppUpdateBloc()),
+       
+        
+
         BlocProvider<CallBloc>(create: (context) => CallBloc()),
         BlocProvider<TokenPageBloc>(create: (context) => TokenPageBloc()),
         BlocProvider<AppointmentPageBloc>(

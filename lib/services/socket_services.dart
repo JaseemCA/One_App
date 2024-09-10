@@ -19,8 +19,7 @@ import 'package:oneappcounter/services/set_device_service.dart';
 import 'package:socket_io_client/socket_io_client.dart' as i_o;
 
 class SocketService {
-
-static bool _isDisposed = false;
+  static bool _isDisposed = false;
 
   static StreamController homePageRebuildRequiredController =
       StreamController<bool>.broadcast();
@@ -39,8 +38,7 @@ static bool _isDisposed = false;
   static StreamController eventReceivedController =
       StreamController<int>.broadcast();
 
- static List<int> listeningServices = [];
- 
+  static List<int> listeningServices = [];
 
   static i_o.Socket socket = i_o.io(
     '${NetworkingService.domainUrl}:6001',
@@ -53,7 +51,6 @@ static bool _isDisposed = false;
         .build(),
   );
 
-
   static Echo echo =
       Echo(broadcaster: EchoBroadcasterType.SocketIO, client: socket, options: {
     'auth': {
@@ -65,7 +62,7 @@ static bool _isDisposed = false;
     }
   });
 
-    Future<void> initliseSocket() async {
+  Future<void> initliseSocket() async {
     LocalNotificationService().initNotificationSettings();
 
     _isDisposed = false;
@@ -81,7 +78,7 @@ static bool _isDisposed = false;
     });
   }
 
- static Future<void> registerEvents({bool isAll = false}) async {
+  static Future<void> registerEvents({bool isAll = false}) async {
     if (GeneralDataService.getTabs().isNotEmpty) {
       for (var serviceCounterTab in GeneralDataService.getTabs()) {
         for (var service in serviceCounterTab.services) {
@@ -155,9 +152,7 @@ static bool _isDisposed = false;
                 GeneralDataService.updateChangeInTab(queue.serviceId).then(
                     (value) => eventReceivedController.add(queue.serviceId));
               }
-
             }).listen('TokenSideMenuActions', (event) {
-            
               if (GeneralDataService.getTabs()[
                       GeneralDataService.currentServiceCounterTabIndex]
                   .services
@@ -225,11 +220,7 @@ static bool _isDisposed = false;
                     .then((value) => eventReceivedController
                         .add(event['queue']['service_id']));
               }
-
-            
             }).listen('TokenTransferred', (event) async {
-            
-
               TokenModel token = TokenModel.fromEntity(
                   TokenEntity.fromJson(event['data']['call']));
               if (GeneralDataService.getTabs()[
@@ -269,7 +260,6 @@ static bool _isDisposed = false;
                 GeneralDataService.updateChangeInTab(token.serviceId).then(
                     (value) => eventReceivedController.add(token.serviceId));
               }
-          
             });
           }
         }
@@ -353,12 +343,7 @@ static bool _isDisposed = false;
     }
   }
 
-  
-
-
-
-
- static Future<void> _leaveChannels({bool leaveAll = false}) async {
+  static Future<void> _leaveChannels({bool leaveAll = false}) async {
     listeningServices.clear();
     if (leaveAll) {
       echo.leaveChannel(
@@ -382,18 +367,266 @@ static bool _isDisposed = false;
     }
   }
 
-static Future<void> connectAfterSwitch() async {
+  static Future<void> connectAfterSwitch() async {
     registerEvents(isAll: false);
   }
-      
 
- static Future<void> destorySocket() async {
+  static Future<void> destorySocket() async {
     try {
       _isDisposed = true;
       _leaveChannels(leaveAll: true);
       echo.disconnect();
     } catch (_) {}
   }
-
-
 }
+
+// import 'dart:async';
+// import 'package:laravel_echo/laravel_echo.dart';
+// import 'package:oneappcounter/entity/countersetting_entity.dart';
+// import 'package:oneappcounter/entity/queue_appointments_entity.dart';
+// import 'package:oneappcounter/entity/queue_entity.dart';
+// import 'package:oneappcounter/entity/service_entity.dart';
+// import 'package:oneappcounter/entity/tocken_entity.dart';
+// import 'package:oneappcounter/model/counter_settings_model.dart';
+// import 'package:oneappcounter/model/queue_appointment_model.dart';
+// import 'package:oneappcounter/model/queue_model.dart';
+// import 'package:oneappcounter/model/service_model.dart';
+// import 'package:oneappcounter/model/tocken_model.dart';
+// import 'package:oneappcounter/services/auth_service.dart';
+// import 'package:oneappcounter/services/counter_setting_service.dart';
+// import 'package:oneappcounter/services/general_data_seevice.dart';
+// // import 'package:oneappcounter/services/general_data_service.dart';
+// import 'package:oneappcounter/services/local_notification_service.dart';
+// import 'package:oneappcounter/services/networking_service.dart';
+// import 'package:oneappcounter/services/set_device_service.dart';
+// import 'package:socket_io_client/socket_io_client.dart' as i_o;
+
+// class SocketService {
+//   static bool _isDisposed = false;
+
+//   // StreamControllers should be final
+//   static final StreamController<bool> homePageRebuildRequiredController =
+//       StreamController<bool>.broadcast();
+//   static final StreamController<bool> homePageAppBarRebuildRequiredController =
+//       StreamController<bool>.broadcast();
+//   static final StreamController<bool> tokensPageRebuildRequiredController =
+//       StreamController<bool>.broadcast();
+//   static final StreamController<bool> appointmentPageRebuildRequiredController =
+//       StreamController<bool>.broadcast();
+//   static final StreamController<bool> settingsPageRebuildRequiredController =
+//       StreamController<bool>.broadcast();
+//   static final StreamController<int> eventReceivedController =
+//       StreamController<int>.broadcast();
+
+//   static List<int> listeningServices = [];
+
+//   static i_o.Socket socket = i_o.io(
+//     '${NetworkingService.domainUrl}:6001',
+//     i_o.OptionBuilder()
+//         .disableAutoConnect()
+//         .setTransports(['websocket'])
+//         .enableReconnection()
+//         .setReconnectionDelay(1000)
+//         .setReconnectionDelayMax(1000)
+//         .build(),
+//   );
+
+//   static Echo echo = Echo(
+//     broadcaster: EchoBroadcasterType.SocketIO,
+//     client: socket,
+//     options: {
+//       'auth': {
+//         'headers': {
+//           'Authorization': 'Bearer ${NetworkingService.accessToken}',
+//           'Accept': 'application/json',
+//           'Tenant': '${AuthService.loginData?.systemBranch["website_id"]}',
+//         },
+//       }
+//     },
+//   );
+
+//   Future<void> initliseSocket() async {
+//     LocalNotificationService().initNotificationSettings();
+
+//     _isDisposed = false;
+//     echo.connect();
+//     socket.onDisconnect((_) {
+//       if (!_isDisposed) {
+//         _attemptReconnection();
+//       }
+//     });
+//   }
+
+//   void _attemptReconnection() {
+//     try {
+//       _leaveChannels(leaveAll: true);
+//     } catch (_) {}
+//     echo.connect();
+//     registerEvents(isAll: true);
+//   }
+
+//   static Future<void> registerEvents({bool isAll = false}) async {
+//     if (GeneralDataService.getTabs().isNotEmpty) {
+//       for (var serviceCounterTab in GeneralDataService.getTabs()) {
+//         for (var service in serviceCounterTab.services) {
+//           if (!listeningServices.contains(service.id)) {
+//             listeningServices.add(service.id);
+//             _registerChannelListeners(service.id);
+//           }
+//         }
+//       }
+//     }
+//     if (isAll) {
+//       _registerGlobalListeners();
+//     }
+//   }
+
+//   static void _registerChannelListeners(int serviceId) {
+//     echo
+//         .channel(
+//             'call.${AuthService.loginData?.systemBranch["website_id"]}.$serviceId')
+//         .listen('TokenIssued', (event) async {
+//       await _handleTokenIssuedEvent(event);
+//     }).listen('AppointmentIssued', (event) async {
+//       // await _handleAppointmentIssuedEvent(event);
+//     }).listen('TokenSideMenuActions', (event) {
+//       _handleTokenSideMenuActions(event);
+//     }).listen('TokenTransferred', (event) async {
+//       await _handleTokenTransferred(event);
+//     }).listen('TokenTransferredCancel', (_) async {
+//       await GeneralDataService.getTodayTokenDetails();
+//       tokensPageRebuildRequiredController.add(true);
+//       appointmentPageRebuildRequiredController.add(true);
+//     }).listen('ReportReady', (event) {
+//       _handleReportReady(event);
+//     });
+//   }
+
+//   static Future<void> _handleTokenIssuedEvent(dynamic event) async {
+//     QueueModel queue =
+//         QueueModel.fromEntity(QueueEntity.fromJson(event['data']));
+//     if (_isTokenForCurrentTab(queue.serviceId)) {
+//       _sendNotification(queue);
+//       await GeneralDataService.getTodayTokenDetails();
+//       _notifyPagesToRebuild();
+//     } else {
+//       GeneralDataService.updateChangeInTab(queue.serviceId).then(
+//           (value) => eventReceivedController.add(queue.serviceId));
+//     }
+//   }
+
+//   static bool _isTokenForCurrentTab(int serviceId) {
+//     return GeneralDataService.getTabs()[GeneralDataService.currentServiceCounterTabIndex]
+//         .services
+//         .map((e) => e.id)
+//         .contains(serviceId);
+//   }
+
+//   static void _sendNotification(QueueModel queue) {
+//     if (CounterSettingService.counterSettings?.notification == true) {
+//       LocalNotificationService.showNotification(
+//         message: 'Token ${queue.tokenNumber} added to ${queue.service['name']}',
+//         title: 'New Token in ${queue.service['name']}',
+//         service: '${queue.serviceId}service',
+//       );
+//     }
+//     if (CounterSettingService.counterSettings?.notificationSound == true) {
+//       LocalNotificationService.playNotificationSound();
+//     }
+//   }
+
+//   static void _notifyPagesToRebuild() {
+//     homePageRebuildRequiredController.add(true);
+//     tokensPageRebuildRequiredController.add(true);
+//     appointmentPageRebuildRequiredController.add(true);
+//   }
+
+//   // static Future<void> _handleAppointmentIssuedEvent(dynamic event) async {
+//   //   QueueAppointmentModel appointment =
+//   //       QueueAppointmentModel.fromEntity(QueueAppointmentsEntity.fromJson(event['data']));
+//   //   if (_isAppointmentForCurrentTab(appointment.serviceId)) {
+//   //     _sendAppointmentNotification(appointment);
+//   //     await GeneralDataService.getTodayAppointmentDetails();
+//   //     _notifyPagesToRebuild();
+//   //   } else {
+//   //     GeneralDataService.updateChangeInTab(appointment.serviceId).then(
+//   //         (value) => eventReceivedController.add(appointment.serviceId));
+//   //   }
+//   // }
+
+//   static bool _isAppointmentForCurrentTab(int serviceId) {
+//     return GeneralDataService.getTabs()[GeneralDataService.currentServiceCounterTabIndex]
+//         .services
+//         .map((e) => e.id)
+//         .contains(serviceId);
+//   }
+
+//   // static void _sendAppointmentNotification(QueueAppointmentModel appointment) {
+//   //   if (CounterSettingService.counterSettings?.notification == true) {
+//   //     LocalNotificationService.showNotification(
+//   //       message: 'Appointment ${appointment.appointmentNumber} added to ${appointment.service['name']}',
+//   //       title: 'New Appointment in ${appointment.service['name']}',
+//   //       service: '${appointment.serviceId}service',
+//   //     );
+//   //   }
+//   //   if (CounterSettingService.counterSettings?.notificationSound == true) {
+//   //     LocalNotificationService.playNotificationSound();
+//   //   }
+//   // }
+
+//   static void _handleTokenSideMenuActions(dynamic event) {
+//     // Handle token side menu actions here
+//   }
+
+//   static Future<void> _handleTokenTransferred(dynamic event) async {
+//     await GeneralDataService.getTodayTokenDetails();
+//     tokensPageRebuildRequiredController.add(true);
+//   }
+
+//   static void _handleReportReady(dynamic event) {
+//     // Handle report ready events here
+//   }
+
+//   // Register global listeners
+//   static void _registerGlobalListeners() {
+//     // Add global event listeners here
+//   }
+
+//   static Future<void> _leaveChannels({bool leaveAll = false}) async {
+//     listeningServices.clear();
+//     if (leaveAll) {
+//       _leaveGlobalChannels();
+//     }
+//     if (GeneralDataService.getTabs().isNotEmpty) {
+//       for (var serviceCounterTab in GeneralDataService.getTabs()) {
+//         for (var service in serviceCounterTab.services) {
+//           echo.leaveChannel(
+//               'call.${AuthService.loginData?.systemBranch["website_id"]}.${service.id}');
+//         }
+//       }
+//     }
+//   }
+
+//   static void _leaveGlobalChannels() {
+//     echo.leaveChannel(
+//         'token_updates.${AuthService.loginData?.systemBranch["website_id"]}');
+//     echo.leaveChannel(
+//         'display.${AuthService.loginData?.systemBranch["website_id"]}');
+//     echo.leaveChannel(
+//         'service_updated.${AuthService.loginData?.systemBranch["website_id"]}');
+//     echo.leaveChannel(
+//         'counter_app_settings_apply.${AuthService.loginData?.systemBranch["website_id"]}');
+//   }
+
+//   static Future<void> connectAfterSwitch() async {
+//     registerEvents(isAll: false);
+//   }
+
+//   static Future<void> destorySocket() async {
+//     try {
+//       _isDisposed = true;
+//       _leaveChannels(leaveAll: true);
+//       echo.disconnect();
+//     } catch (_) {}
+//   }
+// }

@@ -63,6 +63,7 @@ class _HomeScreenState extends State<TokensPage> {
   @override
   void initState() {
     super.initState();
+    // SocketService.registerEvents(isAll: true);
     rebuildListener = SocketService.tokensPageRebuildRequiredController.stream
         .listen((event) {
       if (event is bool && event) {
@@ -1491,40 +1492,6 @@ class _HomeScreenState extends State<TokensPage> {
         });
   }
 
-  void showQueueDetails(QueueModel queue, BuildContext context) {
-    int? id = queue.id;
-    UtilityService.showLoadingAlert(context);
-    CallService.getCustomerFlow(
-      id: id,
-      isQueue: true,
-    ).then((value) {
-      Navigator.pop(context); // Close the loading dialog
-      if (value is bool && value == false) {
-        UtilityService.toast(
-          context,
-          "Something went wrong, can't fetch details",
-        );
-        return;
-      }
-      showModalBottomSheet(
-        backgroundColor: Colors.transparent,
-        context: context,
-        builder: (context) {
-          return FractionallySizedBox(
-            heightFactor: 0.75, // 75% of the screen height
-            child: CustomerFlowDetails(
-              customerFlow: value,
-              tokenNumber: queue.tokenNumber,
-            ),
-          );
-        },
-      );
-    }).catchError((e) {
-      Navigator.pop(context); // Ensure the loading dialog is closed on error
-      UtilityService.toast(context, "An error occurred: $e");
-    });
-  }
-
   // void showQueueDetails(QueueModel queue, BuildContext context) {
   //   int? id = queue.id;
   //   UtilityService.showLoadingAlert(context);
@@ -1532,25 +1499,60 @@ class _HomeScreenState extends State<TokensPage> {
   //     id: id,
   //     isQueue: true,
   //   ).then((value) {
-  //     Navigator.pop(context);
+  //     Navigator.pop(context); // Close the loading dialog
   //     if (value is bool && value == false) {
   //       UtilityService.toast(
   //         context,
-  //         ("Something went wrong, can't fetch details"),
+  //         "Something went wrong, can't fetch details",
   //       );
   //       return;
   //     }
-  //     showBottomSheet(
-  //         backgroundColor: Colors.transparent,
-  //         context: context,
-  //         builder: (context) {
-  //           return CustomerFlowDetails(
+  //     showModalBottomSheet(
+
+  //       backgroundColor: Colors.transparent,
+  //       context: context,
+  //       builder: (context) {
+  //         return FractionallySizedBox(
+  //           heightFactor: 0.75, // 75% of the screen height
+  //           child: CustomerFlowDetails(
   //             customerFlow: value,
   //             tokenNumber: queue.tokenNumber,
-  //           );
-  //         });
+  //           ),
+  //         );
+  //       },
+  //     );
+  //   }).catchError((e) {
+  //     Navigator.pop(context); // Ensure the loading dialog is closed on error
+  //     UtilityService.toast(context, "An error occurred: $e");
   //   });
   // }
+
+  void showQueueDetails(QueueModel queue, BuildContext context) {
+    int? id = queue.id;
+    UtilityService.showLoadingAlert(context);
+    CallService.getCustomerFlow(
+      id: id,
+      isQueue: true,
+    ).then((value) {
+      Navigator.pop(context);
+      if (value is bool && value == false) {
+        UtilityService.toast(
+          context,
+          ("Something went wrong, can't fetch details"),
+        );
+        return;
+      }
+      showBottomSheet(
+          backgroundColor: Colors.transparent,
+          context: context,
+          builder: (context) {
+            return CustomerFlowDetails(
+              customerFlow: value,
+              tokenNumber: queue.tokenNumber,
+            );
+          });
+    });
+  }
 
   Widget makeReportWidgetFn(TokenModel token, BuildContext context) {
     return token.reportReady != null

@@ -483,14 +483,15 @@ class _SetNewServiceTabState extends State<SetNewServiceTab> {
                                         // if (mounted) return;
                                         Navigator.pop(context); // Close loading
                                         Navigator.pop(context); // Close dialog
-                                        Navigator.pop(context); // Close popup
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
                                       },
                                       child: const Text('Switch Tab'),
                                     )
                                   ],
                                 );
                               });
-                              await SocketService.connectAfterSwitch();
+                          await SocketService.connectAfterSwitch();
                         } else {
                           if (_selectedServices.isNotEmpty) {
                             UtilityService.showLoadingAlert(context);
@@ -500,7 +501,7 @@ class _SetNewServiceTabState extends State<SetNewServiceTab> {
                                 counter: _counter!,
                                 index: widget.editingIndex,
                               );
-                               BlocProvider.of<SettingsBloc>(context)
+                              BlocProvider.of<SettingsBloc>(context)
                                   .add(HomePageSettingsChangedEvent());
                             } else {
                               await GeneralDataService
@@ -509,7 +510,7 @@ class _SetNewServiceTabState extends State<SetNewServiceTab> {
                                 counter: _counter!,
                               );
                             }
-                             await SocketService.connectAfterSwitch();
+                            await SocketService.connectAfterSwitch();
                             if (!mounted) return;
                             Navigator.pop(context); // Close loading
                             Navigator.pop(context); // Close popup

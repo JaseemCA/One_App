@@ -1,6 +1,18 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:async';
+
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/core/config/color/appcolors.dart';
+import 'package:oneappcounter/functions/general_functions.dart';
+import 'package:oneappcounter/model/service_model.dart';
+import 'package:oneappcounter/services/counter_setting_service.dart';
+import 'package:oneappcounter/services/general_data_seevice.dart';
+import 'package:oneappcounter/services/set_device_service.dart';
+import 'package:oneappcounter/services/socket_services.dart';
+import 'package:oneappcounter/services/utility_services.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -12,122 +24,264 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final alertTimeController = TextEditingController();
   final uidController = TextEditingController();
+  static bool _isSettingsUpdating = false;
+  static bool _isTabRebuildNeededAfterPop = false;
+  static bool _isHomeRebuildNeededAfterPop = false;
+  Map<String, dynamic>? _currentSettings =
+      CounterSettingService.counterSettings?.toJson();
+
+  ///setstate functions
+  StateSetter? _alertTransferSetState;
+
+  StateSetter? _requiredTransferSetState;
+
+  ///side menu
+
+  StateSetter? _hideCalledSetState;
+
+  StateSetter? _hideServedSetState;
+
+  StateSetter? _hideServedTransferSetState;
+
+  StateSetter? _autoGridViewAfterServeSetState;
+
+  StateSetter? _autoGridViewAfterTransferSetState;
+
+  StateSetter? multipleTransferAtATimeSetState;
+
+  StateSetter? rebuildAllSetState;
+
+  List<ServiceModel> selectedServices =
+      GeneralDataService.activeServices.where((element) {
+    List transferServices =
+        CounterSettingService.counterSettings?.transferServices ?? [];
+    if (transferServices.contains(element.id)) {
+      return true;
+    }
+    return false;
+  }).toList();
+
+  late BuildContext _context;
+
+  late StreamSubscription rebuildRequired;
+  Future<void> updateSettings(BuildContext context, String message) async {
+    _isSettingsUpdating = true;
+    UtilityService.showLoadingAlert(context);
+    if (_currentSettings != null) {
+      await CounterSettingService.updateSettingsLocaly(
+        _currentSettings!,
+        callAPi: false,
+      );
+    }
+    Navigator.pop(context);
+    // await LanguageService.changeLocaleFn(context);
+    UtilityService.toast(context, '$message ${('Settings Updated')}');
+    _isHomeRebuildNeededAfterPop = true;
+    _isSettingsUpdating = false;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    rebuildRequired = SocketService.settingsPageRebuildRequiredController.stream
+        .listen((event) async {
+      if (event is bool && event) {
+        updateMainVaribale();
+        rebuildAllSetState != null ? rebuildAllSetState!(() {}) : null;
+
+        /// as build context need to be passed to change locale function, so all switching tab should call same function
+        // await LanguageService.changeLocaleFn(context);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    try {
+      rebuildRequired.cancel();
+    } catch (_) {}
+    super.dispose();
+  }
+
+  void updateMainVaribale() {
+    _currentSettings = CounterSettingService.counterSettings?.toJson();
+    selectedServices = GeneralDataService.activeServices.where((element) {
+      List transferServices =
+          CounterSettingService.counterSettings?.transferServices;
+      if (transferServices.contains(element.id)) {
+        return true;
+      }
+      return false;
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: isDarkMode
-            ? Appcolors.bottomsheetDarkcolor
-            : Appcolors.appBackgrondcolor,
-        automaticallyImplyLeading: false,
-        title: const Text(
-          'Settings',
-          style: TextStyle(
-              color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(
-              Icons.keyboard_arrow_down_outlined,
-              color: Colors.white,
-              size: 30,
+    // ignore: deprecated_member_use
+    return WillPopScope(
+      onWillPop: () async {
+        UtilityService.showLoadingAlert(context);
+        await waitWhile(() => _isSettingsUpdating);
+        await SetDeviceService.addCounterAppDetails();
+        await GeneralDataService.getTodayTokenDetails();
+        Navigator.pop(context);
+        Navigator.pop(
+          context,
+          {
+            'tab': _isTabRebuildNeededAfterPop,
+            'home': _isHomeRebuildNeededAfterPop
+          },
+        );
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: isDarkMode
+              ? Appcolors.bottomsheetDarkcolor
+              : Appcolors.appBackgrondcolor,
+          automaticallyImplyLeading: false,
+          title: const Text(
+            'Settings',
+            style: TextStyle(
+                color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
+          ),
+          actions: [
+            IconButton(
+              onPressed: () async {
+                UtilityService.showLoadingAlert(context);
+                await waitWhile(() => _isSettingsUpdating);
+                await SetDeviceService.addCounterAppDetails();
+                await GeneralDataService.getTodayTokenDetails();
+                Navigator.pop(context);
+                Navigator.pop(
+                  context,
+                  {
+                    'tab': _isTabRebuildNeededAfterPop,
+                    'home': _isHomeRebuildNeededAfterPop
+                  },
+                );
+              },
+              icon: const Icon(
+                Icons.keyboard_arrow_down_outlined,
+                color: Colors.white,
+                size: 30,
+              ),
             ),
-          ),
-        ],
-      ),
-      body: Container(
-        padding: const EdgeInsets.all(10),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Row(
+          ],
+        ),
+        body: Container(
+          padding: const EdgeInsets.all(10),
+          child: StatefulBuilder(
+              builder: (BuildContext context, StateSetter allPageSetState) {
+            rebuildAllSetState = allPageSetState;
+            return SingleChildScrollView(
+              child: Column(
                 children: [
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'service1',
-                          child: Text('Service 1'),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownSearch<ServiceModel>.multiSelection(
+                          compareFn: (item1, current) {
+                            if (item1.id == current.id) {
+                              return true;
+                            }
+                            return false;
+                          },
+                          selectedItems: selectedServices,
+                          items: GeneralDataService.activeServices,
+                          popupProps: const PopupPropsMultiSelection.dialog(
+                            showSearchBox: true,
+                          ),
+                          dropdownDecoratorProps: const DropDownDecoratorProps(
+                            dropdownSearchDecoration: InputDecoration(
+                              labelText: ("Transfer Service"),
+                              hintText: ("Transfer Service"),
+                            ),
+                          ),
+                          itemAsString: (value) {
+                            return value.displayName;
+                          },
+                          onChanged: (value) {
+                            _currentSettings?['transferServices'] != null
+                                ? _currentSettings!['transferServices'].clear()
+                                : _currentSettings?['transferServices'] = [];
+                            for (var item in value) {
+                              _currentSettings?['transferServices']
+                                  .add(item.id);
+                            }
+                            updateSettings(
+                              context,
+                              ('Transfer Service'),
+                            );
+                          },
                         ),
-                        DropdownMenuItem(
-                          value: 'service2',
-                          child: Text('Service 2'),
-                        ),
-                      ],
-                      onChanged: (value) {},
-                      decoration: const InputDecoration(
-                        labelText: "Transfer Service",
-                        hintText: "Transfer Service",
-                      ),
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'en',
-                          child: Text('English'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'es',
-                          child: Text('Spanish'),
-                        ),
-                      ],
-                      onChanged: (value) {},
-                      decoration: const InputDecoration(
-                        labelText: "Language",
-                        hintText: "Language",
-                      ),
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: 10),
-              buildGeneralCard(),
-              buildSideMenuCard(),
-              buildButtonsCard(),
-              buildGridViewCard(),
-              buildMiscellaneousCard(),
-              const SizedBox(height: 20),
-              const Divider(),
-              const SizedBox(height: 25),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: TextFormField(
-                      controller: uidController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(hintText: 'Enter UID'),
-                    ),
+                      )
+                    ],
                   ),
-                  Expanded(
-                      child: CustomElevatedButton(
-                    text: "APPLY",
-                    onPressed: () {},
-                    fontSize: 12,
-                  ))
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'en',
+                              child: Text('English'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'es',
+                              child: Text('Spanish'),
+                            ),
+                          ],
+                          onChanged: (value) {},
+                          decoration: const InputDecoration(
+                            labelText: "Language",
+                            hintText: "Language",
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  buildGeneralCard(),
+                  buildSideMenuCard(),
+                  buildButtonsCard(),
+                  buildGridViewCard(),
+                  buildMiscellaneousCard(),
+                  const SizedBox(height: 20),
+                  const Divider(),
+                  const SizedBox(height: 25),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: TextFormField(
+                          controller: uidController,
+                          keyboardType: TextInputType.number,
+                          decoration:
+                              const InputDecoration(hintText: 'Enter UID'),
+                        ),
+                      ),
+                      Expanded(
+                          child: CustomElevatedButton(
+                        text: "APPLY",
+                        onPressed: () {},
+                        fontSize: 12,
+                      ))
+                    ],
+                  ),
+                  const SizedBox(height: 25),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Version 1.0.0'),
+                    ],
+                  )
                 ],
               ),
-              const SizedBox(height: 25),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Version 1.0.0'),
-                ],
-              )
-            ],
-          ),
+            );
+          }),
         ),
       ),
     );
