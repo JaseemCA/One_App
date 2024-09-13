@@ -43,9 +43,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   StateSetter? _hideServedTransferSetState;
 
-  StateSetter? _autoGridViewAfterServeSetState;
+  // StateSetter? _autoGridViewAfterServeSetState;
 
-  StateSetter? _autoGridViewAfterTransferSetState;
+  // StateSetter? _autoGridViewAfterTransferSetState;
 
   StateSetter? multipleTransferAtATimeSetState;
 
@@ -298,65 +298,97 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Text(
-                    'General',
+                    ('General'),
                     style: TextStyle(
                       fontSize: 22,
                     ),
                   ),
-                ),
+                )
               ],
             ),
             const Divider(),
-            const Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Recall Unhold Token?',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            const Divider(),
-            const SizedBox(height: 10),
-            const Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Alert Transfer',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            const Divider(),
-            const SizedBox(height: 10),
             Row(
               children: [
                 const Expanded(
                   flex: 4,
                   child: Text(
-                    'Alert Time (in seconds)',
+                    ('Recall Unhold Token?'),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return Switch(
+                      value: _currentSettings?['recallUnholdToken'] ?? false,
+                      onChanged: (value) {
+                        _currentSettings?['recallUnholdToken'] = value;
+
+                        updateSettings(
+                          context,
+                          ('General'),
+                        );
+                        setState(() {});
+                      },
+                    );
+                  }),
+                )
+              ],
+            ),
+            const Divider(),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                const Expanded(
+                    flex: 4,
+                    child: Text(
+                      ('Alert Transfer'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    )),
+                Expanded(
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    _alertTransferSetState = setState;
+                    return Switch(
+                        value: _currentSettings?['alertTransfer'] ?? false,
+                        onChanged: (value) {
+                          _currentSettings?['alertTransfer'] = value;
+                          if (value &&
+                              _currentSettings?['requireTransfer'] == true) {
+                            _currentSettings?['requireTransfer'] = false;
+                          }
+                          if (_requiredTransferSetState != null &&
+                              _alertTransferSetState != null) {
+                            _requiredTransferSetState!(() {});
+                            _alertTransferSetState!(() {});
+                          }
+                          updateSettings(
+                            context,
+                            ('General'),
+                          );
+                        });
+                  }),
+                )
+              ],
+            ),
+            const Divider(),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                const Expanded(
+                  flex: 4,
+                  child: Text(
+                    ('Alert Time (in seconds)'),
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -365,21 +397,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 Expanded(
                   child: TextFormField(
-                    decoration: const InputDecoration(
-                      hintText: 'Enter time',
-                    ),
+                    controller: alertTimeController,
+                    onChanged: (value) {
+                      _currentSettings?['alertTime'] = alertTimeController.text;
+                      updateSettings(
+                        _context,
+                        ('General'),
+                      );
+                    },
                   ),
-                ),
+                )
               ],
             ),
             const Divider(),
-            const SizedBox(height: 10),
-            const Row(
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
               children: [
-                Expanded(
+                const Expanded(
                   flex: 4,
                   child: Text(
-                    'Require Transfer Service?',
+                    ('Require Transfer Service?'),
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -387,21 +426,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    _requiredTransferSetState = setState;
+                    return Switch(
+                        value: _currentSettings?['requireTransfer'] ?? false,
+                        onChanged: (value) {
+                          _currentSettings?['requireTransfer'] = value;
+                          if (value &&
+                              _currentSettings?['alertTransfer'] == true) {
+                            _currentSettings?['alertTransfer'] = false;
+                          }
+
+                          if (_requiredTransferSetState != null &&
+                              _alertTransferSetState != null) {
+                            _requiredTransferSetState!(() {});
+                            _alertTransferSetState!(() {});
+                          }
+                          updateSettings(
+                            _context,
+                            ('General'),
+                          );
+                        });
+                  }),
+                )
               ],
             ),
             const Divider(),
-            const SizedBox(height: 10),
-            const Row(
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
               children: [
-                Expanded(
+                const Expanded(
                   flex: 4,
                   child: Text(
-                    'Notification?',
+                    ('Notification?'),
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -409,21 +469,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return Switch(
+                        value: _currentSettings?['notification'] ?? false,
+                        onChanged: (value) {
+                          _currentSettings?['notification'] = value;
+                          updateSettings(
+                            _context,
+                            ('General'),
+                          );
+                          setState(() {});
+                        });
+                  }),
+                )
               ],
             ),
             const Divider(),
-            const SizedBox(height: 10),
-            const Row(
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
               children: [
-                Expanded(
+                const Expanded(
                   flex: 4,
                   child: Text(
-                    'Notification Sound?',
+                    ('Notification Sound?'),
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -431,21 +502,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return Switch(
+                        value: _currentSettings?['notificationSound'] ?? false,
+                        onChanged: (value) {
+                          _currentSettings?['notificationSound'] = value;
+
+                          updateSettings(
+                            _context,
+                            ('General'),
+                          );
+                          setState(() {});
+                        });
+                  }),
+                )
               ],
             ),
             const Divider(),
-            const SizedBox(height: 10),
-            const Row(
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
               children: [
-                Expanded(
+                const Expanded(
                   flex: 4,
                   child: Text(
-                    'Show Token Priority?',
+                    ('Show Token Priority?'),
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -453,11 +536,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return Switch(
+                        value: _currentSettings?['showPriority'] ?? false,
+                        onChanged: (value) {
+                          _currentSettings?['showPriority'] = value;
+                          updateSettings(
+                            _context,
+                            ('General'),
+                          );
+                          setState(() {});
+                        });
+                  }),
+                )
               ],
             ),
           ],
@@ -467,245 +559,432 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget buildSideMenuCard() {
-    return const Card(
+    return Card(
       child: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    'Navigation Menu',
-                    style: TextStyle(
-                      fontSize: 22,
+        padding: const EdgeInsets.all(8.0),
+        child: StatefulBuilder(
+            builder: (BuildContext context, StateSetter hideSideMenusetState) {
+          return Column(
+            children: [
+              const Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      ('Navigation Menu'),
+                      style: TextStyle(
+                        fontSize: 22,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              const Divider(),
+              Row(
+                children: [
+                  const Expanded(
+                    flex: 4,
+                    child: Text(
+                      ('Hide Navigation Menu (Token and Appointment)?'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            Divider(),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Hide Navigation Menu (Token and Appointment)?',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
+                  Expanded(
+                    child: Switch(
+                      value: _currentSettings?['hideSideMenu'] ?? false,
+                      onChanged: (value) {
+                        _isTabRebuildNeededAfterPop = true;
+                        _currentSettings?['hideSideMenu'] = value;
+                        _currentSettings?['hideNextToCall'] = value;
+                        _currentSettings?['hideTodayAppointments'] = value;
+                        _currentSettings?['hideCalled'] = value;
+                        _currentSettings?['hideServedInCalled'] = value;
+                        _currentSettings?['hideServedAndTransferredInCalled'] =
+                            value;
+                        _currentSettings?['hideHoldedTokens'] = value;
+                        _currentSettings?['hideHoldedQueue'] = value;
+                        _currentSettings?['hideCancelled'] = value;
+                        _currentSettings?['hideCancelledAppointments'] = value;
+                        updateSettings(
+                          _context,
+                          ('Navigation Menu'),
+                        );
+                        hideSideMenusetState(() {});
+                      },
+                    ),
+                  )
+                ],
+              ),
+              const Divider(),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  const Expanded(
+                      flex: 4,
+                      child: Text(
+                        ('Hide Next to Call'),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      )),
+                  Expanded(
+                    child: StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                      return Switch(
+                          value: _currentSettings?['hideNextToCall'] ?? false,
+                          onChanged: (value) {
+                            if (!_currentSettings?['hideSideMenu']) {
+                              _isTabRebuildNeededAfterPop = true;
+                              _currentSettings?['hideNextToCall'] = value;
+                              updateSettings(
+                                _context,
+                                ('Navigation Menu'),
+                              );
+                              setState(() {});
+                            }
+                          });
+                    }),
+                  )
+                ],
+              ),
+              const Divider(),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  const Expanded(
+                      flex: 4,
+                      child: Text(
+                        ('Hide Today Appointments'),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      )),
+                  Expanded(
+                    child: StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                      return Switch(
+                          value: _currentSettings?['hideTodayAppointments'] ??
+                              false,
+                          onChanged: (value) {
+                            if (!_currentSettings?['hideSideMenu']) {
+                              _isTabRebuildNeededAfterPop = true;
+                              _currentSettings?['hideTodayAppointments'] =
+                                  value;
+                              updateSettings(
+                                _context,
+                                ('Navigation Menu'),
+                              );
+                              setState(() {});
+                            }
+                          });
+                    }),
+                  )
+                ],
+              ),
+              const Divider(),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  const Expanded(
+                      flex: 4,
+                      child: Text(
+                        ('Hide Called'),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      )),
+                  Expanded(
+                    child: StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                      _hideCalledSetState = setState;
+                      return Switch(
+                          value: _currentSettings?['hideCalled'] ?? false,
+                          onChanged: (value) {
+                            if (!_currentSettings?['hideSideMenu']) {
+                              _isTabRebuildNeededAfterPop = true;
+                              _currentSettings?['hideCalled'] = value;
+
+                              _currentSettings?['hideServedInCalled'] = value;
+
+                              _currentSettings?[
+                                  'hideServedAndTransferredInCalled'] = value;
+
+                              if (_hideCalledSetState != null &&
+                                  _hideServedSetState != null &&
+                                  _hideServedTransferSetState != null) {
+                                _hideCalledSetState!(() {});
+                                _hideServedSetState!(() {});
+                                _hideServedTransferSetState!(() {});
+                              }
+                              updateSettings(
+                                _context,
+                                ('Navigation Menu'),
+                              );
+                            }
+                          });
+                    }),
+                  )
+                ],
+              ),
+              const Divider(),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  const Expanded(
+                    flex: 4,
+                    child: Text(
+                      ('Hide Served'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Hide Next to Call',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
+                  Expanded(
+                    child: StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                      _hideServedSetState = setState;
+                      return Switch(
+                          value:
+                              _currentSettings?['hideServedInCalled'] ?? false,
+                          onChanged: (value) {
+                            if (!_currentSettings?['hideCalled'] &&
+                                !_currentSettings?['hideSideMenu']) {
+                              _isTabRebuildNeededAfterPop = true;
+                              _currentSettings?['hideServedInCalled'] = value;
+
+                              _currentSettings?[
+                                  'hideServedAndTransferredInCalled'] = value;
+                              if (_hideCalledSetState != null &&
+                                  _hideServedSetState != null &&
+                                  _hideServedTransferSetState != null) {
+                                _hideCalledSetState!(() {});
+                                _hideServedSetState!(() {});
+                                _hideServedTransferSetState!(() {});
+                              }
+                              updateSettings(
+                                _context,
+                                ('Navigation Menu'),
+                              );
+                            }
+                          });
+                    }),
+                  )
+                ],
+              ),
+              const Divider(),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  const Expanded(
+                    flex: 4,
+                    child: Text(
+                      ('Hide Served & Transferred'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Hide Today Appointments',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
+                  Expanded(
+                    child: StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                      _hideServedTransferSetState = setState;
+                      return Switch(
+                          value: _currentSettings?[
+                                  'hideServedAndTransferredInCalled'] ??
+                              false,
+                          onChanged: (value) {
+                            if (!_currentSettings?['hideSideMenu'] &&
+                                !_currentSettings?['hideCalled'] &&
+                                !_currentSettings?['hideServedInCalled']) {
+                              _isTabRebuildNeededAfterPop = true;
+                              _currentSettings?[
+                                  'hideServedAndTransferredInCalled'] = value;
+
+                              if (_hideCalledSetState != null &&
+                                  _hideServedSetState != null &&
+                                  _hideServedTransferSetState != null) {
+                                _hideCalledSetState!(() {});
+                                _hideServedSetState!(() {});
+                                _hideServedTransferSetState!(() {});
+                              }
+                              updateSettings(
+                                _context,
+                                ('Navigation Menu'),
+                              );
+                            }
+                          });
+                    }),
+                  )
+                ],
+              ),
+              const Divider(),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  const Expanded(
+                    flex: 4,
+                    child: Text(
+                      ('Hide Holded Tokens'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Hide Called',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
+                  Expanded(
+                    child: StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                      return Switch(
+                          value: _currentSettings?['hideHoldedTokens'] ?? false,
+                          onChanged: (value) {
+                            if (!_currentSettings?['hideSideMenu']) {
+                              _isTabRebuildNeededAfterPop = true;
+                              _currentSettings?['hideHoldedTokens'] = value;
+                              updateSettings(
+                                _context,
+                                ('Navigation Menu'),
+                              );
+                              setState(() {});
+                            }
+                          });
+                    }),
+                  )
+                ],
+              ),
+              const Divider(),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  const Expanded(
+                    flex: 4,
+                    child: Text(
+                      ('Hide Holded Queue'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Hide Served',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
+                  Expanded(
+                    child: StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                      return Switch(
+                          value: _currentSettings?['hideHoldedQueue'] ?? false,
+                          onChanged: (value) {
+                            if (!_currentSettings?['hideSideMenu']) {
+                              _isTabRebuildNeededAfterPop = true;
+                              _currentSettings?['hideHoldedQueue'] = value;
+                              updateSettings(
+                                _context,
+                                ('Navigation Menu'),
+                              );
+                              setState(() {});
+                            }
+                          });
+                    }),
+                  )
+                ],
+              ),
+              const Divider(),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  const Expanded(
+                    flex: 4,
+                    child: Text(
+                      ('Hide Cancelled'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Hide Served & Transferred',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
+                  Expanded(
+                    child: StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                      return Switch(
+                          value: _currentSettings?['hideCancelled'] ?? false,
+                          onChanged: (value) {
+                            if (!_currentSettings?['hideSideMenu']) {
+                              _isTabRebuildNeededAfterPop = true;
+                              _currentSettings?['hideCancelled'] = value;
+                              updateSettings(
+                                _context,
+                                'Navigation Menu',
+                              );
+                              setState(() {});
+                            }
+                          });
+                    }),
+                  )
+                ],
+              ),
+              const Divider(),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  const Expanded(
+                    flex: 4,
+                    child: Text(
+                      ('Hide Cancelled Appointments'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Hide Holded Tokens',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Hide Holded Queue',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Hide Cancelled',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Hide Cancelled Appointments',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+                  Expanded(
+                    child: StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                      return Switch(
+                          value:
+                              _currentSettings?['hideCancelledAppointments'] ??
+                                  false,
+                          onChanged: (value) {
+                            if (!_currentSettings?['hideSideMenu']) {
+                              _isTabRebuildNeededAfterPop = true;
+                              _currentSettings?['hideCancelledAppointments'] =
+                                  value;
+                              updateSettings(
+                                _context,
+                                ('Navigation Menu'),
+                              );
+                              setState(() {});
+                            }
+                          });
+                    }),
+                  )
+                ],
+              ),
+            ],
+          );
+        }),
       ),
     );
   }

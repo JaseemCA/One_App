@@ -198,7 +198,7 @@ class _BottomTabScreen extends State<BottomTabScreen> {
                       true)) {
             return const HomeScreen();
           }
-          return const AppointmentsPage();
+          return const AppointmentScreen();
         }
       case 1:
         {
@@ -224,7 +224,7 @@ class _BottomTabScreen extends State<BottomTabScreen> {
                       CounterSettingService
                               .counterSettings?.hideCancelledAppointments ==
                           true))) {
-            return ServiceCounterTab();
+            return const ServiceCounterTab();
           } else if (CounterSettingService.counterSettings?.hideSideMenu !=
                   true &&
               (CounterSettingService.counterSettings?.hideTodayAppointments ==
@@ -256,13 +256,13 @@ class _BottomTabScreen extends State<BottomTabScreen> {
                       true &&
                   CounterSettingService.counterSettings?.hideServedInCalled ==
                       true)) {
-            return ServiceCounterTab();
+            return const ServiceCounterTab();
           }
           return const TokensPage();
         }
       case 3:
         {
-          return ServiceCounterTab();
+          return const ServiceCounterTab();
         }
       default:
         {

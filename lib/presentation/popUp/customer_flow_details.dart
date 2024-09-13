@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:oneappcounter/extention/string_casing_extention.dart';
 import 'package:oneappcounter/model/queue_appointment_model.dart';
 import 'package:oneappcounter/model/queue_model.dart';
-import 'package:oneappcounter/services/utility_services.dart';
-import 'package:sizer/sizer.dart';
+// import 'package:oneappcounter/services/utility_services.dart';
+// import 'package:sizer/sizer.dart';
 
 class CustomerFlowDetails extends StatelessWidget {
   const CustomerFlowDetails({
@@ -12,11 +12,12 @@ class CustomerFlowDetails extends StatelessWidget {
     required this.tokenNumber,
   });
 
-  final List<dynamic> customerFlow;
+  final List<dynamic> customerFlow; 
   final String tokenNumber;
 
   @override
   Widget build(BuildContext context) {
+        final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Column(
@@ -27,10 +28,10 @@ class CustomerFlowDetails extends StatelessWidget {
             color: Colors.transparent,
           )),
           Container(
-            height: 38.h,
-            width: 100.w,
+            height: 350, 
+            width: double.infinity,
             decoration: BoxDecoration(
-              color: UtilityService.isDarkTheme
+              color: isDarkMode
                   ? Colors.grey.shade800
                   : Colors.white,
               borderRadius: const BorderRadius.only(
@@ -74,7 +75,7 @@ class CustomerFlowDetails extends StatelessWidget {
                             '#',
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w600, 
                             ),
                           )),
                       Expanded(
