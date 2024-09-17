@@ -312,6 +312,49 @@ class GeneralDataService {
     }
   }
 
+static Future<dynamic> lockService(Map<String, dynamic> data) async {
+    final String path = "service/hold/${data['service']}";
+    var response = await NetworkingService.postHttp(path: path, data: data);
+    if (response is Response &&
+        response.statusCode == 200 &&
+        response.data['status']) {
+      ServiceModel holdedService = ServiceModel.fromEntity(
+          ServiceEntity.fromJson(response.data['data']));
+      int exisitngIndex = activeServices
+          .indexWhere((element) => element.id == holdedService.id);
+      if (exisitngIndex >= 0) {
+        activeServices[exisitngIndex] = holdedService;
+        ServiceCounterTabModel tab = await checkTabValidity(
+            thisTab: _allServiceCounterTabs[currentServiceCounterTabIndex]);
+        _allServiceCounterTabs[currentServiceCounterTabIndex] = tab;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static Future<dynamic> unlockService(Map<String, dynamic> data) async {
+    final String path = "service/unhold/${data['service']}";
+    var response = await NetworkingService.postHttp(path: path, data: data);
+    if (response is Response &&
+        response.statusCode == 200 &&
+        response.data['status']) {
+      ServiceModel holdedService = ServiceModel.fromEntity(
+          ServiceEntity.fromJson(response.data['data']));
+      int exisitngIndex = activeServices
+          .indexWhere((element) => element.id == holdedService.id);
+      if (exisitngIndex >= 0) {
+        activeServices[exisitngIndex] = holdedService;
+        ServiceCounterTabModel tab = await checkTabValidity(
+            thisTab: _allServiceCounterTabs[currentServiceCounterTabIndex]);
+        _allServiceCounterTabs[currentServiceCounterTabIndex] = tab;
+        return true;
+      }
+    }
+    return false;
+  }
+
+
   static Future<bool> getTodayTokenDetails() async {
     String path = 'call/today-token-details';
     if (_allServiceCounterTabs.isNotEmpty &&

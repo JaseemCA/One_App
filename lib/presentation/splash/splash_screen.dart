@@ -26,10 +26,10 @@ class SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _initializeApp() async {
-    // Get the shortest screen size
+
     int shortestScreenSize = MediaQuery.of(context).size.shortestSide.toInt();
 
-    // Initialize the data using SplashScreenService
+    
     SplashInitResponse response =
         await SplashScreenService.initData(shortestScreenSize);
     UtilityService.updateThemeInfo(context);

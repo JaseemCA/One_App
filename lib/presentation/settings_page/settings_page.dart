@@ -1,7 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'dart:async';
-
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
@@ -12,6 +10,7 @@ import 'package:oneappcounter/services/counter_setting_service.dart';
 import 'package:oneappcounter/services/general_data_seevice.dart';
 import 'package:oneappcounter/services/set_device_service.dart';
 import 'package:oneappcounter/services/socket_services.dart';
+import 'package:oneappcounter/services/splash_services.dart';
 import 'package:oneappcounter/services/utility_services.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -43,9 +42,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   StateSetter? _hideServedTransferSetState;
 
-  // StateSetter? _autoGridViewAfterServeSetState;
+  StateSetter? _autoGridViewAfterServeSetState;
 
-  // StateSetter? _autoGridViewAfterTransferSetState;
+  StateSetter? _autoGridViewAfterTransferSetState;
 
   StateSetter? multipleTransferAtATimeSetState;
 
@@ -88,8 +87,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (event is bool && event) {
         updateMainVaribale();
         rebuildAllSetState != null ? rebuildAllSetState!(() {}) : null;
-
-        /// as build context need to be passed to change locale function, so all switching tab should call same function
         // await LanguageService.changeLocaleFn(context);
       }
     });
@@ -272,10 +269,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ],
                   ),
                   const SizedBox(height: 25),
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Version 1.0.0'),
+                      Text('Version ${SplashScreenService.appVersion}')
                     ],
                   )
                 ],
@@ -990,31 +987,122 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget buildButtonsCard() {
-    return const Card(
+    return Card(
       child: Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            Row(
+            const Row(
               children: [
                 Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Text(
-                    'Buttons',
+                    ('Buttons'),
                     style: TextStyle(
                       fontSize: 22,
                     ),
                   ),
-                ),
+                )
               ],
             ),
-            Divider(),
+            const Divider(),
             Row(
               children: [
+                const Expanded(
+                    flex: 4,
+                    child: Text(
+                      ('Always disable Serve'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    )),
                 Expanded(
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return Switch(
+                        value:
+                            _currentSettings?['alwaysDisableServeBtn'] ?? false,
+                        onChanged: (value) {
+                          _currentSettings?['alwaysDisableServeBtn'] = value;
+                          updateSettings(_context, ('Buttons'));
+                          setState(() {});
+                        });
+                  }),
+                )
+              ],
+            ),
+            const Divider(),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                const Expanded(
+                    flex: 4,
+                    child: Text(
+                      ('Always disable Recall'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    )),
+                Expanded(
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return Switch(
+                        value: _currentSettings?['alwaysDisableRecallBtn'] ??
+                            false,
+                        onChanged: (value) {
+                          _currentSettings?['alwaysDisableRecallBtn'] = value;
+
+                          updateSettings(_context, ('Buttons'));
+                          setState(() {});
+                        });
+                  }),
+                )
+              ],
+            ),
+            const Divider(),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                const Expanded(
+                    flex: 4,
+                    child: Text(
+                      ('Always disable No Show'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    )),
+                Expanded(
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return Switch(
+                        value: _currentSettings?['alwaysDisableNoShowBtn'] ??
+                            false,
+                        onChanged: (value) {
+                          _currentSettings?['alwaysDisableNoShowBtn'] = value;
+                          updateSettings(_context, ('Buttons'));
+                          setState(() {});
+                        });
+                  }),
+                )
+              ],
+            ),
+            const Divider(),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                const Expanded(
                   flex: 4,
                   child: Text(
-                    'Always disable Serve',
+                    ('Always disable Call Next'),
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -1022,21 +1110,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return Switch(
+                        value: _currentSettings?['alwaysDisableCallNextBtn'] ??
+                            false,
+                        onChanged: (value) {
+                          _currentSettings?['alwaysDisableCallNextBtn'] = value;
+                          updateSettings(_context, ('Buttons'));
+                          setState(() {});
+                        });
+                  }),
+                )
               ],
             ),
-            Divider(),
-            SizedBox(height: 10),
+            const Divider(),
+            const SizedBox(
+              height: 10,
+            ),
             Row(
               children: [
-                Expanded(
+                const Expanded(
                   flex: 4,
                   child: Text(
-                    'Always disable Recall',
+                    ('Always disable Hold'),
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -1044,21 +1141,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return Switch(
+                        value:
+                            _currentSettings?['alwaysDisableHoldBtn'] ?? false,
+                        onChanged: (value) {
+                          _currentSettings?['alwaysDisableHoldBtn'] = value;
+                          updateSettings(_context, ('Buttons'));
+                          setState(() {});
+                        });
+                  }),
+                )
               ],
             ),
-            Divider(),
-            SizedBox(height: 10),
+            const Divider(),
+            const SizedBox(
+              height: 10,
+            ),
             Row(
               children: [
-                Expanded(
+                const Expanded(
                   flex: 4,
                   child: Text(
-                    'Always disable No Show',
+                    ('Never show Service Hold'),
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -1066,77 +1172,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Always disable Call Next',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Always disable Hold',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Never show Service Hold',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return Switch(
+                        value: _currentSettings?['neverShowServiceHoldBtn'] ??
+                            false,
+                        onChanged: (value) {
+                          _currentSettings?['neverShowServiceHoldBtn'] = value;
+                          updateSettings(_context, ('Buttons'));
+                          setState(() {});
+                        });
+                  }),
+                )
               ],
             ),
           ],
@@ -1146,209 +1193,362 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget buildGridViewCard() {
-    return const Card(
+    return Card(
       child: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    'Grid View',
-                    style: TextStyle(
-                      fontSize: 22,
+        padding: const EdgeInsets.all(8.0),
+        child: StatefulBuilder(builder:
+            (BuildContext context, StateSetter enableGridViewSetState) {
+          return Column(
+            children: [
+              const Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      ('Grid View'),
+                      style: TextStyle(
+                        fontSize: 22,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              const Divider(),
+              Row(
+                children: [
+                  const Expanded(
+                      flex: 4,
+                      child: Text(
+                        ('Enable Grid View'),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      )),
+                  Expanded(
+                    child: Switch(
+                        value: _currentSettings?['enableGridView'] ?? false,
+                        onChanged: (value) {
+                          _currentSettings?['enableGridView'] = value;
+
+                          if (!value) {
+                            _currentSettings?['showNotTransferredInNoShow'] =
+                                value;
+                            _currentSettings?['autoGridViewAfterServe'] = value;
+                            _currentSettings?['autoGridViewAfterTransfer'] =
+                                value;
+                            _currentSettings?['autoGridViewAfterNoShow'] =
+                                value;
+                            _currentSettings?['autoGridViewAfterHold'] = value;
+                          }
+                          updateSettings(_context, ('Grid View'));
+                          enableGridViewSetState(() {});
+                        }),
+                  )
+                ],
+              ),
+              const Divider(),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  const Expanded(
+                      flex: 4,
+                      child: Text(
+                        ('Show NOT Transferred in No Show Section'),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      )),
+                  Expanded(
+                    child: StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                      return Switch(
+                          value:
+                              _currentSettings?['showNotTransferredInNoShow'] ??
+                                  false,
+                          onChanged: (value) {
+                            if (_currentSettings?['enableGridView']) {
+                              _currentSettings?['showNotTransferredInNoShow'] =
+                                  value;
+                              updateSettings(_context, ('Grid View'));
+                              setState(() {});
+                            }
+                          });
+                    }),
+                  )
+                ],
+              ),
+              const Divider(),
+              Row(
+                children: [
+                  const Expanded(
+                      flex: 4,
+                      child: Text(
+                        ('Show Holded in No Show Section'),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      )),
+                  Expanded(
+                    child: StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                      return Switch(
+                          value:
+                              _currentSettings?['showHoldedInNoShow'] ?? false,
+                          onChanged: (value) {
+                            if (_currentSettings?['enableGridView']) {
+                              _currentSettings?['showHoldedInNoShow'] = value;
+                              updateSettings(_context, ('Grid View'));
+                              setState(() {});
+                            }
+                          });
+                    }),
+                  )
+                ],
+              ),
+              const Divider(),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  const Expanded(
+                      flex: 4,
+                      child: Text(
+                        ('Goto Grid View after Serving'),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      )),
+                  Expanded(
+                    child: StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                      _autoGridViewAfterServeSetState = setState;
+
+                      return Switch(
+                          value: _currentSettings?['autoGridViewAfterServe'] ??
+                              false,
+                          onChanged: (value) {
+                            if (_currentSettings?['enableGridView']) {
+                              _currentSettings?['autoGridViewAfterServe'] =
+                                  value;
+                              if (value) {
+                                _currentSettings?['autoGridViewAfterTransfer'] =
+                                    false;
+                              }
+                            }
+                            updateSettings(_context, ('Grid View'));
+                            _autoGridViewAfterTransferSetState!(() {});
+                            _autoGridViewAfterServeSetState!(() {});
+                          });
+                    }),
+                  )
+                ],
+              ),
+              const Divider(),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  const Expanded(
+                    flex: 4,
+                    child: Text(
+                      ('Goto Grid View after Transferring'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            Divider(),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Enable Grid View',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
+                  Expanded(
+                    child: StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                      _autoGridViewAfterTransferSetState = setState;
+                      return Switch(
+                          value:
+                              _currentSettings?['autoGridViewAfterTransfer'] ??
+                                  false,
+                          onChanged: (value) {
+                            if (_currentSettings?['enableGridView']) {
+                              _currentSettings?['autoGridViewAfterTransfer'] =
+                                  value;
+                              if (value) {
+                                _currentSettings?['autoGridViewAfterServe'] =
+                                    false;
+                              }
+                              updateSettings(_context, ('Grid View'));
+                              _autoGridViewAfterTransferSetState!(() {});
+                              _autoGridViewAfterServeSetState!(() {});
+                            }
+                          });
+                    }),
+                  )
+                ],
+              ),
+              const Divider(),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  const Expanded(
+                    flex: 4,
+                    child: Text(
+                      ('Goto Grid View after No Show'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Show NOT Transferred in No Show Section',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
+                  Expanded(child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return Switch(
+                        value: _currentSettings?['autoGridViewAfterNoShow'] ??
+                            false,
+                        onChanged: (value) {
+                          if (_currentSettings?['enableGridView']) {
+                            _currentSettings?['autoGridViewAfterNoShow'] =
+                                value;
+                            updateSettings(_context, ('Grid View'));
+                            setState(() {});
+                          }
+                        });
+                  }))
+                ],
+              ),
+              const Divider(),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  const Expanded(
+                    flex: 4,
+                    child: Text(
+                      ('Goto Grid View after Hold'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Show Holded in No Show Section',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Goto Grid View after Serving',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Goto Grid View after Transferring',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Goto Grid View after No Show',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Goto Grid View after Hold',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+                  Expanded(
+                    child: StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                      return Switch(
+                          value: _currentSettings?['autoGridViewAfterHold'] ??
+                              false,
+                          onChanged: (value) {
+                            if (_currentSettings?['enableGridView']) {
+                              _currentSettings?['autoGridViewAfterHold'] =
+                                  value;
+                              updateSettings(_context, ('Grid View'));
+                              setState(() {});
+                            }
+                          });
+                    }),
+                  )
+                ],
+              ),
+            ],
+          );
+        }),
       ),
     );
   }
 
   Widget buildMiscellaneousCard() {
-    return const Card(
+    return Card(
       child: Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            Row(
+            const Row(
               children: [
                 Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Text(
-                    'Miscellaneous',
+                    ('Miscellaneous'),
                     style: TextStyle(
                       fontSize: 22,
                     ),
                   ),
-                ),
+                )
               ],
             ),
-            Divider(),
-            SizedBox(height: 10),
+            const Divider(),
+            const SizedBox(
+              height: 10,
+            ),
             Row(
               children: [
+                const Expanded(
+                    flex: 4,
+                    child: Text(
+                      ('Pinned Application ?'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    )),
                 Expanded(
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return Switch(
+                        value: _currentSettings?['alwaysOnTop'] ?? false,
+                        onChanged: (value) {
+                          _currentSettings?['alwaysOnTop'] = value;
+                          updateSettings(_context, ('Miscellaneous'));
+                          setState(() {});
+                        });
+                  }),
+                )
+              ],
+            ),
+            const Divider(),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                const Expanded(
+                    flex: 4,
+                    child: Text(
+                      ('Prevent Screenlock ?'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    )),
+                Expanded(child: StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setState) {
+                  return Switch(
+                      value: _currentSettings?['wakeLockEnabled'] ?? false,
+                      onChanged: (value) {
+                        _currentSettings?['wakeLockEnabled'] = value;
+                        updateSettings(_context, ('Miscellaneous'));
+                        setState(() {});
+                      });
+                }))
+              ],
+            ),
+            const Divider(),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                const Expanded(
                   flex: 4,
                   child: Text(
-                    'Pinned Application?',
+                    ('Full screen ?'),
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -1356,21 +1556,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return Switch(
+                        value: _currentSettings?['enableFullScreen'] ?? false,
+                        onChanged: (value) {
+                          _currentSettings?['enableFullScreen'] = value;
+                          updateSettings(_context, ('Miscellaneous'));
+                          setState(() {});
+                        });
+                  }),
+                )
               ],
             ),
-            Divider(),
-            SizedBox(height: 10),
+            const Divider(),
+            const SizedBox(
+              height: 10,
+            ),
             Row(
               children: [
-                Expanded(
+                const Expanded(
                   flex: 4,
                   child: Text(
-                    'Prevent Screenlock?',
+                    ('Multiple Transfer?'),
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -1378,21 +1586,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null,
-                  ),
-                ),
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return Switch(
+                        value: _currentSettings?['multipleTransfer'] ?? false,
+                        onChanged: (value) {
+                          _currentSettings?['multipleTransfer'] = value;
+                          if (!value) {
+                            _currentSettings?['multipleTransferAtATime'] =
+                                false;
+                          }
+                          updateSettings(_context, ('Miscellaneous'));
+                          setState(() {});
+                          multipleTransferAtATimeSetState!(() {});
+                        });
+                  }),
+                )
               ],
             ),
-            Divider(),
-            SizedBox(height: 10),
+            const Divider(),
+            const SizedBox(
+              height: 10,
+            ),
             Row(
               children: [
-                Expanded(
+                const Expanded(
                   flex: 4,
                   child: Text(
-                    'Full screen?',
+                    ('Concurrent transfer?'),
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -1400,55 +1621,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null, // UI only, no functionality
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Multiple Transfer?',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null, // UI only, no functionality
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Text(
-                    'Concurrent transfer?',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Switch(
-                    value: false,
-                    onChanged: null, // UI only, no functionality
-                  ),
-                ),
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    multipleTransferAtATimeSetState = setState;
+                    return Switch(
+                        value: _currentSettings?['multipleTransferAtATime'] ??
+                            false,
+                        onChanged: (value) {
+                          if (_currentSettings?['multipleTransfer']) {
+                            _currentSettings?['multipleTransferAtATime'] =
+                                value;
+                            updateSettings(_context, ('Miscellaneous'));
+                            setState(() {});
+                          }
+                        });
+                  }),
+                )
               ],
             ),
           ],

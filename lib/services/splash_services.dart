@@ -1,7 +1,10 @@
 import 'package:oneappcounter/model/splash_init_response.dart';
 import 'package:oneappcounter/services/auth_service.dart';
 import 'package:oneappcounter/services/clock_service.dart';
+import 'package:oneappcounter/services/counter_setting_service.dart';
+import 'package:oneappcounter/services/general_data_seevice.dart';
 import 'package:oneappcounter/services/networking_service.dart';
+import 'package:oneappcounter/services/set_device_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class SplashScreenService {
@@ -31,6 +34,12 @@ class SplashScreenService {
               AuthService.loginData!.accessToken.isNotEmpty) {
             await AuthService.updateBranchDetails();
             await ClockService.updateDateTime();
+            await CounterSettingService.initSettingsData();
+            await GeneralDataService.initVals();
+            await GeneralDataService.initServiceAndCounterData();
+            await CounterSettingService.initSettingsData();
+            await SetDeviceService.getFromLocal();
+            await SetDeviceService.addCounterAppDetails();
 
             splashInitResponse = SplashInitResponse(
               processed: true,
@@ -50,7 +59,7 @@ class SplashScreenService {
       // Handle errors appropriately
       return SplashInitResponse(
         processed: false,
-        decideLocation: 'error',
+        decideLocation: 'sub',
       );
     }
   }

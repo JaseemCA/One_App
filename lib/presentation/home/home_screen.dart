@@ -1,9 +1,8 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, no_leading_underscores_for_local_identifiers
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:oneappcounter/bloc/call/bloc/call_bloc.dart';
 import 'package:oneappcounter/bloc/call/bloc/call_event.dart';
 import 'package:oneappcounter/bloc/call/bloc/call_state.dart';
@@ -16,10 +15,15 @@ import 'package:oneappcounter/common/widgets/one_app_logo/one_app_logo.dart';
 import 'package:oneappcounter/core/config/color/appcolors.dart';
 import 'package:oneappcounter/core/config/theme/bloc/theme_cubit.dart';
 import 'package:oneappcounter/extention/string_casing_extention.dart';
+import 'package:oneappcounter/model/queue_model.dart';
+import 'package:oneappcounter/model/service_model.dart';
 import 'package:oneappcounter/model/tocken_model.dart';
 import 'package:oneappcounter/presentation/popUp/add_service.dart.dart';
 import 'package:oneappcounter/presentation/popUp/customer_flow_details.dart';
 import 'package:oneappcounter/presentation/popUp/customer_tocken_details.dart';
+import 'package:oneappcounter/presentation/popUp/lock_service.dart';
+import 'package:oneappcounter/presentation/popUp/transfer_to_services.dart';
+import 'package:oneappcounter/presentation/popUp/unlockservice.dart';
 import 'package:oneappcounter/presentation/settings_page/settings_page.dart';
 import 'package:oneappcounter/routes.dart';
 import 'package:oneappcounter/services/auth_service.dart';
@@ -38,7 +42,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   StateSetter? lockServiceButtonState;
 
   StateSetter? unlockServiceButtonState;
@@ -161,16 +164,40 @@ class _HomeScreenState extends State<HomeScreen> {
               await refreshFunction(context);
             },
           ),
-          IconButton(
-            icon: const Icon(
-              Icons.lock,
-              color: Colors.white,
-              size: 30,
-            ),
-            onPressed: () {
-              holdshowBottomSheet();
-            },
-          ),
+          StatefulBuilder(builder:
+              (BuildContext context, StateSetter lockServiceButtonSetState) {
+            lockServiceButtonState = lockServiceButtonSetState;
+            return !isAllServiceOnHold()
+                ? IconButton(
+                    onPressed: () async {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const LockService();
+                          }).then((value) => rebuildHoldUnholdButtons());
+                    },
+                    icon: const Icon(Icons.lock),
+                    color: Colors.white,
+                  )
+                : Container();
+          }),
+          StatefulBuilder(builder:
+              (BuildContext context, StateSetter unlockButtonSetState) {
+            unlockServiceButtonState = unlockButtonSetState;
+            return !isAllServiceOnUnhold()
+                ? IconButton(
+                    onPressed: () async {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return const UnlockService();
+                          }).then((value) => rebuildHoldUnholdButtons());
+                    },
+                    icon: const Icon(Icons.lock_open),
+                    color: Colors.white,
+                  )
+                : Container();
+          }),
           IconButton(
             icon: const Icon(
               Icons.more_vert,
@@ -300,136 +327,136 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void holdshowBottomSheet() {
-    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      builder: (BuildContext context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-            child: Container(
-              height: 420,
-              color: isDarkMode ? Appcolors.bottomsheetDarkcolor : Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Hold Service',
-                        style: TextStyle(fontSize: 22),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  GestureDetector(
-                    child: const TextField(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        suffixIcon: Icon(Icons.arrow_drop_down),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 25),
-                  GestureDetector(
-                    child: const TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Message',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 25),
-                  ElevatedButton(
-                    onPressed: _showTimePicker,
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: isDarkMode
-                            ? Appcolors.bottomsheetDarkcolor
-                            : Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
-                          side: const BorderSide(
-                            color: Colors.grey,
-                            width: 1,
-                          ),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 18, vertical: 10)),
-                    child: Text(
-                      "Expected Ending Time: $selectedTime",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: isDarkMode
-                            ? Appcolors.materialIconButtonDark
-                            : Appcolors.buttonColor,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  CustomElevatedButton(
-                      text: "HOLD",
-                      onPressed: () {
-                        // Add your logic here
-                      })
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
+  // void holdshowBottomSheet() {
+  //   final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  //   showModalBottomSheet(
+  //     isScrollControlled: true,
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return Padding(
+  //         padding: EdgeInsets.only(
+  //           bottom: MediaQuery.of(context).viewInsets.bottom,
+  //         ),
+  //         child: ClipRRect(
+  //           borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+  //           child: Container(
+  //             height: 420,
+  //             color: isDarkMode ? Appcolors.bottomsheetDarkcolor : Colors.white,
+  //             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+  //             child: Column(
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: [
+  //                 const Row(
+  //                   mainAxisAlignment: MainAxisAlignment.center,
+  //                   children: [
+  //                     Text(
+  //                       'Hold Service',
+  //                       style: TextStyle(fontSize: 22),
+  //                     ),
+  //                   ],
+  //                 ),
+  //                 const SizedBox(height: 20),
+  //                 GestureDetector(
+  //                   child: const TextField(
+  //                     decoration: InputDecoration(
+  //                       border: OutlineInputBorder(),
+  //                       suffixIcon: Icon(Icons.arrow_drop_down),
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 const SizedBox(height: 25),
+  //                 GestureDetector(
+  //                   child: const TextField(
+  //                     decoration: InputDecoration(
+  //                       hintText: 'Message',
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 const SizedBox(height: 25),
+  //                 ElevatedButton(
+  //                   onPressed: _showTimePicker,
+  //                   style: ElevatedButton.styleFrom(
+  //                       backgroundColor: isDarkMode
+  //                           ? Appcolors.bottomsheetDarkcolor
+  //                           : Colors.white,
+  //                       shape: RoundedRectangleBorder(
+  //                         borderRadius: BorderRadius.circular(5),
+  //                         side: const BorderSide(
+  //                           color: Colors.grey,
+  //                           width: 1,
+  //                         ),
+  //                       ),
+  //                       padding: const EdgeInsets.symmetric(
+  //                           horizontal: 18, vertical: 10)),
+  //                   child: Text(
+  //                     "Expected Ending Time: $selectedTime",
+  //                     style: TextStyle(
+  //                       fontSize: 18,
+  //                       color: isDarkMode
+  //                           ? Appcolors.materialIconButtonDark
+  //                           : Appcolors.buttonColor,
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 const SizedBox(height: 30),
+  //                 CustomElevatedButton(
+  //                     text: "HOLD",
+  //                     onPressed: () {
+  //                       // Add your logic here
+  //                     })
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
-  Widget buildTimePicker() {
-    DateTime adjustedDateTime = DateTime(
-      dateTime.year,
-      dateTime.month,
-      dateTime.day,
-      dateTime.hour,
-      (dateTime.minute ~/ 10) * 10,
-    );
+  // Widget buildTimePicker() {
+  //   DateTime adjustedDateTime = DateTime(
+  //     dateTime.year,
+  //     dateTime.month,
+  //     dateTime.day,
+  //     dateTime.hour,
+  //     (dateTime.minute ~/ 10) * 10,
+  //   );
 
-    return SizedBox(
-      height: 180,
-      child: CupertinoDatePicker(
-        initialDateTime: adjustedDateTime,
-        mode: CupertinoDatePickerMode.time,
-        minuteInterval: 1,
-        onDateTimeChanged: (dateTime) =>
-            setState(() => this.dateTime = dateTime),
-      ),
-    );
-  }
+  //   return SizedBox(
+  //     height: 180,
+  //     child: CupertinoDatePicker(
+  //       initialDateTime: adjustedDateTime,
+  //       mode: CupertinoDatePickerMode.time,
+  //       minuteInterval: 1,
+  //       onDateTimeChanged: (dateTime) =>
+  //           setState(() => this.dateTime = dateTime),
+  //     ),
+  //   );
+  // }
 
-  void _showTimePicker() {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (context) => CupertinoActionSheet(
-        actions: <Widget>[
-          CupertinoActionSheetAction(
-            child: const Text('Done'),
-            onPressed: () {
-              setState(() {
-                selectedTime = DateFormat('hh:mm a').format(dateTime);
-              });
-              Navigator.pop(context);
-            },
-          ),
-        ],
-        cancelButton: CupertinoButton(
-          child: const Text('Cancel'),
-          onPressed: () => Navigator.pop(context),
-        ),
-        message: buildTimePicker(),
-      ),
-    );
-  }
+  // void _showTimePicker() {
+  //   showCupertinoModalPopup(
+  //     context: context,
+  //     builder: (context) => CupertinoActionSheet(
+  //       actions: <Widget>[
+  //         CupertinoActionSheetAction(
+  //           child: const Text('Done'),
+  //           onPressed: () {
+  //             setState(() {
+  //               selectedTime = DateFormat('hh:mm a').format(dateTime);
+  //             });
+  //             Navigator.pop(context);
+  //           },
+  //         ),
+  //       ],
+  //       cancelButton: CupertinoButton(
+  //         child: const Text('Cancel'),
+  //         onPressed: () => Navigator.pop(context),
+  //       ),
+  //       message: buildTimePicker(),
+  //     ),
+  //   );
+  // }
 
   void showThemeDialog() {
     showDialog(
@@ -495,8 +522,471 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildGridScreen() {
-    return const Center(
-      child: Text("grid view"),
+    List<TokenModel> secondGridViewList = [];
+    secondGridViewList.clear();
+    secondGridViewList = GeneralDataService.todayCalledNoShow;
+    String secondGridViewLabel = ('No Show ');
+    if (CounterSettingService.counterSettings?.showHoldedInNoShow == true) {
+      secondGridViewList = [
+        ...GeneralDataService.todayCalledNoShow,
+        ...GeneralDataService.todayCalledHolded,
+      ];
+      secondGridViewLabel += ('/  Holded ');
+    }
+    if (CounterSettingService.counterSettings?.showNotTransferredInNoShow ==
+        true) {
+      List<TokenModel> list = secondGridViewList;
+      secondGridViewList = [
+        ...list,
+        ...GeneralDataService.todayCalledNotTransferred
+      ];
+      secondGridViewLabel += ('/  Not Transferred');
+    }
+
+    return Column(
+      children: [
+        Column(
+          children: [
+            const SizedBox(
+              height: 10,
+            ),
+            buildTokenPart(),
+            const Divider(),
+            SizedBox(
+              height: 200,
+              child: Column(
+                children: [
+                  const Text(
+                    ('Next to Call'),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(3),
+                      child: GridView.builder(
+                          itemCount: GeneralDataService.todaysQueue.isNotEmpty
+                              ? GeneralDataService.todaysQueue.length
+                              : 0,
+                          physics: const BouncingScrollPhysics(),
+                          gridDelegate:
+                              const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 100,
+                            childAspectRatio: 2.6,
+                            crossAxisSpacing: 7,
+                            mainAxisSpacing: 7,
+                          ),
+                          itemBuilder: (context, index) {
+                            QueueModel queue =
+                                GeneralDataService.todaysQueue[index];
+                            return Tooltip(
+                              message:
+                                  "${queue.name != null ? '${queue.name!}|' : ''} ${queue.phone ?? ''}",
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: queue.priority == 1
+                                      ? const Color(0xffA8F387)
+                                      : queue.priority == 3
+                                          ? const Color(0xffFEE5E0)
+                                          : null,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 2,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  if ((GeneralDataService.lastCalledToken != null &&
+                                          !GeneralDataService
+                                              .lastCalledToken!.isHold &&
+                                          GeneralDataService.lastCalledToken!.status !=
+                                              'no-show') &&
+                                      CounterSettingService.counterSettings?.alertTransfer ==
+                                          true &&
+                                      (((GeneralDataService.lastCalledToken!.queue != null && GeneralDataService.lastCalledToken!.queue['is_transferred'] != true) ||
+                                          (GeneralDataService.lastCalledToken!.queueppointment != null &&
+                                              GeneralDataService.lastCalledToken!.queueppointment['is_transferred'] !=
+                                                  true)))) {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: const Text(
+                                                ('Alert (Not transferred!)')),
+                                            content: Text(
+                                                '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred, Continue Calling?')}'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text(('Cancel')),
+                                              ),
+                                              CountDownButton(
+                                                onPressed: () async {
+                                                  Navigator.pop(context);
+                                                  await callTokenGrid(
+                                                    context: context,
+                                                    id: queue.id,
+                                                  );
+                                                },
+                                              )
+                                            ],
+                                          );
+                                        });
+                                  } else if ((GeneralDataService.lastCalledToken != null &&
+                                          !GeneralDataService
+                                              .lastCalledToken!.isHold &&
+                                          GeneralDataService.lastCalledToken!.status !=
+                                              'no-show') &&
+                                      CounterSettingService.counterSettings
+                                              ?.requireTransfer ==
+                                          true &&
+                                      ((GeneralDataService.lastCalledToken!.queue != null && GeneralDataService.lastCalledToken!.queue['is_transferred'] != true) ||
+                                          (GeneralDataService.lastCalledToken!.queueppointment != null &&
+                                              GeneralDataService.lastCalledToken!.queueppointment['is_transferred'] != true))) {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: const Text(
+                                                ('Transfer is required !')),
+                                            content: Text(
+                                                '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred')}'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text(('Close')),
+                                              ),
+                                            ],
+                                          );
+                                        });
+                                  } else {
+                                    callTokenGrid(
+                                        context: context, id: queue.id);
+                                  }
+                                },
+                                child: FittedBox(
+                                  child: Text(
+                                    queue.tokenNumber,
+                                    style: const TextStyle(
+                                      height: 1,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(),
+            SizedBox(
+              height: 200,
+              child: Column(
+                children: [
+                  Text(
+                    secondGridViewLabel,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(3),
+                      child: GridView.builder(
+                          itemCount: secondGridViewList.isNotEmpty
+                              ? secondGridViewList.length
+                              : 0,
+                          physics: const BouncingScrollPhysics(),
+                          gridDelegate:
+                              const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 100,
+                            childAspectRatio: 2.6,
+                            crossAxisSpacing: 7,
+                            mainAxisSpacing: 7,
+                          ),
+                          itemBuilder: (context, index) {
+                            TokenModel token = secondGridViewList[index];
+                            return ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: token.status == "no-show"
+                                    ? UtilityService.isDarkTheme
+                                        ? Appcolors.lowPriorityDark
+                                        : Appcolors.lowPriorityLight
+                                    : token.isHold == true
+                                        ? UtilityService.isDarkTheme
+                                            ? Appcolors.warningDark
+                                            : Appcolors.warningLight
+                                        : null,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 2,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                              onPressed: token.status == "no-show"
+                                  ? () async {
+                                      if ((GeneralDataService.lastCalledToken != null &&
+                                              !GeneralDataService
+                                                  .lastCalledToken!.isHold &&
+                                              GeneralDataService.lastCalledToken!.status !=
+                                                  'no-show') &&
+                                          CounterSettingService.counterSettings?.alertTransfer ==
+                                              true &&
+                                          (((GeneralDataService.lastCalledToken!.queue != null && GeneralDataService.lastCalledToken!.queue['is_transferred'] != true) ||
+                                              (GeneralDataService.lastCalledToken!.queueppointment != null &&
+                                                  GeneralDataService.lastCalledToken!.queueppointment['is_transferred'] !=
+                                                      true)))) {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                title: const Text(
+                                                    ('Alert (Not transferred!)')),
+                                                content: Text(
+                                                    '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred, Continue Calling?')}'),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child:
+                                                        const Text(('Cancel')),
+                                                  ),
+                                                  CountDownButton(
+                                                    onPressed: () async {
+                                                      Navigator.pop(context);
+                                                      await callTokenNoShowGrid(
+                                                          context: context,
+                                                          id: token.id);
+                                                    },
+                                                  )
+                                                ],
+                                              );
+                                            });
+                                      } else if ((GeneralDataService.lastCalledToken != null &&
+                                              !GeneralDataService
+                                                  .lastCalledToken!.isHold &&
+                                              GeneralDataService.lastCalledToken!.status !=
+                                                  'no-show') &&
+                                          CounterSettingService.counterSettings?.requireTransfer ==
+                                              true &&
+                                          ((GeneralDataService.lastCalledToken!.queue != null && GeneralDataService.lastCalledToken!.queue['is_transferred'] != true) ||
+                                              (GeneralDataService.lastCalledToken!.queueppointment != null &&
+                                                  GeneralDataService.lastCalledToken!.queueppointment['is_transferred'] != true))) {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                title: const Text(
+                                                    ('Transfer is required !')),
+                                                content: Text(
+                                                    '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred')}'),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child:
+                                                        const Text(('Close')),
+                                                  ),
+                                                ],
+                                              );
+                                            });
+                                      } else {
+                                        callTokenNoShowGrid(
+                                            context: context, id: token.id);
+                                      }
+                                    }
+                                  : token.status == 'holded' &&
+                                          token.isHold == true
+                                      ? () {
+                                          if ((GeneralDataService.lastCalledToken != null &&
+                                                  !GeneralDataService
+                                                      .lastCalledToken!
+                                                      .isHold &&
+                                                  GeneralDataService.lastCalledToken!.status !=
+                                                      'no-show') &&
+                                              CounterSettingService
+                                                      .counterSettings
+                                                      ?.alertTransfer ==
+                                                  true &&
+                                              (((GeneralDataService.lastCalledToken!.queue != null &&
+                                                      GeneralDataService.lastCalledToken!.queue['is_transferred'] !=
+                                                          true) ||
+                                                  (GeneralDataService.lastCalledToken!.queueppointment != null &&
+                                                      GeneralDataService.lastCalledToken!.queueppointment['is_transferred'] !=
+                                                          true)))) {
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    title: const Text(
+                                                        ('Alert (Not transferred!)')),
+                                                    content: Text(
+                                                        '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred, Continue Calling?')}'),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child: const Text(
+                                                            ('Cancel')),
+                                                      ),
+                                                      CountDownButton(
+                                                        onPressed: () async {
+                                                          Navigator.pop(
+                                                              context);
+                                                          await setSelectedTokenFromGrid(
+                                                              token);
+                                                        },
+                                                      )
+                                                    ],
+                                                  );
+                                                });
+                                          } else if ((GeneralDataService.lastCalledToken != null &&
+                                                  !GeneralDataService
+                                                      .lastCalledToken!
+                                                      .isHold &&
+                                                  GeneralDataService.lastCalledToken!.status != 'no-show') &&
+                                              CounterSettingService.counterSettings?.requireTransfer == true &&
+                                              ((GeneralDataService.lastCalledToken!.queue != null && GeneralDataService.lastCalledToken!.queue['is_transferred'] != true) || (GeneralDataService.lastCalledToken!.queueppointment != null && GeneralDataService.lastCalledToken!.queueppointment['is_transferred'] != true))) {
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    title: const Text(
+                                                        ('Transfer is required !')),
+                                                    content: Text(
+                                                        '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred')}'),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child: const Text(
+                                                            ('Close')),
+                                                      ),
+                                                    ],
+                                                  );
+                                                });
+                                          } else {
+                                            setSelectedTokenFromGrid(token);
+                                          }
+                                        }
+                                      : () {
+                                          setSelectedTokenFromGrid(token);
+                                        },
+                              child: FittedBox(
+                                child: Text(
+                                  token.tokenNumber,
+                                  style: const TextStyle(
+                                    height: 1,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 5, 5, 10),
+              child: StatefulBuilder(
+                  builder: (BuildContext context, StateSetter tabsetState) {
+                return Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              const Text(
+                                ('Services: '),
+                                style: TextStyle(
+                                  height: 1,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  GeneralDataService.currentServiceCounterTab
+                                          ?.serviceString ??
+                                      '',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  softWrap: false,
+                                  style: const TextStyle(
+                                    height: 1,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              const Text(
+                                ('Counter: '),
+                                style: TextStyle(
+                                  height: 1,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  GeneralDataService.currentServiceCounterTab
+                                          ?.counterString ??
+                                      '',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  softWrap: false,
+                                  style: const TextStyle(
+                                    height: 1,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    IconButton(
+                      onPressed: () async {
+                        await _editServiceAndCounterTabDetails(tabsetState);
+                      },
+                      icon: const Icon(
+                        Icons.edit_note,
+                        size: 25,
+                      ),
+                    )
+                  ],
+                );
+              }),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -813,91 +1303,105 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Expanded(
                             child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: CustomElevatedButton(
-                                  onPressed: CounterSettingService
-                                                  .counterSettings
-                                                  ?.alwaysDisableHoldBtn !=
-                                              true &&
-                                          token?.status == 'serving'
-                                      ? () async {
-                                          ///hold token function.
-                                          UtilityService.showLoadingAlert(
-                                              _context);
-                                          var response =
-                                              await CallService.holdToken();
-                                          Navigator.pop(_context);
-                                          if (response is TokenModel) {
-                                            BlocProvider.of<CallBloc>(_context)
-                                                .add((CallNextTokenEvent()));
-                                            UtilityService.toast(
-                                              _context,
-                                              ('Holded'),
-                                            );
-                                            return;
-                                          }
-                                          UtilityService.toast(
-                                            _context,
-                                            ('Something Went wrong'),
-                                          );
-                                        }
-                                      : token?.isHold == true
+                              padding: const EdgeInsets.all(8.0),
+                              child: CounterSettingService.counterSettings
+                                          ?.neverShowServiceHoldBtn !=
+                                      true
+                                  ? CustomElevatedButton(
+                                      text: token?.isHold == true
+                                          ? 'UNHOLD TOKEN'
+                                          : 'HOLD TOKEN',
+                                      onPressed: CounterSettingService
+                                                      .counterSettings
+                                                      ?.alwaysDisableHoldBtn !=
+                                                  true &&
+                                              token?.status == 'serving'
                                           ? () async {
-                                              ///unhold function.
-
+                                              ///hold token function.
                                               UtilityService.showLoadingAlert(
-                                                _context,
-                                              );
+                                                  _context);
                                               var response =
-                                                  await CallService.unholdToken(
-                                                      id: token?.id ?? 0);
+                                                  await CallService.holdToken();
                                               Navigator.pop(_context);
                                               if (response is TokenModel) {
-                                                if (selectedToken != null) {
-                                                  selectedToken = response;
-                                                }
                                                 BlocProvider.of<CallBloc>(
                                                         _context)
-                                                    .add(
-                                                        (CallNextTokenEvent()));
+                                                    .add(CallNextTokenEvent());
                                                 UtilityService.toast(
-                                                  _context,
-                                                  ('Unholded'),
-                                                );
+                                                    _context, 'Holded');
                                                 return;
                                               }
-                                              UtilityService.toast(
-                                                _context,
-                                                ('Something Went wrong'),
-                                              );
+                                              UtilityService.toast(_context,
+                                                  'Something Went wrong');
                                             }
-                                          : null, // Disabled button
-                                  child: token?.isHold == true
-                                      ? const Text(('UNHOLD TOKEN'))
-                                      : const Text(('HOLD TOKEN')),
-                                )),
+                                          : token?.isHold == true
+                                              ? () async {
+                                                  ///unhold function.
+                                                  UtilityService
+                                                      .showLoadingAlert(
+                                                          _context);
+                                                  var response =
+                                                      await CallService
+                                                          .unholdToken(
+                                                              id: token?.id ??
+                                                                  0);
+                                                  Navigator.pop(_context);
+                                                  if (response is TokenModel) {
+                                                    if (selectedToken != null) {
+                                                      selectedToken = response;
+                                                    }
+                                                    BlocProvider.of<CallBloc>(
+                                                            _context)
+                                                        .add(
+                                                            CallNextTokenEvent());
+                                                    UtilityService.toast(
+                                                        _context, 'Unholded');
+                                                    return;
+                                                  }
+                                                  UtilityService.toast(_context,
+                                                      'Something Went wrong');
+                                                }
+                                              : null,
+                                      // child: token?.isHold == true
+                                      //     ? const Text(('UNHOLD TOKEN'))
+                                      //     : const Text(
+                                      //         ('HOLD TOKEN')), 
+                                    )
+                                  : Container(),
+                            ),
                           ),
                         ],
                       ),
                       const SizedBox(
                         height: 10,
                       ),
-                      const Row(
+                      Row(
                         children: [
                           Expanded(
                             child: Padding(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                 horizontal: 8.0,
                                 vertical: 3.0,
                               ),
-                              child: Text(
-                                'Select Service to transfer',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              child: token?.status == 'served'
+                                  ? Text(
+                                      ((token?.queue != null &&
+                                                  token?.queue[
+                                                          'is_transferred'] ==
+                                                      true) ||
+                                              (token?.queueppointment != null &&
+                                                  token?.queueppointment[
+                                                          'is_transferred'] ==
+                                                      true))
+                                          ? ('Token Transferred To')
+                                          : ('Select Service to transfer'),
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  : Container(),
                             ),
                           ),
                         ],
@@ -914,9 +1418,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: SizedBox(
                 child: LayoutBuilder(builder: (context, constraints) {
                   return Column(
-                    children: [
-                      getTransferButtons(),
-                    ],
+                    children: token?.status == 'served'
+                        ? getTransferButtons(constraints)
+                        : [],
                   );
                 }),
               ),
@@ -926,6 +1430,522 @@ class _HomeScreenState extends State<HomeScreen> {
         Container(), // Placeholder for the Positioned widget
       ],
     );
+  }
+
+  List<Widget> getTransferButtons(BoxConstraints constraints) {
+    List<int> selectedTransferServices = [];
+    TokenModel? token = selectedToken ?? GeneralDataService.lastCalledToken;
+
+    int possibleItems = (constraints.maxHeight / 65).floor();
+    List<Widget> widget = [];
+    Widget allServicesButton = ((token?.queue != null &&
+                token?.queue['transfer_to'] != null &&
+                token?.queue['transfer_to']['called'] == true) ||
+            (token?.queueppointment != null &&
+                token?.queueppointment['transfer_to'] != null &&
+                token?.queueppointment['transfer_to']['called'] == true))
+        ? Container()
+        : OutlinedButton(
+            onPressed: !isAllServiceOnHold()
+                ? token?.status == 'served'
+                    ? ((token?.queue != null &&
+                                token?.queue['is_transferred'] == true) ||
+                            (token?.queueppointment != null &&
+                                token?.queueppointment['is_transferred'] ==
+                                    true))
+                        ? () async {
+                            showDialog(
+                                context: _context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text(('Cancel')),
+                                      ),
+                                      TextButton(
+                                        onPressed: () async {
+                                          isBuildPending = true;
+                                          UtilityService.showLoadingAlert(
+                                              context);
+                                          var response = await CallService
+                                              .undoTransferService(
+                                            token: token!,
+                                          );
+                                          Navigator.pop(context);
+                                          if (response is bool && response) {
+                                            UtilityService.toast(
+                                                context, ('Transfer reversed'));
+                                            BlocProvider.of<CallBloc>(_context)
+                                                .add((CallNextTokenEvent()));
+                                            isBuildPending = false;
+                                            Navigator.pop(_context);
+                                            return;
+                                          }
+                                          isBuildPending = false;
+                                          UtilityService.toast(
+                                              context, ('Somthing went wrong'));
+                                        },
+                                        child: const Text(('Proceed')),
+                                      ),
+                                    ],
+                                    title: const Text(('Cancelling Transfer')),
+                                    content:
+                                        const Text(('Undo Transfer Ticket?')),
+                                  );
+                                });
+                          }
+                        : () async {
+                            UtilityService.showLoadingAlert(_context);
+                            if (GeneralDataService.activeServices.isEmpty) {
+                              await GeneralDataService
+                                  .initServiceAndCounterData();
+                            }
+                            Navigator.pop(_context);
+                            showDialog(
+                                    context: _context,
+                                    builder: (context) {
+                                      return TransferToServices(
+                                        selectedToken: token!,
+                                      );
+                                    })
+                                .then((value) =>
+                                    BlocProvider.of<CallBloc>(_context)
+                                        .add((CallNextTokenEvent())));
+                          }
+                    : null
+                : null,
+            child: Text(
+              (token?.queueId != null &&
+                          token?.queue['is_transferred'] == true) ||
+                      (token?.queueppointmentId != null &&
+                          token?.queueppointment['is_transferred'] == true)
+                  ? ('Undo Transfer')
+                  : ('TRANSFER TO (Show All services)'),
+              overflow: TextOverflow.ellipsis,
+            ),
+          );
+
+    List transferServices =
+        CounterSettingService.counterSettings?.transferServices != null
+            ? (CounterSettingService.counterSettings?.transferServices as List)
+                .where((element) => element != token?.serviceId)
+                .toList()
+            : [];
+    Widget multiTrasnferButton =
+        CounterSettingService.counterSettings?.multipleTransfer == true
+            ? OutlinedButton(
+                onPressed: () {
+                  bool _return = false;
+                  if (selectedTransferServices.isNotEmpty) {
+                    showDialog(
+                        context: _context,
+                        builder: (context) {
+                          String _priority = "Normal";
+                          return AlertDialog(
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text(('Cancel'))),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context, _priority);
+                                },
+                                child: const Text(('Transfer')),
+                              ),
+                            ],
+                            content: SizedBox(
+                              height: 450,
+                              child: Column(
+                                children: [
+                                  DropdownSearch<String>(
+                                    items: const ["High", "Normal", "Low"],
+                                    popupProps: const PopupProps.menu(),
+                                    dropdownDecoratorProps:
+                                        const DropDownDecoratorProps(
+                                      dropdownSearchDecoration: InputDecoration(
+                                        labelText: ("Priority"),
+                                        hintText: ("Priority"),
+                                      ),
+                                    ),
+                                    onChanged: (value) {
+                                      _priority = value!;
+                                    },
+                                    selectedItem: _priority,
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Text(('Return')),
+                                      StatefulBuilder(builder:
+                                          (BuildContext context,
+                                              StateSetter radioButtonState) {
+                                        return Checkbox(
+                                            value: _return,
+                                            onChanged: (value) {
+                                              radioButtonState(() {
+                                                _return = value!;
+                                              });
+                                            });
+                                      }),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            title: const Text(('Select Priority')),
+                          );
+                        }).then((value) async {
+                      if (value is String && value.isNotEmpty) {
+                        UtilityService.showLoadingAlert(_context);
+                        isBuildPending = true;
+                        Map<String, dynamic> data = {
+                          'priority': value == "High"
+                              ? 1
+                              : value == "Normal"
+                                  ? 2
+                                  : 3,
+                          'transfer_service_ids': selectedTransferServices,
+                          'return': _return
+                        };
+                        if (CounterSettingService
+                                .counterSettings?.multipleTransferAtATime ==
+                            true) {
+                          data['multi_transfer_at_a_time'] = 1;
+                        }
+                        var response = await CallService.transferService(
+                          data: data,
+                          token: token!,
+                        );
+                        Navigator.pop(_context);
+                        if (response is bool && response) {
+                          UtilityService.toast(_context, ('Transferred'));
+                          selectedToken = null;
+                          BlocProvider.of<CallBloc>(_context)
+                              .add((CallNextTokenEvent()));
+                          isBuildPending = false;
+                          return;
+                        }
+                        isBuildPending = false;
+                        UtilityService.toast(
+                            _context, ('Something went wrong'));
+                      }
+                    });
+                  } else {
+                    UtilityService.toast(_context, "select service");
+                  }
+                },
+                child: const Text(('Transfer')))
+            : Container();
+
+    if ((token?.queueId != null && token?.queue['is_transferred'] == true) ||
+        (token?.queueppointmentId != null &&
+            token?.queueppointment['is_transferred'] == true)) {
+      widget.add(
+        Text(
+          token?.queueId != null
+              ? token?.queue['transfer_services_label'] ??
+                  token?.queue['transfer_to']['service']['name']
+              : token?.queueppointmentId != null
+                  ? token?.queueppointment['transfer_services_label'] ??
+                      token?.queueppointment['transfer_to']['service']['name']
+                  : '',
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        ),
+      );
+    } else if (transferServices.isNotEmpty &&
+        transferServices.length <= possibleItems &&
+        GeneralDataService.activeServices.isNotEmpty) {
+      for (int item in transferServices) {
+        if (GeneralDataService.activeServices
+            .map((e) => e.id)
+            .toList()
+            .contains(item)) {
+          ServiceModel service = GeneralDataService.activeServices.singleWhere(
+            (element) => element.id == item,
+          );
+          widget.add(
+            Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints.tightFor(
+                    width: double.infinity, height: 45),
+                child: StatefulBuilder(builder: (context, buttonState) {
+                  return ElevatedButton(
+                    style: CounterSettingService
+                                .counterSettings?.multipleTransfer ==
+                            true
+                        ? ElevatedButton.styleFrom(
+                            backgroundColor:
+                                !selectedTransferServices.contains(service.id)
+                                    ? Appcolors.buttonSelectedColor
+                                    : null,
+                          )
+                        : null,
+                    onPressed: () async {
+                      if (CounterSettingService
+                              .counterSettings?.multipleTransfer ==
+                          true) {
+                        if (selectedTransferServices.contains(service.id)) {
+                          try {
+                            selectedTransferServices.removeAt(
+                                selectedTransferServices.indexWhere(
+                                    (element) => element == service.id));
+                          } catch (_) {}
+                        } else {
+                          selectedTransferServices.add(service.id);
+                        }
+                        buttonState(
+                          () {},
+                        );
+                      } else {
+                        showDialog(
+                            context: _context,
+                            builder: (context) {
+                              String _priority = "Normal";
+                              return AlertDialog(
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text(('Cancel'))),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context, _priority);
+                                    },
+                                    child: const Text(('Transfer')),
+                                  ),
+                                ],
+                                content: DropdownSearch<String>(
+                                  items: const ["High", "Normal", "Low"],
+                                  popupProps: const PopupProps.menu(),
+                                  dropdownDecoratorProps:
+                                      const DropDownDecoratorProps(
+                                    dropdownSearchDecoration: InputDecoration(
+                                      labelText: ("Priority"),
+                                      hintText: ("Priority"),
+                                    ),
+                                  ),
+                                  onChanged: (value) {
+                                    _priority = value!;
+                                  },
+                                  selectedItem: _priority,
+                                ),
+                                title: const Text(('Select Priority')),
+                              );
+                            }).then((value) async {
+                          if (value is String && value.isNotEmpty) {
+                            UtilityService.showLoadingAlert(_context);
+                            isBuildPending = true;
+                            Map<String, dynamic> data = {
+                              'priority': value == "High"
+                                  ? 1
+                                  : value == "Normal"
+                                      ? 2
+                                      : 3,
+                              'transfer_service_ids': [service.id]
+                            };
+                            var response = await CallService.transferService(
+                              data: data,
+                              token: token!,
+                            );
+
+                            Navigator.pop(_context);
+                            if (response is bool && response) {
+                              UtilityService.toast(_context, ('Transferred'));
+                              selectedToken = null;
+                              BlocProvider.of<CallBloc>(_context)
+                                  .add((CallNextTokenEvent()));
+                              isBuildPending = false;
+                              return;
+                            }
+                            isBuildPending = false;
+                            UtilityService.toast(
+                                _context, ('Something went wrong'));
+                          }
+                        });
+                      }
+                    },
+                    child: Text(
+                      service.name,
+                      maxLines: 2,
+                      style: const TextStyle(
+                        height: 1,
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          );
+        }
+        // return widget;
+      }
+
+      if (CounterSettingService.counterSettings?.multipleTransfer == true) {
+        widget.add(Padding(
+          padding: const EdgeInsets.only(left: 8, right: 8),
+          child: Row(
+            children: [
+              multiTrasnferButton,
+              const SizedBox(
+                width: 10,
+              ),
+              Expanded(child: allServicesButton),
+            ],
+          ),
+        ));
+      } else {
+        widget.add(allServicesButton);
+      }
+      return widget;
+    } else if (transferServices.isEmpty &&
+        (GeneralDataService.activeServices
+                    .where((element) => element.id != token?.serviceId)
+                    .toList())
+                .length <=
+            possibleItems) {
+      for (var service in GeneralDataService.activeServices
+          .where((element) => element.id != token?.serviceId)
+          .toList()) {
+        widget.add(
+          Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints.tightFor(
+                  width: double.infinity, height: 45),
+              child: StatefulBuilder(builder: (context, buttonState) {
+                return ElevatedButton(
+                  style:
+                      CounterSettingService.counterSettings?.multipleTransfer ==
+                              true
+                          ? ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  !selectedTransferServices.contains(service.id)
+                                      ? Appcolors.buttonSelectedColor
+                                      : null,
+                            )
+                          : null,
+                  onPressed: () async {
+                    if (CounterSettingService
+                            .counterSettings?.multipleTransfer ==
+                        true) {
+                      if (selectedTransferServices.contains(service.id)) {
+                        try {
+                          selectedTransferServices.removeAt(
+                              selectedTransferServices.indexWhere(
+                                  (element) => element == service.id));
+                        } catch (_) {}
+                      } else {
+                        selectedTransferServices.add(service.id);
+                      }
+                      buttonState(
+                        () {},
+                      );
+                    } else {
+                      showDialog(
+                          context: _context,
+                          builder: (context) {
+                            String _priority = "Normal";
+                            return AlertDialog(
+                              actions: [
+                                TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text(('Cancel'))),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, _priority);
+                                  },
+                                  child: const Text(('Transfer')),
+                                ),
+                              ],
+                              content: DropdownSearch<String>(
+                                items: const ["High", "Normal", "Low"],
+                                popupProps: const PopupProps.menu(),
+                                dropdownDecoratorProps:
+                                    const DropDownDecoratorProps(
+                                  dropdownSearchDecoration: InputDecoration(
+                                    labelText: ("Priority"),
+                                    hintText: ("Priority"),
+                                  ),
+                                ),
+                                onChanged: (value) {
+                                  _priority = value!;
+                                },
+                                selectedItem: _priority,
+                              ),
+                              title: const Text(('Select Priority')),
+                            );
+                          }).then((value) async {
+                        if (value is String && value.isNotEmpty) {
+                          UtilityService.showLoadingAlert(_context);
+                          isBuildPending = true;
+                          Map<String, dynamic> data = {
+                            'priority': value == "High"
+                                ? 1
+                                : value == "Normal"
+                                    ? 2
+                                    : 3,
+                            'transfer_service_ids': [service.id]
+                          };
+                          var response = await CallService.transferService(
+                            data: data,
+                            token: token!,
+                          );
+                          Navigator.pop(_context);
+                          if (response is bool && response) {
+                            UtilityService.toast(_context, ('Transferred'));
+                            selectedToken = null;
+                            BlocProvider.of<CallBloc>(_context)
+                                .add((CallNextTokenEvent()));
+                            isBuildPending = false;
+                            return;
+                          }
+                          UtilityService.toast(
+                              _context, ('Something went wrong'));
+                        }
+                      });
+                    }
+                  },
+                  child: Text(
+                    service.name,
+                    maxLines: 2,
+                    style: const TextStyle(
+                      height: 1,
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+        );
+        if (CounterSettingService.counterSettings?.multipleTransfer == true) {
+          widget.add(Padding(
+            padding: const EdgeInsets.only(left: 8, right: 8),
+            child: Row(
+              children: [
+                multiTrasnferButton,
+                const SizedBox(
+                  width: 10,
+                ),
+                Expanded(child: allServicesButton),
+              ],
+            ),
+          ));
+        } else {
+          widget.add(allServicesButton);
+        }
+        return widget;
+      }
+    }
+    widget.add(allServicesButton);
+    return widget;
   }
 
   Widget buildTokenPart() {
@@ -1123,13 +2143,13 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-        IconButton(
-          onPressed: () {
-            remarkhowBottomSheet();
-          },
-          icon: const Icon(Icons.notes),
-          iconSize: 25,
-        ),
+        // IconButton(
+        //   onPressed: () {
+        //     remarkhowBottomSheet();
+        //   },
+        //   icon: const Icon(Icons.notes),
+        //   iconSize: 25,
+        // ),
       ],
     );
   }
@@ -1165,7 +2185,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const Spacer(),
                       IconButton(
                         onPressed: () {
-                          // Navigator.pop();
+                          Navigator.pop(context);
                         },
                         icon: const Icon(Icons.close),
                       ),
@@ -1190,50 +2210,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       },
-    );
-  }
-
-  Widget getTransferButtons() {
-    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    // Undo Transfer Button
-    Widget allServicesButton = OutlinedButton(
-      onPressed: null, // Placeholder for onPressed action
-      style: OutlinedButton.styleFrom(
-        shape: const RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.all(Radius.zero), // Makes the button rectangular
-        ),
-      ),
-      child: Text(
-        'TRANSFER TO (Show All services)',
-        style: TextStyle(
-          fontSize: 18,
-          color: isDarkMode
-              ? Appcolors.materialIconButtonDark
-              : Appcolors.buttonColor,
-        ),
-        overflow: TextOverflow.ellipsis,
-      ),
-    );
-
-    // Custom Elevated Button
-    Widget customButton = CustomElevatedButton(
-      text: "Doctor name ",
-      onPressed: () {},
-    );
-
-    // Combine the custom button and the all services button row
-    return Column(
-      children: [
-        customButton,
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            const SizedBox(width: 10),
-            Expanded(child: allServicesButton),
-          ],
-        ),
-      ],
     );
   }
 
@@ -1322,5 +2298,38 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           });
     });
+  }
+
+  Future<void> callTokenGrid(
+      {required BuildContext context, required int id}) async {
+    UtilityService.showLoadingAlert(context);
+    var response = await CallService.callTokenFromQueue(queueId: id);
+    Navigator.pop(context);
+    if (response is TokenModel) {
+      BlocProvider.of<CallBloc>(_context).add((CallNextTokenEvent()));
+      return;
+    }
+    UtilityService.toast(context, ('Something went wrong'));
+  }
+
+  Future<void> callTokenNoShowGrid(
+      {required BuildContext context, required int id}) async {
+    UtilityService.showLoadingAlert(_context);
+    var response = await CallService.recallToken(id: id);
+
+    if (!mounted) return;
+
+    Navigator.pop(_context);
+    if (response is TokenModel) {
+      BlocProvider.of<CallBloc>(_context).add((CallNextTokenEvent()));
+      return;
+    }
+    UtilityService.toast(context, ('Something went wrong'));
+  }
+
+  Future<void> setSelectedTokenFromGrid(TokenModel token) async {
+    selectedToken = token;
+    BlocProvider.of<CallBloc>(_context).add((CallNextTokenEvent()));
+    return;
   }
 }
