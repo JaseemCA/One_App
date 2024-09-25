@@ -2,9 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:oneappcounter/common/widgets/one_app_logo/one_app_logo.dart';
-import 'package:oneappcounter/core/config/color/appcolors.dart';
+// import 'package:oneappcounter/core/config/color/appcolors.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/common/widgets/textfield/custom_text_field.dart';
+import 'package:oneappcounter/core/config/constants.dart';
 import 'package:oneappcounter/model/user_credential.dart';
 import 'package:oneappcounter/routes.dart';
 import 'package:oneappcounter/services/auth_service.dart';
@@ -34,7 +35,7 @@ class _LoginpageState extends State<Loginpage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Appcolors.appBackgrondcolor,
+        backgroundColor: appBackgrondcolor,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
@@ -43,7 +44,7 @@ class _LoginpageState extends State<Loginpage> {
         ),
         elevation: 0,
       ),
-      backgroundColor: Appcolors.appBackgrondcolor,
+      backgroundColor: appBackgrondcolor,
       body: Column(
         children: [
           Expanded(
@@ -55,7 +56,7 @@ class _LoginpageState extends State<Loginpage> {
                 Text(
                   NetworkingService.domainUrl ?? '',
                   style: const TextStyle(
-                    color: Appcolors.activeFieldColor,
+                    color: activeFieldColor,
                     decoration: TextDecoration.none,
                   ),
                 ),
@@ -79,7 +80,7 @@ class _LoginpageState extends State<Loginpage> {
                       prefixIcon: Icons.lock),
                 ),
                 CustomElevatedButton(
-                    backgroundColor: Appcolors.buttonColor,
+                    backgroundColor: buttonColor,
                     text: "LOGIN",
                     onPressed: () {
                       loginUser();

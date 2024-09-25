@@ -9,7 +9,7 @@ import 'package:oneappcounter/bloc/tocken_page/bloc/tocken_bloc.dart';
 import 'package:oneappcounter/bloc/tocken_page/bloc/tocken_event.dart';
 import 'package:oneappcounter/bloc/tocken_page/bloc/tocken_state.dart';
 import 'package:oneappcounter/common/widgets/button/count_down_button.dart';
-import 'package:oneappcounter/core/config/color/appcolors.dart';
+import 'package:oneappcounter/core/config/constants.dart';
 import 'package:oneappcounter/extention/string_casing_extention.dart';
 import 'package:oneappcounter/model/queue_model.dart';
 import 'package:oneappcounter/model/tocken_model.dart';
@@ -66,7 +66,7 @@ class _HomeScreenState extends State<TokensPage> {
     // SocketService.registerEvents(isAll: true);
     rebuildListener = SocketService.tokensPageRebuildRequiredController.stream
         .listen((event) {
-      if (event is bool && event) {
+      if (event) {
         emitRebuildEvent();
       }
     });
@@ -89,8 +89,8 @@ class _HomeScreenState extends State<TokensPage> {
         appBar: AppBar(
           automaticallyImplyLeading: false,
           backgroundColor: isDarkMode
-              ? Appcolors.bottomsheetDarkcolor
-              : Appcolors.appBackgrondcolor,
+              ? bottomsheetDarkcolor
+              : appBackgrondcolor,
           title: Text(
             '${('Tokens')} (${GeneralDataService.currentServiceCounterTab?.serviceString})',
             maxLines: 1,
@@ -315,7 +315,7 @@ class _HomeScreenState extends State<TokensPage> {
                         icon: Icon(
                           Icons.call,
                           color: isDarkTheme
-                              ? Appcolors.materialIconButtonDark
+                              ? materialIconButtonDark
                               : Colors.blueAccent,
                         ),
                       ),
@@ -341,7 +341,7 @@ class _HomeScreenState extends State<TokensPage> {
                             )
                           : null,
                       trailing: SizedBox(
-                        width: 60,
+                        width: 80,
                         child: Row(
                           children: [
                             Expanded(
@@ -418,7 +418,7 @@ class _HomeScreenState extends State<TokensPage> {
                             ),
                             Expanded(
                               child: SizedBox(
-                                height: 50,
+                                // height: 50,
                                 child: IconButton(
                                   onPressed: () async {
                                     showDialog(
@@ -627,7 +627,7 @@ class _HomeScreenState extends State<TokensPage> {
                           Icons.replay,
                           color: token.status == "no-show"
                               ? isDarkTheme
-                                  ? Appcolors.materialIconButtonDark
+                                  ? materialIconButtonDark
                                   : Colors.blueAccent
                               : null,
                         ),
@@ -916,7 +916,7 @@ class _HomeScreenState extends State<TokensPage> {
                         icon: Icon(
                           Icons.play_circle,
                           color: isDarkTheme
-                              ? Appcolors.materialIconButtonDark
+                              ? materialIconButtonDark
                               : Colors.blueAccent,
                         ),
                       ),
@@ -1158,7 +1158,7 @@ class _HomeScreenState extends State<TokensPage> {
                         icon: Icon(
                           Icons.call,
                           color: isDarkTheme
-                              ? Appcolors.materialIconButtonDark
+                              ? materialIconButtonDark
                               : Colors.blueAccent,
                         ),
                       ),
@@ -1184,7 +1184,7 @@ class _HomeScreenState extends State<TokensPage> {
                             )
                           : null,
                       trailing: SizedBox(
-                        width: 30,
+                        width: 80,
                         child: Row(
                           children: [
                             Expanded(
@@ -1285,8 +1285,6 @@ class _HomeScreenState extends State<TokensPage> {
                                                   Navigator.pop(context);
                                                   if (response is bool &&
                                                       response) {
-                                                    ///rebuild this ..
-                                                    ///
                                                     if (CounterSettingService
                                                             .counterSettings
                                                             ?.hideHoldedQueue !=

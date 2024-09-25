@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/common/widgets/one_app_logo/one_app_logo.dart';
-import 'package:oneappcounter/core/config/color/appcolors.dart';
+import 'package:oneappcounter/core/config/constants.dart';
 import 'package:oneappcounter/routes.dart';
 import 'package:oneappcounter/services/networking_service.dart';
 import 'package:oneappcounter/services/utility_services.dart';
@@ -17,7 +17,7 @@ class NoInternetScreen extends StatelessWidget {
           Container(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
-            color: Appcolors.appBackgrondcolor,
+            color: appBackgrondcolor,
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

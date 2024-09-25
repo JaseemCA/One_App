@@ -66,7 +66,6 @@
 //   }
 // }
 
-
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:oneappcounter/entity/device_entity.dart';
@@ -99,8 +98,11 @@ class SetDeviceService {
 
       var response = await NetworkingService.postHttp(path: path, data: data);
 
-      if (response is Response && response.statusCode == 200 && response.data['data'] != null) {
-        DeviceModel deviceModelData = DeviceModel.fromEntity(DeviceEntity.fromJson(response.data['data']));
+      if (response is Response &&
+          response.statusCode == 200 &&
+          response.data['data'] != null) {
+        DeviceModel deviceModelData = DeviceModel.fromEntity(
+            DeviceEntity.fromJson(response.data['data']));
         deviceSettingDetails = deviceModelData;
         return true;
       } else {
@@ -116,6 +118,7 @@ class SetDeviceService {
 
   static List<dynamic> _generateTabSettingsMap() {
     List<dynamic> val = [];
+    // ignore: no_leading_underscores_for_local_identifiers
     for (var _item in GeneralDataService.getTabs()) {
       Map<String, dynamic> mapOfItem = _item.counterSettings.toJsonEntity();
       mapOfItem['name'] = '${_item.serviceString} | ${_item.counter.name}';
@@ -139,7 +142,8 @@ class SetDeviceService {
 
   static Future<void> getFromLocal() async {
     try {
-      var val = await StorageService.getSavedValue(key: 'device_setting_details');
+      var val =
+          await StorageService.getSavedValue(key: 'device_setting_details');
       if (val != null) {
         DeviceModel data = DeviceModel.fromJson(json.decode(val));
         deviceSettingDetails = data;

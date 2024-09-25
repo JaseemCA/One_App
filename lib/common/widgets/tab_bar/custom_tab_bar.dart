@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:oneappcounter/core/config/color/appcolors.dart';
+// import 'package:oneappcounter/core/config/color/appcolors.dart';
+import 'package:oneappcounter/core/config/constants.dart';
 
 class CustomTabBar extends StatelessWidget implements PreferredSizeWidget {
   final int tabCount;
@@ -32,7 +33,7 @@ class CustomTabBar extends StatelessWidget implements PreferredSizeWidget {
       isScrollable: isScrolable,
       indicator: const UnderlineTabIndicator(
         borderSide: BorderSide(
-          color: Appcolors.buttonColor,
+          color: buttonColor,
           width: 3.0,
         ),
       ),

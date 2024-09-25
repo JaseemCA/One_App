@@ -4,7 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:oneappcounter/bloc/app_update/bloc/app_update_bloc.dart';
 import 'package:oneappcounter/bloc/app_update/bloc/app_update_event.dart';
 import 'package:oneappcounter/common/widgets/one_app_logo/one_app_logo.dart';
-import 'package:oneappcounter/core/config/color/appcolors.dart';
+import 'package:oneappcounter/core/config/constants.dart';
+// import 'package:oneappcounter/core/config/color/appcolors.dart';
 import 'package:oneappcounter/model/splash_init_response.dart';
 import 'package:oneappcounter/routes.dart';
 import 'package:oneappcounter/services/splash_services.dart';
@@ -103,7 +104,7 @@ class SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Appcolors.appBackgrondcolor,
+      backgroundColor: appBackgrondcolor,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

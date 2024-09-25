@@ -12,7 +12,8 @@ import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_state.dart';
 import 'package:oneappcounter/common/widgets/button/count_down_button.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/common/widgets/one_app_logo/one_app_logo.dart';
-import 'package:oneappcounter/core/config/color/appcolors.dart';
+// import 'package:oneappcounter/core/config/color/appcolors.dart';
+import 'package:oneappcounter/core/config/constants.dart';
 import 'package:oneappcounter/core/config/theme/bloc/theme_cubit.dart';
 import 'package:oneappcounter/extention/string_casing_extention.dart';
 import 'package:oneappcounter/model/queue_model.dart';
@@ -57,21 +58,17 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-
     ClockService.updateDateTime();
-
-    SocketService.registerEvents(isAll: true);
-
     homePageRebuild =
         SocketService.homePageRebuildRequiredController.stream.listen((event) {
-      if (event is bool && event && isBuildPending == false) {
+      if (event && isBuildPending == false) {
         BlocProvider.of<SettingsBloc>(context)
             .add(HomePageSettingsChangedEvent());
       }
     });
     appBarRebuild = SocketService.homePageAppBarRebuildRequiredController.stream
         .listen((event) {
-      if (event is bool && event) {
+      if (event) {
         rebuildHoldUnholdButtons();
       }
     });
@@ -123,9 +120,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     try {
-      SocketService.destorySocket();
-    } catch (_) {}
-    try {
       homePageRebuild.cancel();
     } catch (_) {}
 
@@ -142,11 +136,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        elevation: 2,
+        // elevation: 2,
         leadingWidth: 180,
         backgroundColor: isDarkMode
-            ? Appcolors.bottomsheetDarkcolor
-            : Appcolors.appBackgrondcolor,
+            ? bottomsheetDarkcolor
+            : appBackgrondcolor,
         leading: const Padding(
             padding: EdgeInsets.only(left: 20),
             child: OneAppLogo(
@@ -256,7 +250,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (value == 'theme') {
                   showThemeDialog();
                 }
-                // Handle other menu options
               });
             },
           ),
@@ -266,7 +259,6 @@ class _HomeScreenState extends State<HomeScreen> {
         buildWhen: (previous, current) {
           if (previous is SettingsStateUpdating &&
               current is HomePageSettingsState) {
-            // log('inside bloc builder');
             return true;
           }
           return false;
@@ -326,137 +318,6 @@ class _HomeScreenState extends State<HomeScreen> {
       return buildNonGridScreen();
     }
   }
-
-  // void holdshowBottomSheet() {
-  //   final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-  //   showModalBottomSheet(
-  //     isScrollControlled: true,
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return Padding(
-  //         padding: EdgeInsets.only(
-  //           bottom: MediaQuery.of(context).viewInsets.bottom,
-  //         ),
-  //         child: ClipRRect(
-  //           borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-  //           child: Container(
-  //             height: 420,
-  //             color: isDarkMode ? Appcolors.bottomsheetDarkcolor : Colors.white,
-  //             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-  //             child: Column(
-  //               mainAxisSize: MainAxisSize.min,
-  //               children: [
-  //                 const Row(
-  //                   mainAxisAlignment: MainAxisAlignment.center,
-  //                   children: [
-  //                     Text(
-  //                       'Hold Service',
-  //                       style: TextStyle(fontSize: 22),
-  //                     ),
-  //                   ],
-  //                 ),
-  //                 const SizedBox(height: 20),
-  //                 GestureDetector(
-  //                   child: const TextField(
-  //                     decoration: InputDecoration(
-  //                       border: OutlineInputBorder(),
-  //                       suffixIcon: Icon(Icons.arrow_drop_down),
-  //                     ),
-  //                   ),
-  //                 ),
-  //                 const SizedBox(height: 25),
-  //                 GestureDetector(
-  //                   child: const TextField(
-  //                     decoration: InputDecoration(
-  //                       hintText: 'Message',
-  //                     ),
-  //                   ),
-  //                 ),
-  //                 const SizedBox(height: 25),
-  //                 ElevatedButton(
-  //                   onPressed: _showTimePicker,
-  //                   style: ElevatedButton.styleFrom(
-  //                       backgroundColor: isDarkMode
-  //                           ? Appcolors.bottomsheetDarkcolor
-  //                           : Colors.white,
-  //                       shape: RoundedRectangleBorder(
-  //                         borderRadius: BorderRadius.circular(5),
-  //                         side: const BorderSide(
-  //                           color: Colors.grey,
-  //                           width: 1,
-  //                         ),
-  //                       ),
-  //                       padding: const EdgeInsets.symmetric(
-  //                           horizontal: 18, vertical: 10)),
-  //                   child: Text(
-  //                     "Expected Ending Time: $selectedTime",
-  //                     style: TextStyle(
-  //                       fontSize: 18,
-  //                       color: isDarkMode
-  //                           ? Appcolors.materialIconButtonDark
-  //                           : Appcolors.buttonColor,
-  //                     ),
-  //                   ),
-  //                 ),
-  //                 const SizedBox(height: 30),
-  //                 CustomElevatedButton(
-  //                     text: "HOLD",
-  //                     onPressed: () {
-  //                       // Add your logic here
-  //                     })
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
-  // Widget buildTimePicker() {
-  //   DateTime adjustedDateTime = DateTime(
-  //     dateTime.year,
-  //     dateTime.month,
-  //     dateTime.day,
-  //     dateTime.hour,
-  //     (dateTime.minute ~/ 10) * 10,
-  //   );
-
-  //   return SizedBox(
-  //     height: 180,
-  //     child: CupertinoDatePicker(
-  //       initialDateTime: adjustedDateTime,
-  //       mode: CupertinoDatePickerMode.time,
-  //       minuteInterval: 1,
-  //       onDateTimeChanged: (dateTime) =>
-  //           setState(() => this.dateTime = dateTime),
-  //     ),
-  //   );
-  // }
-
-  // void _showTimePicker() {
-  //   showCupertinoModalPopup(
-  //     context: context,
-  //     builder: (context) => CupertinoActionSheet(
-  //       actions: <Widget>[
-  //         CupertinoActionSheetAction(
-  //           child: const Text('Done'),
-  //           onPressed: () {
-  //             setState(() {
-  //               selectedTime = DateFormat('hh:mm a').format(dateTime);
-  //             });
-  //             Navigator.pop(context);
-  //           },
-  //         ),
-  //       ],
-  //       cancelButton: CupertinoButton(
-  //         child: const Text('Cancel'),
-  //         onPressed: () => Navigator.pop(context),
-  //       ),
-  //       message: buildTimePicker(),
-  //     ),
-  //   );
-  // }
 
   void showThemeDialog() {
     showDialog(
@@ -720,12 +581,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: token.status == "no-show"
                                     ? UtilityService.isDarkTheme
-                                        ? Appcolors.lowPriorityDark
-                                        : Appcolors.lowPriorityLight
+                                        ? lowPriorityDark
+                                        : lowPriorityLight
                                     : token.isHold == true
                                         ? UtilityService.isDarkTheme
-                                            ? Appcolors.warningDark
-                                            : Appcolors.warningLight
+                                            ? warningDark
+                                            : warningLight
                                         : null,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 2,
@@ -1091,7 +952,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const Divider(
                     height: 40,
-                  ), // kDivider replaced with Divider()
+                  ),
                   Column(
                     children: [
                       Row(
@@ -1127,7 +988,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                               .add((CallNextTokenEvent()));
                                         }
                                       }
-                                    : null, // Disabled button
+                                    : null,
+                                // child: const Text("SERVE"), // Disabled button
                                 text: "SERVE",
                               ),
                             ),
@@ -1220,6 +1082,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                             token.isHold == true) &&
                                         !isAllServiceOnHold()
                                     ? () async {
+                                        
+                                        print(
+                                            'alwaysDisableCallNextBtn: ${CounterSettingService.counterSettings?.alwaysDisableCallNextBtn}');
+                                        print('Token status: ${token?.status}');
+                                        print('Token isHold: ${token?.isHold}');
+                                        print(
+                                            'isAllServiceOnHold: ${isAllServiceOnHold()}');
+
                                         if ((token != null &&
                                                 !token.isHold &&
                                                 token.status != 'no-show') &&
@@ -1233,6 +1103,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 (token.queueppointment != null &&
                                                     token.queueppointment['is_transferred'] !=
                                                         true)))) {
+                                          // Log to verify if this dialog gets triggered
+                                          print(
+                                              'Showing alert dialog for non-transferred token');
                                           showDialog(
                                               context: _context,
                                               builder: (context) {
@@ -1244,6 +1117,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   actions: [
                                                     TextButton(
                                                       onPressed: () {
+                                                        print(
+                                                            'Cancelled call'); // Log for dialog cancel
                                                         Navigator.pop(context);
                                                       },
                                                       child:
@@ -1252,7 +1127,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     CountDownButton(
                                                       onPressed: () async {
                                                         Navigator.pop(context);
+                                                        print(
+                                                            'Calling next token...'); // Log before calling
                                                         await _callNextToken();
+                                                        print(
+                                                            'Called next token.'); // Log after calling
                                                       },
                                                     )
                                                   ],
@@ -1269,6 +1148,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 (token.queueppointment != null &&
                                                     token.queueppointment['is_transferred'] !=
                                                         true))) {
+                                          // Log to verify if the require transfer dialog gets triggered
+                                          print(
+                                              'Showing transfer required dialog');
                                           showDialog(
                                               context: _context,
                                               builder: (context) {
@@ -1280,6 +1162,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   actions: [
                                                     TextButton(
                                                       onPressed: () {
+                                                        print(
+                                                            'Closed transfer required dialog'); // Log for dialog close
                                                         Navigator.pop(context);
                                                       },
                                                       child:
@@ -1289,10 +1173,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 );
                                               });
                                         } else {
+                                          // Directly call next token without showing a dialog
+                                          print(
+                                              'Calling next token without dialog...'); // Log for default call
                                           await _callNextToken();
+                                          print(
+                                              'Called next token.'); // Log after calling
                                         }
                                       }
-                                    : null, // Disabled button
+                                    : () {
+                                        // Log if the button is disabled
+                                        print('CALL NEXT button is disabled');
+                                      },
                                 text: 'CALL NEXT',
                               ),
                             ),
@@ -1365,7 +1257,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       // child: token?.isHold == true
                                       //     ? const Text(('UNHOLD TOKEN'))
                                       //     : const Text(
-                                      //         ('HOLD TOKEN')), 
+                                      //         ('HOLD TOKEN')),
                                     )
                                   : Container(),
                             ),
@@ -1681,7 +1573,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ? ElevatedButton.styleFrom(
                             backgroundColor:
                                 !selectedTransferServices.contains(service.id)
-                                    ? Appcolors.buttonSelectedColor
+                                    ? buttonSelectedColor
                                     : null,
                           )
                         : null,
@@ -1826,7 +1718,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ? ElevatedButton.styleFrom(
                               backgroundColor:
                                   !selectedTransferServices.contains(service.id)
-                                      ? Appcolors.buttonSelectedColor
+                                      ? buttonSelectedColor
                                       : null,
                             )
                           : null,
@@ -2168,7 +2060,7 @@ class _HomeScreenState extends State<HomeScreen> {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
             child: Container(
               height: 400,
-              color: isDarkMode ? Appcolors.bottomsheetDarkcolor : Colors.white,
+              color: isDarkMode ? bottomsheetDarkcolor : Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
               child: Column(
                 mainAxisSize: MainAxisSize.min,

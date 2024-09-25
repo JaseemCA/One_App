@@ -279,7 +279,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_bloc.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_event.dart';
-import 'package:oneappcounter/core/config/color/appcolors.dart';
+import 'package:oneappcounter/core/config/constants.dart';
 import 'package:oneappcounter/model/counter_model.dart';
 import 'package:oneappcounter/model/service_counter_tab_model.dart';
 import 'package:oneappcounter/model/service_model.dart';
@@ -436,8 +436,8 @@ class _SetNewServiceTabState extends State<SetNewServiceTab> {
                     style: ButtonStyle(
                       backgroundColor: WidgetStateProperty.all<Color>(
                         isDarkMode
-                            ? Appcolors.materialIconButtonDark
-                            : Appcolors.buttonColor,
+                            ? materialIconButtonDark
+                            : buttonColor,
                       ),
                       shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(

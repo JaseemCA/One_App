@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:oneappcounter/core/config/color/appcolors.dart';
+import 'package:oneappcounter/core/config/constants.dart';
+// import 'package:oneappcounter/core/config/color/appcolors.dart';
 
 class UtilityService {
   static bool isDarkTheme = false;
@@ -54,9 +55,7 @@ class UtilityService {
                     child: CircularProgressIndicator(
                       strokeWidth: 4,
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        isDarkTheme
-                            ? Appcolors.materialIconButtonDark
-                            : Appcolors.loadingColor,
+                        isDarkTheme ? materialIconButtonDark : loadingColor,
                       ),
                     ),
                   ),

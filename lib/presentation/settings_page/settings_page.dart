@@ -2,9 +2,10 @@
 import 'dart:async';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:oneappcounter/common/widgets/button/custom_button.dart';
-import 'package:oneappcounter/core/config/color/appcolors.dart';
+// import 'package:oneappcounter/common/widgets/button/custom_button.dart';
+import 'package:oneappcounter/core/config/constants.dart';
 import 'package:oneappcounter/functions/general_functions.dart';
+import 'package:oneappcounter/model/counter_settings_model.dart';
 import 'package:oneappcounter/model/service_model.dart';
 import 'package:oneappcounter/services/counter_setting_service.dart';
 import 'package:oneappcounter/services/general_data_seevice.dart';
@@ -21,13 +22,15 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final alertTimeController = TextEditingController();
-  final uidController = TextEditingController();
-  static bool _isSettingsUpdating = false;
-  static bool _isTabRebuildNeededAfterPop = false;
-  static bool _isHomeRebuildNeededAfterPop = false;
   Map<String, dynamic>? _currentSettings =
       CounterSettingService.counterSettings?.toJson();
+  static bool _isTabRebuildNeededAfterPop = false;
+  static bool _isHomeRebuildNeededAfterPop = false;
+  static bool _isSettingsUpdating = false;
+
+  final alertTimeController = TextEditingController();
+
+  final uidController = TextEditingController();
 
   ///setstate functions
   StateSetter? _alertTransferSetState;
@@ -63,6 +66,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late BuildContext _context;
 
   late StreamSubscription rebuildRequired;
+
   Future<void> updateSettings(BuildContext context, String message) async {
     _isSettingsUpdating = true;
     UtilityService.showLoadingAlert(context);
@@ -84,9 +88,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.initState();
     rebuildRequired = SocketService.settingsPageRebuildRequiredController.stream
         .listen((event) async {
-      if (event is bool && event) {
+      if (event) {
         updateMainVaribale();
         rebuildAllSetState != null ? rebuildAllSetState!(() {}) : null;
+
+        /// as build context need to be passed to change locale function, so all switching tab should call same function
         // await LanguageService.changeLocaleFn(context);
       }
     });
@@ -115,6 +121,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    _context = context;
+    alertTimeController.text = _currentSettings?['alertTime'].toString() ?? '';
     // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async {
@@ -135,8 +143,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: isDarkMode
-              ? Appcolors.bottomsheetDarkcolor
-              : Appcolors.appBackgrondcolor,
+              ? bottomsheetDarkcolor
+              : appBackgrondcolor,
           automaticallyImplyLeading: false,
           title: const Text(
             'Settings',
@@ -216,39 +224,65 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       )
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'en',
-                              child: Text('English'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'es',
-                              child: Text('Spanish'),
-                            ),
-                          ],
-                          onChanged: (value) {},
-                          decoration: const InputDecoration(
-                            labelText: "Language",
-                            hintText: "Language",
-                          ),
-                        ),
-                      )
-                    ],
+                  const Divider(),
+                  // Row(
+                  //   children: [
+                  //     Expanded(
+                  //       child: DropdownSearch<LanguageModel>(
+                  //         compareFn: (item1, current) {
+                  //           if (item1.code == current.code) {
+                  //             return true;
+                  //           }
+                  //           return false;
+                  //         },
+                  //         selectedItem: LanguageService.getCurrentLanguage(),
+                  //         items: LanguageService.languageList,
+                  //         popupProps: const PopupProps.dialog(),
+                  //         dropdownDecoratorProps: DropDownDecoratorProps(
+                  //           dropdownSearchDecoration: InputDecoration(
+                  //             labelText: translate("Language"),
+                  //             hintText: translate("Language"),
+                  //           ),
+                  //         ),
+                  //         itemAsString: (value) {
+                  //           return value.nativeName;
+                  //         },
+                  //         onChanged: (value) {
+                  //           ///make sure convert to entity so when server based languge is applying won't affect deeply\
+                  //           ///can simply eleminate many code changes.
+                  //           _currentSettings?['language'] != null
+                  //               ? _currentSettings!['language'].clear()
+                  //               : _currentSettings?['language'] = [];
+                  //           Map<String, dynamic> val = value!.toJsonEntity();
+                  //           _currentSettings?['language'].add(val);
+                  //           updateSettings(
+                  //             context,
+                  //             ('Language'),
+                  //           );
+                  //         },
+                  //       ),
+                  //     )
+                  //   ],
+                  // ),
+                  const SizedBox(
+                    height: 10,
                   ),
-                  const SizedBox(height: 10),
                   buildGeneralCard(),
                   buildSideMenuCard(),
                   buildButtonsCard(),
                   buildGridViewCard(),
                   buildMiscellaneousCard(),
-                  const SizedBox(height: 20),
+
+                  const SizedBox(
+                    height: 20,
+                  ),
+
+                  ///apply uid button.
+                  ///
                   const Divider(),
-                  const SizedBox(height: 25),
+                  const SizedBox(
+                    height: 25,
+                  ),
                   Row(
                     children: [
                       Expanded(
@@ -261,14 +295,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                       ),
                       Expanded(
-                          child: CustomElevatedButton(
-                        text: "APPLY",
-                        onPressed: () {},
-                        fontSize: 12,
-                      ))
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (uidController.text.isNotEmpty) {
+                              UtilityService.showLoadingAlert(context);
+                              var response = await CounterSettingService
+                                  .updateCounterWithUid(
+                                uid: int.parse(uidController.text),
+                              );
+                              Navigator.pop(context);
+                              if (response is CounterSettingsModel) {
+                                updateMainVaribale();
+                                allPageSetState(() {});
+                                return;
+                              }
+                              UtilityService.toast(
+                                  context, 'Something went wrong');
+                              return;
+                            }
+                            UtilityService.toast(context, 'Please enter uid');
+                          },
+                          child: const Text('APPLY'),
+                        ),
+                      )
                     ],
                   ),
-                  const SizedBox(height: 25),
+                  const SizedBox(
+                    height: 25,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

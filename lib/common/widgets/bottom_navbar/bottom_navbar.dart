@@ -36,7 +36,7 @@ class _BottomTabScreen extends State<BottomTabScreen> {
     isSettingsChanged = SocketService
         .settingsPageRebuildRequiredController.stream
         .listen((event) {
-      if (event is bool && event) {
+      if (event) {
         BlocProvider.of<SettingsBloc>(context).add(SettingsEventUpdated());
       }
     });

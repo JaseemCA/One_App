@@ -5,9 +5,10 @@ import 'package:oneappcounter/bloc/branch_domain/bloc/branc_domain_bloc.dart';
 import 'package:oneappcounter/bloc/branch_domain/bloc/branc_domain_event.dart';
 import 'package:oneappcounter/bloc/branch_domain/bloc/branc_domain_state.dart';
 import 'package:oneappcounter/common/widgets/one_app_logo/one_app_logo.dart';
-import 'package:oneappcounter/core/config/color/appcolors.dart';
+// import 'package:oneappcounter/core/config/color/appcolors.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/common/widgets/textfield/custom_text_field.dart';
+import 'package:oneappcounter/core/config/constants.dart';
 import 'package:oneappcounter/routes.dart';
 import 'package:oneappcounter/services/auth_service.dart';
 import 'package:oneappcounter/services/networking_service.dart';
@@ -47,7 +48,7 @@ class _DomainScreenState extends State<DomainScreen> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        backgroundColor: Appcolors.appBackgrondcolor,
+        backgroundColor: appBackgrondcolor,
         body: BlocListener<BranchDomainBloc, BranchDomainState>(
           listener: (context, state) {
             if (state is BranchDomainSubmitted) {
@@ -104,7 +105,7 @@ class _DomainScreenState extends State<DomainScreen> {
                         BlocBuilder<BranchDomainBloc, BranchDomainState>(
                           builder: (context, state) {
                             return CustomElevatedButton(
-                                backgroundColor: Appcolors.buttonColor,
+                                backgroundColor: buttonColor,
                                 text: "CONNECT",
                                 onPressed: () {
                                   buttonClicked();

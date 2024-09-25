@@ -34,6 +34,9 @@ class GeneralDataService {
   static ThemeModeModel themeModeVar =
       const ThemeModeModel(themeMode: ThemeMode.system);
 
+       static StreamController<bool> themeModeController =
+      StreamController<bool>.broadcast();
+
   ///token and calls
   static TokenModel? lastCalledToken;
   static List<QueueModel> todaysQueue = [];
@@ -55,7 +58,7 @@ class GeneralDataService {
     await resetIndex();
     await getLastToken();
     await getTodayTokenDetails();
-    await SocketService().initliseSocket();
+    await SocketService().initialiseSocket();
     await SocketService.registerEvents(isAll: true);
   }
 

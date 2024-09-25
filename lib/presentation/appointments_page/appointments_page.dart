@@ -60,7 +60,8 @@ import 'package:oneappcounter/bloc/appointment_page/bloc/appointment_state.dart'
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_bloc.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_event.dart';
 import 'package:oneappcounter/common/widgets/button/count_down_button.dart';
-import 'package:oneappcounter/core/config/color/appcolors.dart';
+// import 'package:oneappcounter/core/config/color/appcolors.dart';
+import 'package:oneappcounter/core/config/constants.dart';
 import 'package:oneappcounter/model/queue_appointment_model.dart';
 import 'package:oneappcounter/model/tocken_model.dart';
 import 'package:oneappcounter/presentation/popUp/customer_flow_details.dart';
@@ -94,7 +95,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
     rebuildListener = SocketService
         .appointmentPageRebuildRequiredController.stream
         .listen((event) {
-      if (event is bool && event) {
+      if (event) {
         BlocProvider.of<AppointmentPageBloc>(context).add(RebuildAllTabEvent());
       }
     });
@@ -125,8 +126,8 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
             ),
           ),
           backgroundColor: isDarkMode
-              ? Appcolors.bottomsheetDarkcolor
-              : Appcolors.appBackgrondcolor,
+              ? bottomsheetDarkcolor
+              : appBackgrondcolor,
           bottom: TabBar(
             labelColor: Colors.white,
             unselectedLabelColor: const Color.fromARGB(255, 216, 214, 214),
@@ -288,7 +289,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                     icon: Icon(
                       Icons.call,
                       color: UtilityService.isDarkTheme
-                          ? Appcolors.buttonColor
+                          ? buttonColor
                           : Colors.blueAccent,
                     ),
                   ),

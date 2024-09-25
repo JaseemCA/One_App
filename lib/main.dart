@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:oneappcounter/bloc/app_update/bloc/app_update_bloc.dart';
+import 'package:oneappcounter/bloc/app_update/bloc/app_update_state.dart';
 import 'package:oneappcounter/bloc/appointment_page/bloc/appointment_bloc.dart';
 import 'package:oneappcounter/bloc/call/bloc/call_bloc.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_bloc.dart';
@@ -60,11 +62,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         });
         SocketService.destorySocket().then((value) {
           SocketService()
-              .initliseSocket()
+              .initialiseSocket()
               .then((value) => SocketService.registerEvents(isAll: true));
         });
       }
-    }
+    } 
   }
 
   @override
@@ -75,28 +77,49 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         BlocProvider<BranchDomainBloc>(create: (context) => BranchDomainBloc()),
         BlocProvider<SettingsBloc>(create: (context) => SettingsBloc()),
         BlocProvider<AppUpdateBloc>(create: (context) => AppUpdateBloc()),
-       
-        
-
         BlocProvider<CallBloc>(create: (context) => CallBloc()),
         BlocProvider<TokenPageBloc>(create: (context) => TokenPageBloc()),
         BlocProvider<AppointmentPageBloc>(
             create: (context) => AppointmentPageBloc()),
-
-        // Provide NetworkingCubit here
       ],
-      child: BlocBuilder<ThemeCubit, ThemeMode>(
-        builder: (context, mode) {
-          return MaterialApp(
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: mode,
-            debugShowCheckedModeBanner: false,
-            title: 'OneAppCounter',
-            initialRoute: AppRoutes.splashScreen,
-            routes: routes,
-          );
+      child: BlocListener<AppUpdateBloc, AppUpdateState>(
+        listener: (context, state) async {
+          if ((state is AppUpdateAvailable) &&
+              (state.appUpdateInfo.updateAvailability ==
+                  UpdateAvailability.updateAvailable)) {
+            bool immediateUpdateAllowed =
+                state.appUpdateInfo.immediateUpdateAllowed;
+
+            if (immediateUpdateAllowed) {
+              try {
+                await InAppUpdate.performImmediateUpdate();
+              } catch (e) {
+                immediateUpdateAllowed = false;
+              }
+            }
+
+            if (!immediateUpdateAllowed &&
+                state.appUpdateInfo.flexibleUpdateAllowed) {
+              try {
+                await InAppUpdate.startFlexibleUpdate();
+                await InAppUpdate.completeFlexibleUpdate();
+              } catch (_) {}
+            }
+          }
         },
+        child: BlocBuilder<ThemeCubit, ThemeMode>(
+          builder: (context, mode) {
+            return MaterialApp(
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: mode,
+              debugShowCheckedModeBanner: false,
+              title: 'OneAppCounter',
+              initialRoute: AppRoutes.splashScreen,
+              routes: routes,
+            );
+          },
+        ),
       ),
     );
   }

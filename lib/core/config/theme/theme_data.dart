@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'package:oneappcounter/core/config/color/appcolors.dart';
+// import 'package:oneappcounter/core/config/color/appcolors.dart';
+import 'package:oneappcounter/core/config/constants.dart';
 
 class AppTheme {
   static final darkTheme = ThemeData(
     brightness: Brightness.dark,
-    primarySwatch: createMaterialColor(Appcolors.materialIconButtonDark),
+    primarySwatch: createMaterialColor(materialIconButtonDark),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       elevation: 10,
       selectedItemColor: Colors.white,
@@ -15,9 +16,9 @@ class AppTheme {
 
   static final lightTheme = ThemeData(
     brightness: Brightness.light,
-    primarySwatch: createMaterialColor(Appcolors.buttonColor),
+    primarySwatch: createMaterialColor(buttonColor),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Appcolors.appBackgrondcolor,
+      backgroundColor: appBackgrondcolor,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: elevatedButtonStyle,
@@ -31,7 +32,7 @@ class AppTheme {
 }
 
 final ButtonStyle elevatedButtonStyle = ElevatedButton.styleFrom(
-  backgroundColor: Appcolors.buttonColor,
+  backgroundColor: buttonColor,
   foregroundColor: Colors.white,
   minimumSize: const Size(10, 45),
 );

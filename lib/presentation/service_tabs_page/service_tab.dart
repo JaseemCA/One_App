@@ -445,12 +445,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_bloc.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_event.dart';
-import 'package:oneappcounter/core/config/color/appcolors.dart';
+import 'package:oneappcounter/core/config/constants.dart';
 import 'package:oneappcounter/model/service_counter_tab_model.dart';
 import 'package:oneappcounter/presentation/popUp/add_service.dart.dart';
 import 'package:oneappcounter/services/general_data_seevice.dart';
 import 'package:oneappcounter/services/socket_services.dart';
 import 'package:oneappcounter/services/utility_services.dart';
+
 // ignore: must_be_immutable
 class ServiceCounterTab extends StatefulWidget {
   const ServiceCounterTab({super.key});
@@ -460,18 +461,24 @@ class ServiceCounterTab extends StatefulWidget {
 }
 
 class _ServiceCounterTabState extends State<ServiceCounterTab> {
-late  StateSetter _listSetState;
+  late StateSetter _listSetState;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(('Service Tabs')),
+        title: const Text(('Service Tabs'),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            )),
       ),
       floatingActionButton: FloatingActionButton(
+      
         onPressed: () async {
           await _showAddTabPopup(context, _listSetState);
         },
+        
         child: const Icon(
           Icons.add,
           size: 30,
@@ -479,21 +486,20 @@ late  StateSetter _listSetState;
       ),
       body: StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
-        _listSetState = setState; 
+        _listSetState = setState;
 
-      if (GeneralDataService.getTabs().isEmpty) {
+        if (GeneralDataService.getTabs().isEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _showAddTabPopup(context, _listSetState).then((value) async {
-              await SocketService().initliseSocket();
+              await SocketService().initialiseSocket();
               await SocketService.registerEvents(isAll: true);
             });
           });
-         } else if (GeneralDataService.getTabs().isNotEmpty &&
+        } else if (GeneralDataService.getTabs().isNotEmpty &&
             GeneralDataService.getTabs()[
                     GeneralDataService.currentServiceCounterTabIndex]
                 .services
                 .isEmpty) {
-                    
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _showAddTabPopup(
               context,
@@ -528,7 +534,7 @@ late  StateSetter _listSetState;
                               );
                             }).then((value) {
                           _listSetState(() {});
-                                                });
+                        });
                       },
                       icon: const Icon(Icons.edit_note),
                     ),
@@ -562,7 +568,7 @@ late  StateSetter _listSetState;
                                           UtilityService.toast(
                                               context, ('Tab deleted!'));
                                           _listSetState(() {});
-                                                                                },
+                                        },
                                       ),
                                     ],
                                   );
@@ -576,7 +582,7 @@ late  StateSetter _listSetState;
               ),
               selected: currentItem.selected,
               selectedColor:
-                  !UtilityService.isDarkTheme ? Appcolors.buttonColor : null,
+                  !UtilityService.isDarkTheme ? buttonColor : null,
               selectedTileColor: !UtilityService.isDarkTheme
                   ? Colors.grey.shade300
                   : Colors.grey.shade800,
@@ -628,7 +634,7 @@ late  StateSetter _listSetState;
                   await SocketService.connectAfterSwitch();
                   Navigator.pop(context);
                   _listSetState(() {});
-                                  BlocProvider.of<SettingsBloc>(context)
+                  BlocProvider.of<SettingsBloc>(context)
                       .add(SettingsEventUpdated());
                   return;
                 }
@@ -648,10 +654,8 @@ late  StateSetter _listSetState;
     );
   }
 
-  Future<void> _showAddTabPopup(BuildContext context,
-      StateSetter listSetState, 
-      {ServiceCounterTabModel? editableService,
-      int? editingIndex}) async {
+  Future<void> _showAddTabPopup(BuildContext context, StateSetter listSetState,
+      {ServiceCounterTabModel? editableService, int? editingIndex}) async {
     UtilityService.showLoadingAlert(context);
     await GeneralDataService.initServiceAndCounterData();
     Navigator.pop(context);
