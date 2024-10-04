@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:oneappcounter/entity/countersetting_entity.dart';
 
-
 class CounterSettingsModel extends Equatable {
   final String title;
   final int? uid;
@@ -19,7 +18,10 @@ class CounterSettingsModel extends Equatable {
 
   ///side menu options,navigation tabs options
   final bool hideNextToCall;
+  final bool hideCancelBtnInNextToCall;
+  final bool hideHoldBtnInNextToCall;
   final bool hideTodayAppointments;
+  final bool hideCancelBtnInTodayAppointments;
   final bool hideCalled;
   final bool hideServedInCalled;
   final bool hideServedAndTransferredInCalled;
@@ -48,6 +50,11 @@ class CounterSettingsModel extends Equatable {
 
   /// miscellaneous options
   final bool multipleTransferAtATime;
+  final bool canAddTab;
+  final bool canRemoveTab;
+  final bool hideSettingsBtn;
+  final bool hideServiceEditBtn;
+  final bool showRemarksNotification;
   final bool alwaysOnTop;
   final bool showTokensButton;
   final bool wakeLockEnabled;
@@ -67,7 +74,10 @@ class CounterSettingsModel extends Equatable {
     required this.recallUnholdToken,
     required this.notification,
     required this.hideNextToCall,
+    required this.hideCancelBtnInNextToCall,
+    required this.hideHoldBtnInNextToCall,
     required this.hideTodayAppointments,
+    required this.hideCancelBtnInTodayAppointments,
     required this.hideCalled,
     required this.hideServedInCalled,
     required this.hideServedAndTransferredInCalled,
@@ -90,6 +100,11 @@ class CounterSettingsModel extends Equatable {
     required this.autoGridViewAfterNoShow,
     required this.autoGridViewAfterHold,
     required this.multipleTransferAtATime,
+    required this.canAddTab,
+    required this.canRemoveTab,
+    required this.hideSettingsBtn,
+    required this.hideServiceEditBtn,
+    required this.showRemarksNotification,
     required this.alwaysOnTop,
     required this.showTokensButton,
     required this.wakeLockEnabled,
@@ -111,7 +126,10 @@ class CounterSettingsModel extends Equatable {
       recallUnholdToken: entity.recallUnholdToken,
       notification: entity.desktopNotification,
       hideNextToCall: entity.hideNextToCall,
+      hideCancelBtnInNextToCall: entity.hideCancelBtnInNextToCall,
+      hideHoldBtnInNextToCall: entity.hideHoldBtnInNextToCall,
       hideTodayAppointments: entity.hideTodayAppointments,
+      hideCancelBtnInTodayAppointments: entity.hideCancelBtnInTodayAppointments,
       hideCalled: entity.hideCalled,
       hideServedInCalled: entity.hideServedInCalled,
       hideServedAndTransferredInCalled: entity.hideServedAndTransferredInCalled,
@@ -134,6 +152,11 @@ class CounterSettingsModel extends Equatable {
       autoGridViewAfterNoShow: entity.autoGridViewAfterNoShow,
       autoGridViewAfterHold: entity.autoGridViewAfterHold,
       multipleTransferAtATime: entity.multipleTransferAtATime,
+      canAddTab: entity.canAddTab,
+      canRemoveTab: entity.canRemoveTab,
+      hideSettingsBtn: entity.hideSettingsBtn,
+      hideServiceEditBtn: entity.hideServiceEditBtn,
+      showRemarksNotification: entity.showRemarksNotification,
       alwaysOnTop: entity.alwaysOnTop,
       showTokensButton: entity.showTokensButton,
       wakeLockEnabled: true,
@@ -158,7 +181,11 @@ class CounterSettingsModel extends Equatable {
       recallUnholdToken: json['recallUnholdToken'],
       notification: json['notification'],
       hideNextToCall: json['hideNextToCall'],
+      hideCancelBtnInNextToCall: json['hideCancelBtnInNextToCall'] ?? false,
+      hideHoldBtnInNextToCall: json['hideHoldBtnInNextToCall'] ?? false,
       hideTodayAppointments: json['hideTodayAppointments'],
+      hideCancelBtnInTodayAppointments:
+          json['hideCancelBtnInTodayAppointments'] ?? false,
       hideCalled: json['hideCalled'],
       hideServedInCalled: json['hideServedInCalled'],
       hideServedAndTransferredInCalled:
@@ -182,6 +209,11 @@ class CounterSettingsModel extends Equatable {
       autoGridViewAfterNoShow: json['autoGridViewAfterNoShow'],
       autoGridViewAfterHold: json['autoGridViewAfterHold'],
       multipleTransferAtATime: json['multipleTransferAtATime'],
+      canAddTab: json['canAddTab'] ?? true,
+      canRemoveTab: json['canRemoveTab'] ?? true,
+      hideSettingsBtn: json['hideSettingsBtn'] ?? false,
+      hideServiceEditBtn: json['hideServiceEditBtn'] ?? false,
+      showRemarksNotification: json['showRemarksNotification'] ?? false,
       alwaysOnTop: json['alwaysOnTop'],
       showTokensButton: json['showTokensButton'],
       wakeLockEnabled: json['wakeLockEnabled'],
@@ -204,7 +236,10 @@ class CounterSettingsModel extends Equatable {
       'recallUnholdToken': recallUnholdToken,
       'notification': notification,
       'hideNextToCall': hideNextToCall,
+      'hideCancelBtnInNextToCall': hideCancelBtnInNextToCall,
+      'hideHoldBtnInNextToCall': hideHoldBtnInNextToCall,
       'hideTodayAppointments': hideTodayAppointments,
+      'hideCancelBtnInTodayAppointments': hideCancelBtnInTodayAppointments,
       'hideCalled': hideCalled,
       'hideServedInCalled': hideServedInCalled,
       'hideServedAndTransferredInCalled': hideServedAndTransferredInCalled,
@@ -227,6 +262,11 @@ class CounterSettingsModel extends Equatable {
       'autoGridViewAfterNoShow': autoGridViewAfterNoShow,
       'autoGridViewAfterHold': autoGridViewAfterHold,
       'multipleTransferAtATime': multipleTransferAtATime,
+      'canAddTab': canAddTab,
+      'canRemoveTab': canRemoveTab,
+      'hideSettingsBtn': hideSettingsBtn,
+      'hideServiceEditBtn': hideServiceEditBtn,
+      'showRemarksNotification': showRemarksNotification,
       'alwaysOnTop': alwaysOnTop,
       'showTokensButton': showTokensButton,
       'wakeLockEnabled': wakeLockEnabled,
@@ -249,7 +289,10 @@ class CounterSettingsModel extends Equatable {
       'recall_unhold_token': recallUnholdToken,
       'notification': notification,
       'hide_nexto_call': hideNextToCall,
+      'hide_cancel_btn_in_next_to_call': hideCancelBtnInNextToCall,
+      'hide_hold_btn_in_next_to_call': hideHoldBtnInNextToCall,
       'hide_today_appointments': hideTodayAppointments,
+      'hide_cancel_btn_in_today_appointments': hideCancelBtnInTodayAppointments,
       'hide_called': hideCalled,
       'hide_served_in_called': hideServedInCalled,
       'hide_served_and_transferred_in_called': hideServedAndTransferredInCalled,
@@ -271,6 +314,11 @@ class CounterSettingsModel extends Equatable {
       'auto_grid_view_after_no_show': autoGridViewAfterNoShow,
       'auto_grid_view_after_hold': autoGridViewAfterHold,
       'multiple_transfer_at_a_Time': multipleTransferAtATime,
+      'can_add_tab': canAddTab,
+      'can_remove_tab': canRemoveTab,
+      'hide_settings_btn': hideSettingsBtn,
+      'hide_service_edit_btn': hideServiceEditBtn,
+      'show_remarks_notification': showRemarksNotification,
       'always_on_top': alwaysOnTop,
       'show_tokens_button': showTokensButton,
       'wake_lock_enabled': wakeLockEnabled,
@@ -293,7 +341,10 @@ class CounterSettingsModel extends Equatable {
       recallUnholdToken: true,
       notification: false,
       hideNextToCall: false,
+      hideCancelBtnInNextToCall: false,
+      hideHoldBtnInNextToCall: false,
       hideTodayAppointments: false,
+      hideCancelBtnInTodayAppointments: false,
       hideCalled: false,
       hideServedInCalled: false,
       hideServedAndTransferredInCalled: false,
@@ -316,6 +367,11 @@ class CounterSettingsModel extends Equatable {
       autoGridViewAfterNoShow: false,
       autoGridViewAfterHold: false,
       multipleTransferAtATime: false,
+      canAddTab: true,
+      canRemoveTab: true,
+      hideSettingsBtn: false,
+      hideServiceEditBtn: false,
+      showRemarksNotification: false,
       alwaysOnTop: false,
       showTokensButton: false,
       wakeLockEnabled: true,
@@ -338,7 +394,10 @@ class CounterSettingsModel extends Equatable {
         recallUnholdToken,
         notification,
         hideNextToCall,
+        hideCancelBtnInNextToCall,
+        hideHoldBtnInNextToCall,
         hideTodayAppointments,
+        hideCancelBtnInTodayAppointments,
         hideCalled,
         hideServedInCalled,
         hideServedAndTransferredInCalled,
@@ -361,6 +420,11 @@ class CounterSettingsModel extends Equatable {
         autoGridViewAfterNoShow,
         autoGridViewAfterHold,
         multipleTransferAtATime,
+        canAddTab,
+        canRemoveTab,
+        hideSettingsBtn,
+        hideServiceEditBtn,
+        showRemarksNotification,
         alwaysOnTop,
         showTokensButton,
         wakeLockEnabled,

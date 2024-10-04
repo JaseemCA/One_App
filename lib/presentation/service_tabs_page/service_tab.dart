@@ -441,6 +441,7 @@
 //     });
 //   }
 // }
+// import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_bloc.dart';
@@ -474,15 +475,18 @@ class _ServiceCounterTabState extends State<ServiceCounterTab> {
             )),
       ),
       floatingActionButton: FloatingActionButton(
-      
-        onPressed: () async {
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+        onPressed: () async {           
           await _showAddTabPopup(context, _listSetState);
         },
-        
-        child: const Icon(
-          Icons.add,
-          size: 30,
-        ),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? materialIconButtonDark
+            : buttonColor,
+        child: Icon(Icons.add,
+            size: 30,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black
+                : Colors.white),
       ),
       body: StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
@@ -581,8 +585,7 @@ class _ServiceCounterTabState extends State<ServiceCounterTab> {
                 ),
               ),
               selected: currentItem.selected,
-              selectedColor:
-                  !UtilityService.isDarkTheme ? buttonColor : null,
+              selectedColor: !UtilityService.isDarkTheme ? buttonColor : null,
               selectedTileColor: !UtilityService.isDarkTheme
                   ? Colors.grey.shade300
                   : Colors.grey.shade800,

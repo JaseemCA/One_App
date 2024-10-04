@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:oneappcounter/entity/service_entity.dart';
 
-
 class ServiceModel extends Equatable {
   final int id;
   final int serviceId;
@@ -25,30 +24,31 @@ class ServiceModel extends Equatable {
   final dynamic walkinDetails;
   final dynamic appointmentDetails;
   final bool isHold;
-  const ServiceModel({
-    required this.id,
-    required this.serviceId,
-    required this.name,
-    required this.type,
-    required this.color,
-    required this.tokenConfirm,
-    required this.print,
-    required this.status,
-    required this.departmentId,
-    required this.mainServiceId,
-    required this.displayName,
-    required this.askNameForWalkin,
-    required this.nameIsRequiredForWalkin,
-    required this.askEmailForWalkin,
-    required this.emailIsRequiredForWalkin,
-    required this.askNameForAppt,
-    required this.nameIsRequiredForAppt,
-    required this.askEmailForAppt,
-    required this.emailIsRequiredForAppt,
-    required this.walkinDetails,
-    required this.appointmentDetails,
-    required this.isHold,
-  });
+  final String? remarks;
+  const ServiceModel(
+      {required this.id,
+      required this.serviceId,
+      required this.name,
+      required this.type,
+      required this.color,
+      required this.tokenConfirm,
+      required this.print,
+      required this.status,
+      required this.departmentId,
+      required this.mainServiceId,
+      required this.displayName,
+      required this.askNameForWalkin,
+      required this.nameIsRequiredForWalkin,
+      required this.askEmailForWalkin,
+      required this.emailIsRequiredForWalkin,
+      required this.askNameForAppt,
+      required this.nameIsRequiredForAppt,
+      required this.askEmailForAppt,
+      required this.emailIsRequiredForAppt,
+      required this.walkinDetails,
+      required this.appointmentDetails,
+      required this.isHold,
+      required this.remarks});
 
   @override
   List<Object?> get props => [
@@ -74,59 +74,60 @@ class ServiceModel extends Equatable {
         walkinDetails,
         appointmentDetails,
         isHold,
+        remarks
       ];
   static ServiceModel fromEntity(ServiceEntity entity) {
     return ServiceModel(
-      id: entity.id,
-      serviceId: entity.serviceId,
-      name: entity.name,
-      type: entity.type,
-      color: entity.color,
-      tokenConfirm: entity.tokenConfirm,
-      print: entity.print,
-      status: entity.status,
-      departmentId: entity.departmentId,
-      mainServiceId: entity.mainServiceId,
-      displayName: entity.displayName,
-      askNameForWalkin: entity.askNameForWalkin,
-      nameIsRequiredForWalkin: entity.nameIsRequiredForWalkin,
-      askEmailForWalkin: entity.askEmailForWalkin,
-      emailIsRequiredForWalkin: entity.emailIsRequiredForWalkin,
-      askNameForAppt: entity.askNameForAppt,
-      nameIsRequiredForAppt: entity.nameIsRequiredForAppt,
-      askEmailForAppt: entity.askEmailForAppt,
-      emailIsRequiredForAppt: entity.emailIsRequiredForAppt,
-      walkinDetails: entity.walkinDetails,
-      appointmentDetails: entity.appointmentDetails,
-      isHold: entity.isHold,
-    );
+        id: entity.id,
+        serviceId: entity.serviceId,
+        name: entity.name,
+        type: entity.type,
+        color: entity.color,
+        tokenConfirm: entity.tokenConfirm,
+        print: entity.print,
+        status: entity.status,
+        departmentId: entity.departmentId,
+        mainServiceId: entity.mainServiceId,
+        displayName: entity.displayName,
+        askNameForWalkin: entity.askNameForWalkin,
+        nameIsRequiredForWalkin: entity.nameIsRequiredForWalkin,
+        askEmailForWalkin: entity.askEmailForWalkin,
+        emailIsRequiredForWalkin: entity.emailIsRequiredForWalkin,
+        askNameForAppt: entity.askNameForAppt,
+        nameIsRequiredForAppt: entity.nameIsRequiredForAppt,
+        askEmailForAppt: entity.askEmailForAppt,
+        emailIsRequiredForAppt: entity.emailIsRequiredForAppt,
+        walkinDetails: entity.walkinDetails,
+        appointmentDetails: entity.appointmentDetails,
+        isHold: entity.isHold,
+        remarks: entity.remarks);
   }
 
   static ServiceModel fromJson(Map<String, dynamic> json) {
     return ServiceModel(
-      id: json['id'],
-      serviceId: json['serviceId'],
-      name: json['name'],
-      type: json['type'],
-      color: json['color'],
-      tokenConfirm: json['tokenConfirm'],
-      print: json['print'],
-      status: json['status'],
-      departmentId: json['departmentId'],
-      mainServiceId: json['mainServiceId'],
-      displayName: json['displayName'],
-      askNameForWalkin: json['askNameForWalkin'],
-      nameIsRequiredForWalkin: json['nameIsRequiredForWalkin'],
-      askEmailForWalkin: json['askEmailForWalkin'],
-      emailIsRequiredForWalkin: json['emailIsRequiredForWalkin'],
-      askNameForAppt: json['askNameForAppt'],
-      nameIsRequiredForAppt: json['nameIsRequiredForAppt'],
-      askEmailForAppt: json['askEmailForAppt'],
-      emailIsRequiredForAppt: json['emailIsRequiredForAppt'],
-      walkinDetails: json['walkinDetails'],
-      appointmentDetails: json['appointment_details'],
-      isHold: json['isHold'] ?? false,
-    );
+        id: json['id'],
+        serviceId: json['serviceId'],
+        name: json['name'],
+        type: json['type'],
+        color: json['color'],
+        tokenConfirm: json['tokenConfirm'],
+        print: json['print'],
+        status: json['status'],
+        departmentId: json['departmentId'],
+        mainServiceId: json['mainServiceId'],
+        displayName: json['displayName'],
+        askNameForWalkin: json['askNameForWalkin'],
+        nameIsRequiredForWalkin: json['nameIsRequiredForWalkin'],
+        askEmailForWalkin: json['askEmailForWalkin'],
+        emailIsRequiredForWalkin: json['emailIsRequiredForWalkin'],
+        askNameForAppt: json['askNameForAppt'],
+        nameIsRequiredForAppt: json['nameIsRequiredForAppt'],
+        askEmailForAppt: json['askEmailForAppt'],
+        emailIsRequiredForAppt: json['emailIsRequiredForAppt'],
+        walkinDetails: json['walkinDetails'],
+        appointmentDetails: json['appointment_details'],
+        isHold: json['isHold'] ?? false,
+        remarks: json['remarks']);
   }
 
   Map<String, dynamic> toJson() {
@@ -153,6 +154,7 @@ class ServiceModel extends Equatable {
       'walkinDetails': walkinDetails,
       'appointmentDetails': appointmentDetails,
       'isHold': isHold,
+      'remarks': remarks
     };
   }
 }

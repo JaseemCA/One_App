@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:oneappcounter/services/storage_service.dart';
 
@@ -17,39 +19,31 @@ class NetworkingService {
       if (!useAsFullPath) {
         if (apiDomainUrl != null) {
           path = '${apiDomainUrl!}/$path';
-        } else {
-          path = '$defaultApiUrl/$path';
         }
       }
 
-      var response = await Dio().get(
-        path,
-        queryParameters: data,
-        options: Options(
-          headers: _getHeaders(token: accessToken),
-        ),
-      );
+      var response = await Dio().get(path,
+          queryParameters: data,
+          options: Options(
+            headers: _getHeaders(token: accessToken),
+          ));
       return response;
     } catch (e) {
-      return e;
+      log("Error in GET request: $e");
+      return null; // Return null on error
     }
   }
 
-  static Future<dynamic> postHttp({
-    required String path,
-    required Map<String, dynamic> data,
-    bool addToken = true,
-  }) async {
+  static Future<dynamic> postHttp(
+      {required String path,
+      required Map<String, dynamic> data,
+      bool addToken = true}) async {
     try {
-      String fullPath =
-          apiDomainUrl != null ? '$apiDomainUrl/$path' : '$defaultApiUrl/$path';
-      return await Dio().post(
-        fullPath,
-        data: data,
-        options: Options(
-          headers: _getHeaders(token: addToken ? accessToken : null),
-        ),
-      );
+      String _path = '$apiDomainUrl/$path';
+      return await Dio().post(_path,
+          data: data,
+          options: Options(
+              headers: _getHeaders(token: addToken ? accessToken : null)));
     } catch (e) {
       return e;
     }
@@ -59,23 +53,30 @@ class NetworkingService {
     domainUrl = await StorageService.getSavedValue(key: 'domain_url');
     if (domainUrl != null) {
       apiDomainUrl = await StorageService.getSavedValue(key: 'api_domain_url');
-      accessToken = await StorageService.getSavedValue(key: 'access_token');
-      apiDomainUrl ??= '$domainUrl/api';
-      return true;
+      String? _accessToken =
+          await StorageService.getSavedValue(key: 'access_token');
+      if (_accessToken != null) {
+        accessToken = _accessToken;
+      }
+      if (apiDomainUrl != null) {
+        return true;
+      } else {
+        apiDomainUrl = '${domainUrl!}/api';
+        return true;
+      }
     }
     return false;
   }
 
   static Future<dynamic> deleteHttp({required String path}) async {
     try {
-      String fullPath =
-          apiDomainUrl != null ? '$apiDomainUrl/$path' : '$defaultApiUrl/$path';
-      return await Dio().delete(
-        fullPath,
-        options: Options(
-          headers: _getHeaders(token: accessToken),
-        ),
-      );
+      if (apiDomainUrl != null) {
+        path = '${apiDomainUrl!}/$path';
+      }
+      return await Dio().delete(path,
+          options: Options(
+            headers: _getHeaders(token: accessToken),
+          ));
     } catch (e) {
       return e;
     }
@@ -98,7 +99,10 @@ class NetworkingService {
   static Future<bool> checkSubscription() async {
     try {
       Response response = await getHttp('time');
-      return response.statusCode == 200;
+      if (response.statusCode == 200) {
+        return true;
+      }
+      return false;
     } catch (e) {
       return false;
     }
@@ -109,12 +113,9 @@ class NetworkingService {
       return {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer $token'
       };
     }
-    return {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    };
+    return {'Accept': 'application/json', 'Content-Type': 'application/json'};
   }
 }

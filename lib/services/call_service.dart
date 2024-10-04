@@ -302,4 +302,22 @@ class CallService {
     }
     return false;
   }
+
+  static Future<bool> saveQueueRemark(
+      {required int id, required remarks, bool isAppointment = false}) async {
+    String path = 'queue/$id/remarks';
+
+    if (isAppointment == true) {
+      path = 'appointment-queue/$id/remarks';
+    }
+
+    var response = await NetworkingService.postHttp(
+        path: path, data: {"remarks": remarks});
+
+    if (response is Response && response.statusCode == 200) {
+      GeneralDataService.getLastToken();
+      return true;
+    }
+    return false;
+  }
 }

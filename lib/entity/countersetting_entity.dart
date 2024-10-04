@@ -13,11 +13,19 @@ class CounterSettingsEntity extends Equatable {
   final bool recallUnholdToken;
   final bool multipleTransfer;
   final bool multipleTransferAtATime;
+  final bool canAddTab;
+  final bool canRemoveTab;
+  final bool hideSettingsBtn;
+  final bool hideServiceEditBtn;
+  final bool showRemarksNotification;
   final bool alwaysOnTop;
   final bool desktopNotification;
   final bool hideSideMenu;
   final bool hideNextToCall;
+  final bool hideCancelBtnInNextToCall;
+  final bool hideHoldBtnInNextToCall;
   final bool hideTodayAppointments;
+  final bool hideCancelBtnInTodayAppointments;
   final bool hideCalled;
   final bool hideServedInCalled;
   final bool hideServedAndTransferredInCalled;
@@ -53,11 +61,19 @@ class CounterSettingsEntity extends Equatable {
     this.recallUnholdToken,
     this.multipleTransfer,
     this.multipleTransferAtATime,
+    this.canAddTab,
+    this.canRemoveTab,
+    this.hideSettingsBtn,
+    this.hideServiceEditBtn,
+    this.showRemarksNotification,
     this.alwaysOnTop,
     this.desktopNotification,
     this.hideSideMenu,
     this.hideNextToCall,
+    this.hideCancelBtnInNextToCall,
+    this.hideHoldBtnInNextToCall,
     this.hideTodayAppointments,
+    this.hideCancelBtnInTodayAppointments,
     this.hideCalled,
     this.hideServedInCalled,
     this.hideServedAndTransferredInCalled,
@@ -83,47 +99,53 @@ class CounterSettingsEntity extends Equatable {
 
   static CounterSettingsEntity fromJson(Map<String, dynamic> json) {
     return CounterSettingsEntity(
-        json['title'],
-        json['uid'],
-        json['alert_time'],
-        json['transfer_services'],
-        json['alert_transfer'],
-        json['require_transfer'],
-        json['show_tokens_button'],
-        json['notification_sound'],
-        json['show_priority'],
-        json['recall_unhold_token'],
-        json['multiple_transfer'],
-        json['multiple_transfer_at_a_time'],
-        json['always_on_top'],
-        json['desktop_notification'],
-        json['hide_side_menu'],
-        json['hide_next_to_call'],
-        json['hide_today_appointments'],
-        json['hide_called'],
-        json['hide_served_in_called'],
-        json['hide_served_and_transferred_in_called'],
-        json['hide_holded_tokens'],
-        json['hide_holded_queue'],
-        json['hide_cancelled'],
-        json['hide_cancelled_appointments'],
-        json['always_disable_serve_btn'],
-        json['always_disable_recall_btn'],
-        json['always_disable_no_show_btn'],
-        json['always_disable_call_next_btn'],
-        json['always_disable_hold_btn'],
-        json['never_show_service_hold_btn'],
-        json['enable_grid_view'],
-        json['show_not_transferred_in_no_show'],
-        // ignore: prefer_if_null_operators
-        json['show_holded_in_no_show'] != null
-            ? json['show_holded_in_no_show']
-            : false,
-        json['auto_grid_view_after_serve'],
-        json['auto_grid_view_after_transfer'],
-        json['auto_grid_view_after_no_show'],
-        json['auto_grid_view_after_hold'],
-        json['language']);
+      json['title'],
+      json['uid'],
+      json['alert_time'],
+      json['transfer_services'],
+      json['alert_transfer'],
+      json['require_transfer'],
+      json['show_tokens_button'],
+      json['notification_sound'],
+      json['show_priority'],
+      json['recall_unhold_token'],
+      json['multiple_transfer'],
+      json['multiple_transfer_at_a_time'],
+      json['can_add_tab'] ?? true,
+      json['can_remove_tab'] ?? true,
+      json['hide_settings_btn'] ?? false,
+      json['hide_service_edit_btn'] ?? false,
+      json['show_remarks_notification'] ?? false,
+      json['always_on_top'],
+      json['desktop_notification'],
+      json['hide_side_menu'],
+      json['hide_next_to_call'],
+      json['hide_cancel_btn_in_next_to_call'] ?? false,
+      json['hide_hold_btn_in_next_to_call'] ?? false,
+      json['hide_today_appointments'],
+      json['hide_cancel_btn_in_today_appointments'] ?? false,
+      json['hide_called'],
+      json['hide_served_in_called'],
+      json['hide_served_and_transferred_in_called'],
+      json['hide_holded_tokens'],
+      json['hide_holded_queue'],
+      json['hide_cancelled'],
+      json['hide_cancelled_appointments'],
+      json['always_disable_serve_btn'],
+      json['always_disable_recall_btn'],
+      json['always_disable_no_show_btn'],
+      json['always_disable_call_next_btn'],
+      json['always_disable_hold_btn'],
+      json['never_show_service_hold_btn'],
+      json['enable_grid_view'],
+      json['show_not_transferred_in_no_show'],
+      json['show_holded_in_no_show'] ?? false,
+      json['auto_grid_view_after_serve'],
+      json['auto_grid_view_after_transfer'],
+      json['auto_grid_view_after_no_show'],
+      json['auto_grid_view_after_hold'],
+      json['language'],
+    );
   }
 
   Map<String, dynamic> toJson() {
@@ -140,12 +162,20 @@ class CounterSettingsEntity extends Equatable {
       'recall_unhold_token': recallUnholdToken,
       'multiple_transfer': multipleTransfer,
       'multiple_transfer_at_a_time': multipleTransferAtATime,
+      'can_add_tab': canAddTab,
+      'can_remove_tab': canRemoveTab,
+      'hide_settings_btn': hideSettingsBtn,
+      'hide_service_edit_btn': hideServiceEditBtn,
+      'show_remarks_notification': showRemarksNotification,
       'always_on_top': alwaysOnTop, //pinned in android if this option is true
       'desktop_notification':
           desktopNotification, //notification shown if this value is true
       'hide_side_menu': hideSideMenu,
       'hide_next_to_call': hideNextToCall,
+      'hide_cancel_btn_in_next_to_call': hideCancelBtnInNextToCall,
+      'hide_hold_btn_in_next_to_call': hideHoldBtnInNextToCall,
       'hide_today_appointments': hideTodayAppointments,
+      'hide_cancel_btn_in_today_appointments': hideCancelBtnInTodayAppointments,
       'hide_called': hideCalled,
       'hide_served_in_called': hideServedInCalled,
       'hide_served_and_transferred_in_called': hideServedAndTransferredInCalled,
@@ -184,11 +214,19 @@ class CounterSettingsEntity extends Equatable {
         recallUnholdToken,
         multipleTransfer,
         multipleTransferAtATime,
+        canAddTab,
+        canRemoveTab,
+        hideSettingsBtn,
+        hideServiceEditBtn,
+        showRemarksNotification,
         alwaysOnTop,
         desktopNotification,
         hideSideMenu,
         hideNextToCall,
+        hideCancelBtnInNextToCall,
+        hideHoldBtnInNextToCall,
         hideTodayAppointments,
+        hideCancelBtnInTodayAppointments,
         hideCalled,
         hideServedInCalled,
         hideServedAndTransferredInCalled,

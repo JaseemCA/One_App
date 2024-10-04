@@ -142,9 +142,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: isDarkMode
-              ? bottomsheetDarkcolor
-              : appBackgrondcolor,
+          backgroundColor:
+              isDarkMode ? bottomsheetDarkcolor : appBackgrondcolor,
           automaticallyImplyLeading: false,
           title: const Text(
             'Settings',
@@ -1692,6 +1691,130 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   }),
                 )
               ],
+            ),
+            kDivider,
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                const Expanded(
+                  flex: 4,
+                  child: Text(
+                    ('Can Add Tab'),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return Switch(
+                        value: _currentSettings?['canAddTab'] ?? true,
+                        onChanged: (value) {
+                          _currentSettings?['canAddTab'] = value;
+                          updateSettings(_context, ('Miscellaneous'));
+                          setState(() {});
+                        });
+                  }),
+                )
+              ],
+            ),
+            kDivider,
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                const Expanded(
+                  flex: 4,
+                  child: Text(
+                    ('Can Remove This Tab'),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return Switch(
+                        value: _currentSettings?['canRemoveTab'] ?? true,
+                        onChanged: (value) {
+                          _currentSettings?['canRemoveTab'] = value;
+                          updateSettings(_context, ('Miscellaneous'));
+                          setState(() {});
+                        });
+                  }),
+                )
+              ],
+            ),
+            kDivider,
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                const Expanded(
+                  flex: 4,
+                  child: Text(
+                    ('Hide Settings Button'),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return Switch(
+                        value: _currentSettings?['hideSettingsBtn'] ?? false,
+                        onChanged: (value) {
+                          _currentSettings?['hideSettingsBtn'] = value;
+                          updateSettings(_context, ('Miscellaneous'));
+                          setState(() {});
+                        });
+                  }),
+                )
+              ],
+            ),
+            kDivider,
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                const Expanded(
+                  flex: 4,
+                  child: Text(
+                    ('Hide Service Edit Button'),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return Switch(
+                        value: _currentSettings?['hideServiceEditBtn'] ?? false,
+                        onChanged: (value) {
+                          _currentSettings?['hideServiceEditBtn'] = value;
+                          updateSettings(_context, ('Miscellaneous'));
+                          setState(() {});
+                        });
+                  }),
+                )
+              ],
+            ),
+            kDivider,
+            const SizedBox(
+              height: 10,
             ),
           ],
         ),

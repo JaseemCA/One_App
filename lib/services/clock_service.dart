@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart'; // <-- Import this for locale initialization
 import 'package:oneappcounter/model/formated_time.dart';
 import 'package:oneappcounter/services/networking_service.dart';
 
@@ -22,10 +24,14 @@ class ClockService {
   static bool _reseted = false;
   static Timer? _timerStopWatch;
 
+  // Call this before any formatting
+  static Future<void> initializeLocale() async {
+    await initializeDateFormatting('en'); // <-- Initialize locale here
+  }
+
   static Future<void> _emitTime() async {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       try {
-        // ignore: no_leading_underscores_for_local_identifiers
         DateTime? _now = _time?.add(const Duration(seconds: 1));
         _time = _now;
         late String formattedTime;
@@ -87,12 +93,32 @@ class ClockService {
   }
 
   static Future<void> updateDateTime() async {
-    var response = await NetworkingService.getHttp('time');
-    if (response is Response && response.statusCode == 200) {
-      now = response.data['now'];
-      dateFormat = response.data['data']['date_format_js'];
-      timeFormat = response.data['data']['time_format_js'];
-      setThisTime(DateFormat('yyyy-M-dd H:m:s').parse(now!));
+    log("Updating date and time...");
+    try {
+      await initializeLocale(); 
+
+      var response = await NetworkingService.getHttp('time');
+      if (response is Response &&
+          response.statusCode == 200 &&
+          response.data != null) {
+        now = response.data['now'];
+        dateFormat = response.data['data']?['date_format_js'];
+        timeFormat = response.data['data']?['time_format_js'];
+
+        if (now != null) {
+          log("Parsed 'now': $now");
+          setThisTime(Intl.withLocale(
+            'en',
+            () => DateFormat('yyyy-M-dd H:m:s').parse(now!),
+          ));
+        } else {
+          log("Error: 'now' is null in the API response.");
+        }
+      } else {
+        log("Error: Invalid response from NetworkingService.");
+      }
+    } catch (e) {
+      log("Error in updateDateTime: $e");
     }
   }
 
