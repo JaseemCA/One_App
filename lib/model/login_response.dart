@@ -22,13 +22,6 @@ class LoginResponse extends Equatable {
       entity.systemBranch,
     );
   }
-
-  // @override
-  // String toString() {
-  //
-  //   return 'Login Response: access token: $accessToken, user :$user,branch: $branch, system branch: $systemBranch';
-  // }
-
   Map<String, Object> toJson() {
     return {
       'access_token': accessToken,

@@ -98,6 +98,8 @@
 //   //         );
 //   // }
 
+// ignore_for_file: use_build_context_synchronously
+
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
@@ -143,7 +145,7 @@ import 'package:oneappcounter/services/utility_services.dart';
 import 'package:shimmer/shimmer.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();

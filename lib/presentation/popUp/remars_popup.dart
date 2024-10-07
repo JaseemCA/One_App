@@ -1,5 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/model/service_model.dart';
 import 'package:oneappcounter/model/tocken_model.dart';
 import 'package:oneappcounter/services/call_service.dart';
@@ -8,7 +11,7 @@ import 'package:oneappcounter/services/utility_services.dart';
 import 'package:sizer/sizer.dart';
 
 class RemarksPopup extends StatefulWidget {
-  const RemarksPopup({Key? key, required this.token}) : super(key: key);
+  const RemarksPopup({super.key, required this.token});
 
   final TokenModel? token;
 
@@ -98,9 +101,9 @@ class _RemarksPopupState extends State<RemarksPopup> {
                             if (isTextChanged == true) {
                               showDialog(
                                   context: context,
-                                  builder: (_context) {
+                                  builder: (context) {
                                     return AlertDialog(
-                                      title: Text(translate('Not Saved') + '!'),
+                                      title: Text('${translate('Not Saved')}!'),
                                       content: Text(
                                           translate('Not Saved Last Change')),
                                       actions: [
@@ -160,8 +163,8 @@ class _RemarksPopupState extends State<RemarksPopup> {
                           ),
                         ),
                         Expanded(
-                            flex: 1,
-                            child: ElevatedButton(
+                            flex: 2,
+                            child: CustomElevatedButton(
                               onPressed: () async {
                                 UtilityService.showLoadingAlert(context);
                                 if (await CallService.saveQueueRemark(
@@ -213,8 +216,7 @@ class _RemarksPopupState extends State<RemarksPopup> {
                                     onPressed: () {
                                       if (widget.token?.queueId != null) {
                                         _remarkTextController.text =
-                                            _remarkTextController.text +
-                                                '\n${service.remarks}';
+                                            '${_remarkTextController.text}\n${service.remarks}';
                                       } else if (widget
                                               .token?.queueppointmentId !=
                                           null) {
@@ -226,8 +228,7 @@ class _RemarksPopupState extends State<RemarksPopup> {
                                                 ''
                                             : '';
                                         _remarkTextController.text =
-                                            _remarkTextController.text +
-                                                '\n$appRemark';
+                                            '${_remarkTextController.text}\n$appRemark';
                                       }
 
                                       isTextChanged = true;

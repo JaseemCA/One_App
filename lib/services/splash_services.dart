@@ -54,6 +54,8 @@
 //         );
 //       }
 
+// ignore_for_file: use_build_context_synchronously
+
 //       return splashInitResponse;
 //     } catch (e) {
 //       // Handle errors appropriately
@@ -65,7 +67,7 @@
 //   }
 // }
 import 'dart:async';
-import 'dart:developer';
+// import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:oneappcounter/model/splash_init_response.dart';
 import 'package:oneappcounter/services/auth_service.dart';
@@ -85,11 +87,11 @@ class SplashScreenService {
 
   static Future<SplashInitResponse> initData(
       BuildContext context, int screenSize) async {
-    log("Initializing Splash Screen Service...");
+    // log("Initializing Splash Screen Service...");
 
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     appVersion = packageInfo.version;
-    log("App Version: $appVersion");
+    // log("App Version: $appVersion");
 
     shortestScreenSize = screenSize;
     SplashInitResponse spalshinitResponse = SplashInitResponse(
@@ -98,10 +100,10 @@ class SplashScreenService {
     );
 
     splashScreenEvents.add('Checking network');
-    log("Checking network connection...");
+    // log("Checking network connection...");
     if (await NetworkingService.checkInternetConnection()) {
       splashScreenEvents.add('Validating user');
-      log("Network connected. Validating user...");
+      // log("Network connected. Validating user...");
 
       if (await NetworkingService.setSavedValues()) {
         spalshinitResponse = SplashInitResponse(
@@ -109,21 +111,21 @@ class SplashScreenService {
           decideLocation: 'login',
         );
 
-        log("Fetching saved user data...");
+        // log("Fetching saved user data...");
         await AuthService.getSavedData();
         if (AuthService.loginData != null &&
             AuthService.loginData!.accessToken.isNotEmpty) {
           splashScreenEvents.add('Fetching');
-          log("User logged in. AccessToken found.");
+          // log("User logged in. AccessToken found.");
 
           await AuthService.updateBranchDetails();
           splashScreenEvents.add('Validating device');
-          log("Updated branch details.");
+          // log("Updated branch details.");
 
           await ClockService.updateDateTime();
           splashScreenEvents.add('Fetching');
           await CounterSettingService.initSettingsData();
-          log("Counter settings initialized.");
+          // log("Counter settings initialized.");
 
           splashScreenEvents.add('Validating details');
           await GeneralDataService.initVals();
@@ -144,7 +146,7 @@ class SplashScreenService {
           await SetDeviceService.addCounterAppDetails();
           splashScreenEvents.add('');
 
-          log("All services initialized. Navigating to Home.");
+          // log("All services initialized. Navigating to Home.");
           spalshinitResponse = SplashInitResponse(
             processed: true,
             decideLocation: 'home',
@@ -152,7 +154,7 @@ class SplashScreenService {
         }
       }
     } else {
-      log("No internet connection.");
+      // log("No internet connection.");
       spalshinitResponse = SplashInitResponse(
         processed: false,
         decideLocation: 'no-internet',

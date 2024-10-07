@@ -5,10 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_bloc.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_event.dart';
+import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/model/service_model.dart';
 import 'package:oneappcounter/services/general_data_seevice.dart';
 import 'package:oneappcounter/services/utility_services.dart';
-
 
 class UnlockService extends StatefulWidget {
   const UnlockService({super.key});
@@ -137,7 +137,7 @@ class _UnlockServiceState extends State<UnlockService> {
                     }),
                     const Text(('Sent Unholding Message to Customers')),
                   ]),
-                  ElevatedButton(
+                  CustomElevatedButton(
                     onPressed: () async {
                       if (service != 0) {
                         Map<String, dynamic> data = {

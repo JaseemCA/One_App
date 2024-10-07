@@ -88,9 +88,8 @@ class _HomeScreenState extends State<TokensPage> {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: isDarkMode
-              ? bottomsheetDarkcolor
-              : appBackgrondcolor,
+          backgroundColor:
+              isDarkMode ? bottomsheetDarkcolor : appBackgrondcolor,
           title: Text(
             '${('Tokens')} (${GeneralDataService.currentServiceCounterTab?.serviceString})',
             maxLines: 1,
@@ -712,7 +711,7 @@ class _HomeScreenState extends State<TokensPage> {
                                       ),
                                     ),
                                     const SizedBox(
-                                      width: 18,
+                                      width: 5,
                                     ),
                                     Text(
                                       token.status.toTitleCase()[0],
@@ -755,7 +754,7 @@ class _HomeScreenState extends State<TokensPage> {
                                           ),
                                         ),
                                         const SizedBox(
-                                          width: 18,
+                                          width: 10,
                                         ),
                                         Text(
                                           token.status.toTitleCase()[0],

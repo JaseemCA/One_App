@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:oneappcounter/services/utility_services.dart';
 import 'package:sizer/sizer.dart';

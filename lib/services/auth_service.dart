@@ -138,6 +138,8 @@
 //   // }
 // }
 
+// ignore_for_file: no_leading_underscores_for_local_identifiers
+
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:oneappcounter/model/country_model.dart';
@@ -156,7 +158,7 @@ class AuthService {
   static String? countryIso31662;
 
   static Future<bool> validateDomain(String url) async {
-    url = url + '/api/check-domain';
+    url = '$url/api/check-domain';
     var response = await NetworkingService.getHttp(url, useAsFullPath: true);
     if (response is Response) {
       if (response.statusCode == 200) {

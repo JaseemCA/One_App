@@ -2,6 +2,7 @@
 
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/core/config/constants.dart';
 import 'package:oneappcounter/model/service_model.dart';
 import 'package:oneappcounter/model/tocken_model.dart';
@@ -98,9 +99,10 @@ class TransferToServices extends StatelessWidget {
                                 (BuildContext context, StateSetter setState) {
                               return ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: !_selectedServices.contains(id)
-                                      ? buttonSelectedColor
-                                      : null,
+                                  backgroundColor:
+                                      !_selectedServices.contains(id)
+                                          ? buttonSelectedColor
+                                          : null,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 2,
                                   ),
@@ -188,7 +190,7 @@ class TransferToServices extends StatelessWidget {
                   const SizedBox(
                     height: 15,
                   ),
-                  ElevatedButton(
+                  CustomElevatedButton(
                     onPressed: () async {
                       UtilityService.showLoadingAlert(context);
                       Map<String, dynamic> data = {
@@ -215,8 +217,7 @@ class TransferToServices extends StatelessWidget {
                         Navigator.pop(context);
                         return;
                       }
-                      UtilityService.toast(
-                          context, ('Somthing went wrong'));
+                      UtilityService.toast(context, ('Somthing went wrong'));
                     },
                     child: const Text(('TRANSFER')),
                   )

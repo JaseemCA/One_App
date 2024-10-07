@@ -1,8 +1,10 @@
+// ignore_for_file: no_leading_underscores_for_local_identifiers
+
 import 'dart:async';
-import 'dart:developer';
+// import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
-import 'package:intl/date_symbol_data_local.dart'; // <-- Import this for locale initialization
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:oneappcounter/model/formated_time.dart';
 import 'package:oneappcounter/services/networking_service.dart';
 
@@ -93,9 +95,9 @@ class ClockService {
   }
 
   static Future<void> updateDateTime() async {
-    log("Updating date and time...");
+    // log("Updating date and time...");
     try {
-      await initializeLocale(); 
+      await initializeLocale();
 
       var response = await NetworkingService.getHttp('time');
       if (response is Response &&
@@ -106,19 +108,19 @@ class ClockService {
         timeFormat = response.data['data']?['time_format_js'];
 
         if (now != null) {
-          log("Parsed 'now': $now");
+          // log("Parsed 'now': $now");
           setThisTime(Intl.withLocale(
             'en',
             () => DateFormat('yyyy-M-dd H:m:s').parse(now!),
           ));
         } else {
-          log("Error: 'now' is null in the API response.");
+          // log("Error: 'now' is null in the API response.");
         }
       } else {
-        log("Error: Invalid response from NetworkingService.");
+        // log("Error: Invalid response from NetworkingService.");
       }
     } catch (e) {
-      log("Error in updateDateTime: $e");
+      // log("Error in updateDateTime: $e");
     }
   }
 

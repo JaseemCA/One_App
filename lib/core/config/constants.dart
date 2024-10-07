@@ -383,12 +383,12 @@ oyi3B43njTOQ5yOf+1CceWxG1bQVs5ZufpsMljq4Ui0/1lvh+wjChP4kqKOJ2qxq
 mRGunUHBcnWEvgJBQl9nJEiU0Zsnvgc/ubhPgXRR4Xq37Z0j4r7g1SgEEzwxA57d
 emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
 -----END CERTIFICATE-----""";
-//constant values
+
 const String kExampleBranchDomainUrl = 'https://branch-domain.oneapp.life';
 
 const String kNoPhoneStr = "k3JvgCljqW";
 
-//color constants
+
 const Color appBackgrondcolor = Color(0xffEE413E);
 const Color cardColor = Color(0x00ffffff);
 const Color buttonColor = Color(0xff171f4c);
@@ -407,8 +407,6 @@ const Color warningLight = Color(0xfffaad14);
 const Color highPriorityDark = Color(0xff64fedc);
 const Color materialIconButtonDark = Color(0xff52a18e);
 
-const Color khighPriorityDark = Color(0xff64fedc);
-const Color kmaterialIconButtonDark = Color(0xff52a18e);
 
 ButtonStyle kElevatedButtonStyle = ElevatedButton.styleFrom(
   backgroundColor: buttonColor,
@@ -501,10 +499,10 @@ Align kAppVersion = Align(
   ),
 );
 
-final Align kAppCopyRight = Align(
+const Align kAppCopyRight = Align(
   alignment: Alignment.bottomLeft,
   child: Row(
-    children: const [
+    children: [
       FittedBox(
         child: Text(
           'Powered by ',
@@ -601,7 +599,7 @@ Widget getCopyRight(double rowHeight) {
   /// padding bottom :0.089466= 1.5 as normal
   /// logo height = 9 as default will (rowHeight/10)*5.368
   /// padding top of version enrapped contaainer is 0.2088
-  Widget _kAppCopyRight = Row(
+  Widget kAppCopyRight = Row(
     children: [
       Text(
         'Powered by ',
@@ -626,7 +624,7 @@ Widget getCopyRight(double rowHeight) {
     ],
   );
 
-  Widget _kAppVersion = Text(
+  Widget kAppVersion = Text(
     'Version ${SplashScreenService.appVersion}',
     style: TextStyle(
       color: copyRightTextColor,
@@ -647,10 +645,10 @@ Widget getCopyRight(double rowHeight) {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Expanded(
-          child: _kAppCopyRight,
+          child: kAppCopyRight,
         ),
         const SizedBox(width: 10),
-        _kAppVersion
+        kAppVersion
       ],
     ),
   );

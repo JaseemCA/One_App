@@ -2186,7 +2186,7 @@
 //     UtilityService.toast(context, ('Something went wrong'));
 //   }
 
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, no_leading_underscores_for_local_identifiers
 
 //   Future<void> setSelectedTokenFromGrid(TokenModel token) async {
 //     selectedToken = token;
@@ -2206,6 +2206,7 @@ import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_bloc.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_event.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_state.dart';
 import 'package:oneappcounter/common/widgets/button/count_down_button.dart';
+import 'package:oneappcounter/common/widgets/button/custom_button.dart';
 import 'package:oneappcounter/common/widgets/one_app_logo/one_app_logo.dart';
 import 'package:oneappcounter/core/config/constants.dart';
 import 'package:oneappcounter/core/config/theme/bloc/theme_cubit.dart';
@@ -2233,8 +2234,8 @@ import 'package:sizer/sizer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -2339,9 +2340,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     _context = context;
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: isDarkMode ? bottomsheetDarkcolor : appBackgrondcolor,
         title: const OneAppLogo(height: 30),
         actions: [
           IconButton(
@@ -2586,7 +2589,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 GeneralDataService.todaysQueue[index];
                             return Tooltip(
                               message:
-                                  "${queue.name != null ? queue.name! + '|' : ''} ${queue.phone ?? ''}",
+                                  "${queue.name != null ? '${queue.name!}|' : ''} ${queue.phone ?? ''}",
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   foregroundColor: queue.priority == 1
@@ -3132,7 +3135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: ElevatedButton(
+                              child: CustomElevatedButton(
                                 onPressed: CounterSettingService.counterSettings
                                                 ?.alwaysDisableServeBtn !=
                                             true &&
@@ -3168,7 +3171,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: ElevatedButton(
+                              child: CustomElevatedButton(
                                 onPressed: CounterSettingService.counterSettings
                                                 ?.alwaysDisableRecallBtn !=
                                             true &&
@@ -3208,7 +3211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: ElevatedButton(
+                              child: CustomElevatedButton(
                                 onPressed: CounterSettingService.counterSettings
                                                 ?.alwaysDisableNoShowBtn !=
                                             true &&
@@ -3242,7 +3245,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: ElevatedButton(
+                              child: CustomElevatedButton(
                                 onPressed: CounterSettingService.counterSettings
                                                 ?.alwaysDisableCallNextBtn !=
                                             true &&
@@ -3340,7 +3343,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: CounterSettingService.counterSettings
                                           ?.neverShowServiceHoldBtn !=
                                       true
-                                  ? ElevatedButton(
+                                  ? CustomElevatedButton(
                                       onPressed: CounterSettingService
                                                       .counterSettings
                                                       ?.alwaysDisableHoldBtn !=
@@ -3756,6 +3759,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 token?.queueppointment['transfer_to']['called'] == true))
         ? Container()
         : OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(7), // Set your desired radius here
+              ),
+            ),
             onPressed: !isAllServiceOnHold()
                 ? token?.status == 'served'
                     ? ((token?.queue != null &&

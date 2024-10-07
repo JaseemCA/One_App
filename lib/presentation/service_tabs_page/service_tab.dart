@@ -466,8 +466,10 @@ class _ServiceCounterTabState extends State<ServiceCounterTab> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: isDarkMode ? bottomsheetDarkcolor : appBackgrondcolor,
         title: const Text(('Service Tabs'),
             style: TextStyle(
               color: Colors.white,
@@ -476,7 +478,7 @@ class _ServiceCounterTabState extends State<ServiceCounterTab> {
       ),
       floatingActionButton: FloatingActionButton(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-        onPressed: () async {           
+        onPressed: () async {
           await _showAddTabPopup(context, _listSetState);
         },
         backgroundColor: Theme.of(context).brightness == Brightness.dark
