@@ -144,6 +144,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:in_app_update/in_app_update.dart';
@@ -165,7 +166,6 @@ import 'package:sizer/sizer.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   LocalizationDelegate delegate = await LocalizationDelegate.create(
     fallbackLocale: 'en',
     supportedLocales: ['en', 'ar', 'fr', 'ml', 'pt'],
@@ -186,8 +186,7 @@ Future<void> main() async {
         BlocProvider<AppUpdateBloc>(create: (context) => AppUpdateBloc()),
         BlocProvider<CallBloc>(create: (context) => CallBloc()),
         BlocProvider<TokenPageBloc>(create: (context) => TokenPageBloc()),
-        BlocProvider<AppointmentPageBloc>(
-            create: (context) => AppointmentPageBloc()),
+        BlocProvider<AppointmentPageBloc>(create: (context) => AppointmentPageBloc()),
       ],
       child: LocalizedApp(delegate, const MyApp()),
     ),
@@ -275,7 +274,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                   debugShowCheckedModeBanner: false,
                   title: 'OneAppCounter',
                   localizationsDelegates: [
-                    LocalizedApp.of(context).delegate, 
+                    LocalizedApp.of(context).delegate,
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
                   ],
                   supportedLocales:
                       LocalizedApp.of(context).delegate.supportedLocales,

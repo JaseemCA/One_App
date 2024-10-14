@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_bloc.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_event.dart';
 import 'package:oneappcounter/bloc/tocken_page/bloc/tocken_bloc.dart';
@@ -91,7 +92,7 @@ class _HomeScreenState extends State<TokensPage> {
           backgroundColor:
               isDarkMode ? bottomsheetDarkcolor : appBackgrondcolor,
           title: Text(
-            '${('Tokens')} (${GeneralDataService.currentServiceCounterTab?.serviceString})',
+            '${translate('Tokens')} (${GeneralDataService.currentServiceCounterTab?.serviceString})',
             maxLines: 1,
             style: const TextStyle(
                 fontWeight: FontWeight.w600,
@@ -128,40 +129,38 @@ class _HomeScreenState extends State<TokensPage> {
     List<Tab> content = [];
     if (CounterSettingService.counterSettings?.hideNextToCall != true) {
       content.add(
-        const Tab(
+        Tab(
           child: FittedBox(
-            child: Text(
-              "TO CALL",
-            ),
+            child: Text(translate("TO CALL")),
           ),
         ),
       );
     }
     if (CounterSettingService.counterSettings?.hideCalled != true) {
       content.add(
-        const Tab(
-          child: FittedBox(child: Text(("CALLED"))),
+        Tab(
+          child: FittedBox(child: Text(translate("CALLED"))),
         ),
       );
     }
     if (CounterSettingService.counterSettings?.hideHoldedTokens != true) {
       content.add(
-        const Tab(
-          child: FittedBox(child: Text(("HOLDED TOKEN"))),
+        Tab(
+          child: FittedBox(child: Text(translate("HOLDED TOKEN"))),
         ),
       );
     }
     if (CounterSettingService.counterSettings?.hideCancelled != true) {
       content.add(
-        const Tab(
-          child: FittedBox(child: Text(("CANCELLED"))),
+        Tab(
+          child: FittedBox(child: Text(translate("CANCELLED"))),
         ),
       );
     }
     if (CounterSettingService.counterSettings?.hideHoldedQueue != true) {
       content.add(
-        const Tab(
-          child: FittedBox(child: Text(("HOLDED QUEUE"))),
+        Tab(
+          child: FittedBox(child: Text(translate("HOLDED QUEUE"))),
         ),
       );
     }
@@ -256,8 +255,8 @@ class _HomeScreenState extends State<TokensPage> {
                                       context: context,
                                       builder: (context) {
                                         return AlertDialog(
-                                          title: const Text(
-                                              ('Alert (Not transferred!)')),
+                                          title: Text(translate(
+                                              'Alert (Not transferred!)')),
                                           content: Text(
                                               '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred, Continue Calling?')}'),
                                           actions: [
@@ -265,7 +264,7 @@ class _HomeScreenState extends State<TokensPage> {
                                               onPressed: () {
                                                 Navigator.pop(context);
                                               },
-                                              child: const Text(('Cancel')),
+                                              child: Text(translate('Cancel')),
                                             ),
                                             CountDownButton(
                                               onPressed: () async {
@@ -293,8 +292,8 @@ class _HomeScreenState extends State<TokensPage> {
                                       context: context,
                                       builder: (context) {
                                         return AlertDialog(
-                                          title: const Text(
-                                              ('Transfer is required !')),
+                                          title: Text(translate(
+                                              'Transfer is required !')),
                                           content: Text(
                                               '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred')}'),
                                           actions: [
@@ -302,7 +301,7 @@ class _HomeScreenState extends State<TokensPage> {
                                               onPressed: () {
                                                 Navigator.pop(context);
                                               },
-                                              child: const Text(('Close')),
+                                              child: Text(translate('Close')),
                                             ),
                                           ],
                                         );
@@ -355,8 +354,8 @@ class _HomeScreenState extends State<TokensPage> {
                                               onPressed: () {
                                                 Navigator.pop(context);
                                               },
-                                              child: const Text(
-                                                ('Cancel'),
+                                              child: Text(
+                                                translate('Cancel'),
                                               ),
                                             ),
                                             TextButton(
@@ -401,14 +400,17 @@ class _HomeScreenState extends State<TokensPage> {
                                                     return;
                                                   }
 
-                                                  UtilityService.toast(context,
-                                                      ('Something went wrong'));
+                                                  UtilityService.toast(
+                                                      context,
+                                                      translate(
+                                                          'Something went wrong'));
                                                 },
-                                                child: const Text(('Continue')))
+                                                child:
+                                                    Text(translate('Continue')))
                                           ],
-                                          title: const Text(('Hold Token')),
+                                          title: Text(translate('Hold Token')),
                                           content: Text(
-                                              "${('Do you want to hold token')} (${queue.tokenNumber})?"),
+                                              "${translate('Do you want to hold token')} (${queue.tokenNumber})?"),
                                         );
                                       });
                                 },
@@ -429,8 +431,8 @@ class _HomeScreenState extends State<TokensPage> {
                                                 onPressed: () {
                                                   Navigator.pop(context);
                                                 },
-                                                child: const Text(
-                                                  ('Cancel'),
+                                                child: Text(
+                                                  translate('Cancel'),
                                                 ),
                                               ),
                                               TextButton(
@@ -476,18 +478,19 @@ class _HomeScreenState extends State<TokensPage> {
                                                   }
                                                   UtilityService.toast(
                                                     context,
-                                                    ("Something went wrong"),
+                                                    translate(
+                                                        "Something went wrong"),
                                                   );
                                                 },
-                                                child: const Text(
-                                                  ('Continue'),
+                                                child: Text(
+                                                  translate('Continue'),
                                                 ),
                                               ),
                                             ],
                                             title:
                                                 const Text(('Cancel Token?')),
                                             content: Text(
-                                                "${('Do you want to cancel token')} (${queue.tokenNumber}) ?"),
+                                                "${translate('Do you want to cancel token')} (${queue.tokenNumber}) ?"),
                                           );
                                         });
                                   },
@@ -568,8 +571,8 @@ class _HomeScreenState extends State<TokensPage> {
                                       context: context,
                                       builder: (context) {
                                         return AlertDialog(
-                                          title: const Text(
-                                              ('Alert (Not transferred!)')),
+                                          title: Text(translate(
+                                              'Alert (Not transferred!)')),
                                           content: Text(
                                               '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred, Continue Calling?')}'),
                                           actions: [
@@ -577,7 +580,7 @@ class _HomeScreenState extends State<TokensPage> {
                                               onPressed: () {
                                                 Navigator.pop(context);
                                               },
-                                              child: const Text(('Cancel')),
+                                              child: Text(translate('Cancel')),
                                             ),
                                             CountDownButton(
                                               onPressed: () async {
@@ -603,8 +606,8 @@ class _HomeScreenState extends State<TokensPage> {
                                       context: context,
                                       builder: (context) {
                                         return AlertDialog(
-                                          title: const Text(
-                                              ('Transfer is required !')),
+                                          title: Text(translate(
+                                              'Transfer is required !')),
                                           content: Text(
                                               '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred')}'),
                                           actions: [
@@ -612,7 +615,7 @@ class _HomeScreenState extends State<TokensPage> {
                                               onPressed: () {
                                                 Navigator.pop(context);
                                               },
-                                              child: const Text(('Close')),
+                                              child: Text(translate('Close')),
                                             ),
                                           ],
                                         );
@@ -858,8 +861,8 @@ class _HomeScreenState extends State<TokensPage> {
                                 context: context,
                                 builder: (context) {
                                   return AlertDialog(
-                                    title: const Text(
-                                        ('Alert (Not transferred!)')),
+                                    title: Text(
+                                        translate('Alert (Not transferred!)')),
                                     content: Text(
                                         '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred, Continue Calling?')}'),
                                     actions: [
@@ -867,7 +870,7 @@ class _HomeScreenState extends State<TokensPage> {
                                         onPressed: () {
                                           Navigator.pop(context);
                                         },
-                                        child: const Text(('Cancel')),
+                                        child: Text(translate('Cancel')),
                                       ),
                                       CountDownButton(
                                         onPressed: () async {
@@ -894,8 +897,8 @@ class _HomeScreenState extends State<TokensPage> {
                                 context: context,
                                 builder: (context) {
                                   return AlertDialog(
-                                    title:
-                                        const Text(('Transfer is required !')),
+                                    title: Text(
+                                        translate('Transfer is required !')),
                                     content: Text(
                                         '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred')}'),
                                     actions: [
@@ -903,7 +906,7 @@ class _HomeScreenState extends State<TokensPage> {
                                         onPressed: () {
                                           Navigator.pop(context);
                                         },
-                                        child: const Text(('Close')),
+                                        child: Text(translate('Close')),
                                       ),
                                     ],
                                   );
@@ -1042,7 +1045,7 @@ class _HomeScreenState extends State<TokensPage> {
                                           onPressed: () {
                                             Navigator.pop(context);
                                           },
-                                          child: const Text(('Cancel')),
+                                          child: Text(translate('Cancel')),
                                         ),
                                         TextButton(
                                           onPressed: () async {
@@ -1055,9 +1058,6 @@ class _HomeScreenState extends State<TokensPage> {
                                             if (res is bool && res) {
                                               Navigator.pop(context);
 
-                                              ///rebuid this..
-                                              ///
-
                                               if (CounterSettingService
                                                       .counterSettings
                                                       ?.hideCancelled !=
@@ -1068,8 +1068,6 @@ class _HomeScreenState extends State<TokensPage> {
                                                         RebuildCancelledEvent());
                                               }
 
-                                              ///rebuild to call
-                                              ///
                                               if (CounterSettingService
                                                       .counterSettings
                                                       ?.hideNextToCall !=
@@ -1080,16 +1078,18 @@ class _HomeScreenState extends State<TokensPage> {
                                               }
                                               return;
                                             }
-                                            UtilityService.toast(context,
-                                                ('Something went wrong'));
+                                            UtilityService.toast(
+                                                context,
+                                                translate(
+                                                    'Something went wrong'));
                                           },
-                                          child: const Text(('Continue')),
+                                          child: Text(translate('Continue')),
                                         )
                                       ],
-                                      title: const Text(
-                                          ('Adding Cancelled Token To Queue')),
+                                      title: Text(translate(
+                                          'Adding Cancelled Token To Queue')),
                                       content: Text(
-                                          '${('Do you want to add canceled token')} ${queue.tokenNumber}?'),
+                                          '${translate('Do you want to add canceled token')} ${queue.tokenNumber}?'),
                                     );
                                   });
                             },
@@ -1152,7 +1152,7 @@ class _HomeScreenState extends State<TokensPage> {
                             return;
                           }
                           UtilityService.toast(
-                              context, ('Something went wrong'));
+                              context, translate('Something went wrong'));
                         },
                         icon: Icon(
                           Icons.call,
@@ -1198,8 +1198,8 @@ class _HomeScreenState extends State<TokensPage> {
                                                   onPressed: () {
                                                     Navigator.pop(context);
                                                   },
-                                                  child:
-                                                      const Text(('Cancel'))),
+                                                  child: Text(
+                                                      translate('Cancel'))),
                                               TextButton(
                                                   onPressed: () async {
                                                     UtilityService
@@ -1243,13 +1243,13 @@ class _HomeScreenState extends State<TokensPage> {
                                                       return;
                                                     }
                                                   },
-                                                  child:
-                                                      const Text(('Continue'))),
+                                                  child: Text(
+                                                      translate('Continue'))),
                                             ],
-                                            title:
-                                                const Text(('Unholding Token')),
+                                            title: Text(
+                                                translate('Unholding Token')),
                                             content: Text(
-                                                '${('Do you want to unhold token')} ${queue.tokenNumber}?'),
+                                                '${translate('Do you want to unhold token')} ${queue.tokenNumber}?'),
                                           );
                                         });
                                   },
@@ -1267,8 +1267,8 @@ class _HomeScreenState extends State<TokensPage> {
                                               onPressed: () {
                                                 Navigator.pop(context);
                                               },
-                                              child: const Text(
-                                                ('Cancel'),
+                                              child: Text(
+                                                translate('Cancel'),
                                               ),
                                             ),
                                             TextButton(
@@ -1310,14 +1310,18 @@ class _HomeScreenState extends State<TokensPage> {
                                                     Navigator.pop(context);
                                                     return;
                                                   }
-                                                  UtilityService.toast(context,
-                                                      ("Something went wrong"));
+                                                  UtilityService.toast(
+                                                      context,
+                                                      translate(
+                                                          "Something went wrong"));
                                                 },
-                                                child: const Text(('Continue')))
+                                                child:
+                                                    Text(translate('Continue')))
                                           ],
-                                          title: const Text(('Cancel Token?')),
+                                          title:
+                                              Text(translate('Cancel Token?')),
                                           content: Text(
-                                              "${('Do you want to cancel token')}(${queue.tokenNumber})?"),
+                                              "${translate('Do you want to cancel token')}(${queue.tokenNumber})?"),
                                         );
                                       });
                                 },
@@ -1337,13 +1341,13 @@ class _HomeScreenState extends State<TokensPage> {
   ListView listViewNoDataFound() {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      children: const [
+      children: [
         Center(
           child: Padding(
-            padding: EdgeInsets.only(top: 15.0),
+            padding: const EdgeInsets.only(top: 15.0),
             child: Text(
-              ('No Data!'),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              translate('No Data!'),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
           ),
         )
@@ -1362,7 +1366,7 @@ class _HomeScreenState extends State<TokensPage> {
       if (value is bool && value == false) {
         UtilityService.toast(
           context,
-          ("Something went wrong, can't fetch details"),
+          translate("Something went wrong, can't fetch details"),
         );
         return;
       }
@@ -1383,7 +1387,7 @@ class _HomeScreenState extends State<TokensPage> {
     CallService.unholdToken(id: token.id).then((value) {
       Navigator.pop(context);
       if (value is! TokenModel) {
-        UtilityService.toast(context, ('Something went wrong'));
+        UtilityService.toast(context, translate('Something went wrong'));
         return;
       }
       BlocProvider.of<SettingsBloc>(context).add(SwitchToHomePageEvent());
@@ -1399,7 +1403,7 @@ class _HomeScreenState extends State<TokensPage> {
       BlocProvider.of<SettingsBloc>(context).add(SwitchToHomePageEvent());
       return;
     }
-    UtilityService.toast(context, ('Something went wrong'));
+    UtilityService.toast(context, translate('Something went wrong'));
   }
 
   Future<void> _recallToken(BuildContext context, int tokenId) async {
@@ -1410,7 +1414,7 @@ class _HomeScreenState extends State<TokensPage> {
       BlocProvider.of<SettingsBloc>(context).add(SwitchToHomePageEvent());
       return;
     }
-    UtilityService.toast(context, ("Something went wrong"));
+    UtilityService.toast(context, translate("Something went wrong"));
   }
 
   Future<void> markReportReadyFn(BuildContext context, TokenModel token) async {
@@ -1426,8 +1430,8 @@ class _HomeScreenState extends State<TokensPage> {
                     context,
                   );
                 },
-                child: const Text(
-                  ('Close'),
+                child: Text(
+                  translate('Close'),
                 ),
               ),
               TextButton(
@@ -1441,7 +1445,7 @@ class _HomeScreenState extends State<TokensPage> {
 
                     UtilityService.toast(
                       context,
-                      ('Updated'),
+                      translate('Updated'),
                     );
                     emitRebuildEvent();
                     return;
@@ -1449,10 +1453,10 @@ class _HomeScreenState extends State<TokensPage> {
                   Navigator.pop(context);
                   UtilityService.toast(
                     context,
-                    ('Something went wrong'),
+                    translate('Something went wrong'),
                   );
                 },
-                child: const Text(('Yes')),
+                child: Text(translate('Yes')),
               )
             ],
             content: SizedBox(
@@ -1460,7 +1464,7 @@ class _HomeScreenState extends State<TokensPage> {
               child: Column(
                 children: [
                   Text(
-                    '${('Mark Report Ready on')} ${token.tokenNumber}',
+                    '${translate('Mark Report Ready on')} ${token.tokenNumber}',
                     style: const TextStyle(
                       fontSize: 18,
                     ),
@@ -1468,7 +1472,7 @@ class _HomeScreenState extends State<TokensPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(('Show on Display')),
+                      Text(translate('Show on Display')),
                       StatefulBuilder(builder:
                           (BuildContext context, StateSetter checkBoxSetState) {
                         return Checkbox(
@@ -1535,7 +1539,7 @@ class _HomeScreenState extends State<TokensPage> {
       if (value is bool && value == false) {
         UtilityService.toast(
           context,
-          ("Something went wrong, can't fetch details"),
+          translate("Something went wrong, can't fetch details"),
         );
         return;
       }

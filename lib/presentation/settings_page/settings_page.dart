@@ -1919,8 +1919,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (event is bool && event) {
         updateMainVaribale();
         rebuildAllSetState != null ? rebuildAllSetState!(() {}) : null;
-
-        /// as build context need to be passed to change locale function, so all switching tab should call same function
         await LanguageService.changeLocaleFn(context);
       }
     });
@@ -2145,7 +2143,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           controller: uidController,
                           keyboardType: TextInputType.number,
                           decoration:
-                              const InputDecoration(hintText: 'Enter UID'),
+                               InputDecoration(hintText:translate('Enter UID')),
                         ),
                       ),
                       Expanded(
@@ -2164,12 +2162,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 return;
                               }
                               UtilityService.toast(
-                                  context, 'Something went wrong');
+                                  context, translate('Something went wrong'));
                               return;
                             }
-                            UtilityService.toast(context, 'Please enter uid');
+                            UtilityService.toast(
+                                context, translate('Please enter uid'));
                           },
-                          child: const Text('APPLY'),
+                          child: Text(translate('APPLY')),
                         ),
                       )
                     ],

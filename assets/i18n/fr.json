@@ -243,6 +243,21 @@
     "Service Remark":"Remarque sur l'entretien",
     "Not Saved":"Non enregistré",
     "Saved":"Enregistré",
-    "Not Saved Last Change":"Dernière modification non enregistrée, souhaitez-vous fermer sans enregistrer ?"
+    "Not Saved Last Change":"Dernière modification non enregistrée, souhaitez-vous fermer sans enregistrer ?",
+    "Can Add Tab":"peut ajouter un onglet",
+    "Can Remove This Tab":"Peut supprimer cet onglet",
+    "Hide Settings Button": "Masquer le bouton Paramètres",
+    "Hide Service Edit Button":"Masquer le bouton Modifier le service",
+    "Show Remarks Badge":"afficher le badge de remarques",
+    "Enter UID":"Entrez l'UID",
+    "APPLY": "Appliquer",
+    "Light": "Clair",
+    "Dark": "Sombre",
+    "System": "Système",
+    "Hide Cancel Button In Next to Call": "Masquer le bouton d'annulation à côté de l'appel",
+    "Hide Hold Button In Next to Call": "Masquer le bouton de maintien à côté de l'appel",
+    "Hide Cancel Button In Today Appointments": "Masquer le bouton d'annulation dans les rendez-vous d'aujourd'hui"
 
+
+    
 }

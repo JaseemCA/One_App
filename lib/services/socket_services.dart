@@ -413,7 +413,7 @@
 // ignore_for_file: library_prefixes
 
 import 'dart:async';
-import 'dart:developer';
+// import 'dart:developer';
 import 'package:oneappcounter/entity/countersetting_entity.dart';
 import 'package:oneappcounter/entity/queue_appointments_entity.dart';
 import 'package:oneappcounter/entity/queue_entity.dart';
@@ -456,7 +456,7 @@ class SocketService {
   static List<int> listeningServices = [];
 
   static IO.Socket socket = IO.io(
-    'https://kozhikode-hospital.oneapp.life:6001',
+    '${NetworkingService.domainUrl}:6001',
     IO.OptionBuilder()
         .disableAutoConnect()
         .setTransports(['websocket'])
@@ -465,6 +465,17 @@ class SocketService {
         .setReconnectionDelayMax(1000)
         .build(),
   );
+
+  // static IO.Socket socket = IO.io(
+  //   'https://kozhikode-hospital.oneapp.life:6001',
+  //   IO.OptionBuilder()
+  //       .disableAutoConnect()
+  //       .setTransports(['websocket'])
+  //       .enableReconnection()
+  //       .setReconnectionDelay(1000)
+  //       .setReconnectionDelayMax(1000)
+  //       .build(),
+  // );
   static Echo echo =
       Echo(broadcaster: EchoBroadcasterType.SocketIO, client: socket, options: {
     'auth': {
@@ -478,43 +489,43 @@ class SocketService {
 
   Future<void> initialiseSocket() async {
     LocalNotificationService().initNotificationSettings();
-    log("initialisesocket");
-    log(' ${NetworkingService.domainUrl}:6001');
-    log('${NetworkingService.accessToken}');
+    // log("initialisesocket");
+    // log(' ${NetworkingService.domainUrl}:6001');
+    // log('${NetworkingService.accessToken}');
 
     _isDisposed = false;
     echo.connect();
     socket.onDisconnect((data) {
-      log('Socket disconnected');
+      // log('Socket disconnected');
       if (_isDisposed == false) {
         try {
           _leaveChannels(leaveAll: true);
         } catch (_) {}
         echo.connect();
-        log("reconnect");
+        // log("reconnect");
         registerEvents(isAll: true);
       }
     });
   }
 
   static Future<void> registerEvents({bool isAll = false}) async {
-    log('registerEvents called');
+    // log('registerEvents called');
     if (GeneralDataService.getTabs().isNotEmpty) {
-      log('Tabs found: ${GeneralDataService.getTabs().length}');
+      // log('Tabs found: ${GeneralDataService.getTabs().length}');
 
       for (var serviceCounterTab in GeneralDataService.getTabs()) {
-        log('Registering services for tab: ${serviceCounterTab.services}');
+        // log('Registering services for tab: ${serviceCounterTab.services}');
         for (var service in serviceCounterTab.services) {
-          log('Checking if service ${service.id} is already registered');
+          // log('Checking if service ${service.id} is already registered');
           if (!(listeningServices.contains(service.id))) {
-            log('Registering service: ${service.id}');
-            log('sdfsdfsdsdfyyyyyyyyy: call.${AuthService.loginData?.systemBranch["website_id"]}.${service.id}');
+            // log('Registering service: ${service.id}');
+            // log('sdfsdfsdsdfyyyyyyyyy: call.${AuthService.loginData?.systemBranch["website_id"]}.${service.id}');
             listeningServices.add(service.id);
             echo
                 .channel(
                     'call.${AuthService.loginData?.systemBranch["website_id"]}.${service.id}')
                 .listen('TokenIssued', (event) async {
-              log('TokenIssued event received for service: ${service.id}');
+              // log('TokenIssued event received for service: ${service.id}');
 
               QueueModel queue =
                   QueueModel.fromEntity(QueueEntity.fromJson(event['data']));
@@ -540,7 +551,7 @@ class SocketService {
                 await GeneralDataService.getTodayTokenDetails();
                 homePageRebuildRequiredController.add(true);
 
-                log('homePageRebuildRequiredController updated');
+                // log('homePageRebuildRequiredController updated');
 
                 tokensPageRebuildRequiredController.add(true);
                 appointmentPageRebuildRequiredController.add(true);
@@ -550,7 +561,7 @@ class SocketService {
               }
             }).listen('AppointmentIssued', (event) async {
               //data;
-              log('AppointmentIssued event received for service: ${service.id}');
+              // log('AppointmentIssued event received for service: ${service.id}');
               QueueAppointmentModel queue = QueueAppointmentModel.fromEntity(
                   QueueAppointmentEntity.fromJson(event['data']));
               if (GeneralDataService.getTabs()[
@@ -649,10 +660,8 @@ class SocketService {
                         .add(event['queue']['service_id']));
               }
 
-              log('Token side menu actions :: $event');
+              // log('Token side menu actions :: $event');
             }).listen('TokenTransferred', (event) async {
-              //data;
-
               TokenModel token = TokenModel.fromEntity(
                   TokenEntity.fromJson(event['data']['call']));
               if (GeneralDataService.getTabs()[
@@ -671,7 +680,7 @@ class SocketService {
                     (value) => eventReceivedController.add(token.serviceId));
               }
             }).listen('TokenTransferredCancel', (event) {
-              log('token transferred cancelled:: $event');
+              // log('token transferred cancelled:: $event');
 
               GeneralDataService.getTodayTokenDetails().then((value) {
                 tokensPageRebuildRequiredController.add(true);
@@ -692,19 +701,19 @@ class SocketService {
                 GeneralDataService.updateChangeInTab(token.serviceId).then(
                     (value) => eventReceivedController.add(token.serviceId));
               }
-              log('report ready ::$event');
+              // log('report ready ::$event');
             });
           }
         }
       }
     }
     if (isAll) {
-      log('Registering global token and service events');
+      // log('Registering global token and service events');
       echo
           .channel(
               'token_updates.${AuthService.loginData?.systemBranch["website_id"]}')
           .listen('TokenStatusChanged', (event) async {
-        log('TokenStatusChanged event received');
+        // log('TokenStatusChanged event received');
         TokenModel token =
             TokenModel.fromEntity(TokenEntity.fromJson(event['call_data']));
 
@@ -779,25 +788,25 @@ class SocketService {
 
   static Future<void> _leaveChannels({bool leaveAll = false}) async {
     listeningServices.clear();
-    log('Cleared listening services.');
+    // log('Cleared listening services.');
 
     if (leaveAll) {
-      log('Leaving all channels...');
+      // log('Leaving all channels...');
       echo.leaveChannel(
           'token_updates.${AuthService.loginData?.systemBranch["website_id"]}');
-      log('Left token_updates channel.');
+      // log('Left token_updates channel.');
 
       echo.leaveChannel(
           'display.${AuthService.loginData?.systemBranch["website_id"]}');
-      log('Left display channel.');
+      // log('Left display channel.');
 
       echo.leaveChannel(
           'service_updated.${AuthService.loginData?.systemBranch["website_id"]}');
-      log('Left service_updated channel.');
+      // log('Left service_updated channel.');
 
       echo.leaveChannel(
           'counter_app_settings_apply.${AuthService.loginData?.systemBranch["website_id"]}');
-      log('Left counter_app_settings_apply channel.');
+      // log('Left counter_app_settings_apply channel.');
     }
 
     if (GeneralDataService.getTabs().isNotEmpty) {
@@ -806,7 +815,7 @@ class SocketService {
         for (var service in serviceCounterTab.services) {
           echo.leaveChannel(
               'call.${AuthService.loginData?.systemBranch["website_id"]}.${service.id}');
-          log('Left call.${AuthService.loginData?.systemBranch["website_id"]}.${service.id} channel.');
+          // log('Left call.${AuthService.loginData?.systemBranch["website_id"]}.${service.id} channel.');
         }
       }
     }
@@ -839,13 +848,13 @@ class SocketService {
   }
 
   static Future<void> connectAfterSwitch() async {
-    log("Connect after switch");
+    // log("Connect after switch");
 
     registerEvents(isAll: false);
   }
 
   static Future<void> destorySocket() async {
-    log("Destroy  Socket");
+    // log("Destroy  Socket");
 
     try {
       _isDisposed = true;

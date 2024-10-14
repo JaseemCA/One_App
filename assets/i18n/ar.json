@@ -243,5 +243,18 @@
     "Service Remark":"ملاحظة الخدمة",
     "Not Saved":"يتم حفظ",
     "Saved":"أنقذ",
-    "Not Saved Last Change":"لم يتم حفظ التغيير الأخير ، هل ترغب في الإغلاق بدون حفظ؟"
+    "Not Saved Last Change":"لم يتم حفظ التغيير الأخير ، هل ترغب في الإغلاق بدون حفظ؟",
+    "Can Add Tab": "يمكن إضافة علامة تبويب",
+    "Can Remove This Tab": "يمكن إزالة هذه العلامة",
+    "Hide Settings Button": "إخفاء زر الإعدادات",
+    "Hide Service Edit Button": "إخفاء زر تعديل الخدمة",
+    "Show Remarks Badge": "إظهار شارة الملاحظات",
+    "Enter UID": "أدخل UID",
+    "APPLY": "تطبيق",
+    "Light": "فاتح",
+    "Dark": "داكن",
+    "System": "النظام",
+    "Hide Cancel Button In Next to Call": "إخفاء زر الإلغاء بجانب المكالمة",
+    "Hide Hold Button In Next to Call": "إخفاء زر التعليق بجانب المكالمة",
+    "Hide Cancel Button In Today Appointments": "إخفاء زر الإلغاء في مواعيد اليوم"
 }

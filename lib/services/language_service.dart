@@ -19,12 +19,11 @@ class LanguageService {
     const LanguageModel(
         id: 4, code: "ml", name: "Malayalam", dir: "ltr", nativeName: "മലയാളം"),
     const LanguageModel(
-      id: 5,
-      code: "pt",
-      name: "Portuguese",
-      dir: "ltr",
-      nativeName: "Português",
-    )
+        id: 5,
+        code: "pt",
+        name: "Portuguese",
+        dir: "ltr",
+        nativeName: "Português"),
   ];
 
   static Future<void> changeLocaleFn(BuildContext context) async {

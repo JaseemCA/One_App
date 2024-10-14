@@ -2345,7 +2345,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: isDarkMode ? bottomsheetDarkcolor : appBackgrondcolor,
-        title: const OneAppLogo(height: 30),
+        title: const OneAppLogo(height: 38),
         actions: [
           IconButton(
             icon: const Icon(
@@ -2406,7 +2406,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     value: 'settings',
                     child: ListTile(
                       leading: const Icon(Icons.settings),
-                      title: const Text('Settings'),
+                      title:  Text(translate('Settings')),
                       onTap: () {
                         Navigator.push(
                             context,
@@ -2416,18 +2416,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                   ),
-                  const PopupMenuItem<String>(
+                   PopupMenuItem<String>(
                     value: 'theme',
                     child: ListTile(
-                      leading: Icon(Icons.mode_night_outlined),
-                      title: Text('Theme'),
+                      leading:const Icon(Icons.mode_night_outlined),
+                      title: Text(translate('Theme')),
                     ),
                   ),
                   PopupMenuItem<String>(
                     value: 'logout',
                     child: ListTile(
                       leading: const Icon(Icons.logout),
-                      title: const Text('Logout'),
+                      title:  Text(translate('Logout')),
                       onTap: () async {
                         UtilityService.showLoadingAlert(context);
                         if (await AuthService.logoutUser()) {
@@ -2439,7 +2439,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                           return;
                         }
-                        UtilityService.toast(context, ('Something went wrong'));
+                        UtilityService.toast(context,translate ('Something went wrong'));
                       },
                     ),
                   ),
@@ -3497,8 +3497,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildTokenPart() {
-    ///for both view this part will be same.
-    ///
     TokenModel? token = selectedToken ?? GeneralDataService.lastCalledToken;
 
     String servedTime = GeneralDataService.lastCalledToken?.servedTime ?? '';
@@ -3550,7 +3548,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 null ||
                             token?.queueppointment['phone'] != null))
                     ? () {
-                        // queue_appointment_details
+                    
                         showBottomSheet(
                             backgroundColor: Colors.transparent,
                             context: context,
@@ -4339,14 +4337,14 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (BuildContext context) {
         final currentThemeMode = context.read<ThemeCubit>().state;
         return SimpleDialog(
-          title: const Text('Theme'),
+          title:  Text(translate('Theme')),
           children: [
             ListTile(
               onTap: () {
                 context.read<ThemeCubit>().updateTheme(ThemeMode.light);
                 Navigator.pop(context);
               },
-              title: const Text('Light'),
+              title:  Text(translate('Light')),
               leading: Radio(
                 value: ThemeMode.light,
                 groupValue: currentThemeMode,
@@ -4361,7 +4359,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 context.read<ThemeCubit>().updateTheme(ThemeMode.dark);
                 Navigator.pop(context);
               },
-              title: const Text('Dark'),
+              title:  Text(translate('Dark')),
               leading: Radio(
                 value: ThemeMode.dark,
                 groupValue: currentThemeMode,
@@ -4376,7 +4374,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 context.read<ThemeCubit>().updateTheme(ThemeMode.system);
                 Navigator.pop(context);
               },
-              title: const Text('System'),
+              title:  Text(translate('System')),
               leading: Radio(
                 value: ThemeMode.system,
                 groupValue: currentThemeMode,
@@ -4388,7 +4386,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
+              child:  Text(translate('Close')),
             ),
           ],
         );

@@ -3,6 +3,7 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_bloc.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_event.dart';
 import 'package:oneappcounter/common/widgets/button/custom_button.dart';
@@ -62,11 +63,11 @@ class _UnlockServiceState extends State<UnlockService> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Expanded(
-                        child: Text(
+                       Expanded(
+                        child: Text(translate
                           ('Unhold Service'),
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style:const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w400,
                           ),
@@ -135,7 +136,7 @@ class _UnlockServiceState extends State<UnlockService> {
                         },
                       );
                     }),
-                    const Text(('Sent Unholding Message to Customers')),
+                     Text(translate('Sent Unholding Message to Customers')),
                   ]),
                   CustomElevatedButton(
                     onPressed: () async {
@@ -152,13 +153,13 @@ class _UnlockServiceState extends State<UnlockService> {
                           Navigator.pop(context);
                           return;
                         }
-                        UtilityService.toast(context, ('Something went wrong'));
+                        UtilityService.toast(context, translate ('Something went wrong'));
                       } else {
                         UtilityService.toast(
-                            context, ('please select a service'));
+                            context, translate('please select a service'));
                       }
                     },
-                    child: const Text(('UNHOLD')),
+                    child:  Text(translate('UNHOLD')),
                   )
                 ],
               ),

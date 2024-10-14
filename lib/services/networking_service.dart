@@ -1,7 +1,4 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
-
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:oneappcounter/services/storage_service.dart';
 
@@ -31,7 +28,7 @@ class NetworkingService {
           ));
       return response;
     } catch (e) {
-      log("Error in GET request: $e");
+      // log("Error in GET request: $e");
       return null; 
     }
   }

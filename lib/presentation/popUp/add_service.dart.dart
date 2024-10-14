@@ -277,9 +277,11 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_bloc.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_event.dart';
-import 'package:oneappcounter/core/config/constants.dart';
+import 'package:oneappcounter/common/widgets/button/custom_button.dart';
+// import 'package:oneappcounter/core/config/constants.dart';
 import 'package:oneappcounter/model/counter_model.dart';
 import 'package:oneappcounter/model/service_counter_tab_model.dart';
 import 'package:oneappcounter/model/service_model.dart';
@@ -339,11 +341,11 @@ class _SetNewServiceTabState extends State<SetNewServiceTab> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Select Services And Counter',
+                          translate('Select Services And Counter'),
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w400,
                           ),
@@ -371,8 +373,8 @@ class _SetNewServiceTabState extends State<SetNewServiceTab> {
                                   Navigator.pop(context); // Close dialog
                                   return;
                                 }
-                                UtilityService.toast(
-                                    context, 'At least one tab required!');
+                                UtilityService.toast(context,
+                                    translate('Atleast one tab required!'));
                               } else {
                                 Navigator.pop(context);
                               }
@@ -380,8 +382,8 @@ class _SetNewServiceTabState extends State<SetNewServiceTab> {
                               Navigator.pop(context);
                             }
                           } else {
-                            UtilityService.toast(
-                                context, 'At least one tab required!');
+                            UtilityService.toast(context,
+                                translate('Atleast one tab required!'));
                           }
                         },
                         icon: const Icon(Icons.close_outlined),
@@ -394,9 +396,9 @@ class _SetNewServiceTabState extends State<SetNewServiceTab> {
                     popupProps: const PopupPropsMultiSelection.dialog(
                       showSearchBox: true,
                     ),
-                    dropdownDecoratorProps: const DropDownDecoratorProps(
+                    dropdownDecoratorProps: DropDownDecoratorProps(
                       dropdownSearchDecoration: InputDecoration(
-                        labelText: "Services",
+                        labelText: translate("Services"),
                       ),
                     ),
                     items: GeneralDataService.getActiveServices(),
@@ -417,9 +419,9 @@ class _SetNewServiceTabState extends State<SetNewServiceTab> {
                       showSearchBox: true,
                       showSelectedItems: true,
                     ),
-                    dropdownDecoratorProps: const DropDownDecoratorProps(
+                    dropdownDecoratorProps: DropDownDecoratorProps(
                       dropdownSearchDecoration: InputDecoration(
-                        labelText: "Counter",
+                        labelText: translate("Counter"),
                       ),
                     ),
                     items: GeneralDataService.getActiveCounters(),
@@ -432,19 +434,19 @@ class _SetNewServiceTabState extends State<SetNewServiceTab> {
                     },
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all<Color>(
-                        isDarkMode
-                            ? materialIconButtonDark
-                            : buttonColor,
-                      ),
-                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
+                  CustomElevatedButton(
+                    // style: ButtonStyle(
+                    //   backgroundColor: WidgetStateProperty.all<Color>(
+                    //     isDarkMode
+                    //         ? materialIconButtonDark
+                    //         : buttonColor,
+                    //   ),
+                    //   shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                    //     RoundedRectangleBorder(
+                    //       borderRadius: BorderRadius.circular(10),
+                    //     ),
+                    //   ),
+                    // ),
                     onPressed: () async {
                       if (_counter != null && _selectedServices.isNotEmpty) {
                         UtilityService.showLoadingAlert(context);
@@ -461,15 +463,15 @@ class _SetNewServiceTabState extends State<SetNewServiceTab> {
                               context: context,
                               builder: (context) {
                                 return AlertDialog(
-                                  title: const Text('Duplicate Tab'),
-                                  content: const Text(
-                                      'Would you like to switch tab?'),
+                                  title: Text(translate('Duplicate Tab')),
+                                  content: Text(translate(
+                                      'Would you like to switch tab?')),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
                                         Navigator.pop(context);
                                       },
-                                      child: const Text('Close'),
+                                      child: Text(translate('Close')),
                                     ),
                                     TextButton(
                                       onPressed: () async {
@@ -486,7 +488,7 @@ class _SetNewServiceTabState extends State<SetNewServiceTab> {
                                         Navigator.pop(context);
                                         Navigator.pop(context);
                                       },
-                                      child: const Text('Switch Tab'),
+                                      child: Text(translate('Switch Tab')),
                                     )
                                   ],
                                 );
@@ -516,14 +518,15 @@ class _SetNewServiceTabState extends State<SetNewServiceTab> {
                             Navigator.pop(context); // Close popup
                           } else {
                             UtilityService.toast(
-                                context, 'All fields required');
+                                context, translate('All fileds required'));
                           }
                         }
                       } else {
-                        UtilityService.toast(context, 'All fields required');
+                        UtilityService.toast(
+                            context, translate('All fileds required'));
                       }
                     },
-                    child: const Text('Save'),
+                    child: Text(translate('Save')),
                   ),
                 ],
               ),

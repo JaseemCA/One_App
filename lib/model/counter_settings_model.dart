@@ -14,7 +14,7 @@ class CounterSettingsModel extends Equatable {
   final bool notificationSound;
   final bool showPriority;
   final bool recallUnholdToken;
-  final bool notification; //desktop notification in entity
+  final bool notification; 
 
   ///side menu options,navigation tabs options
   final bool hideNextToCall;

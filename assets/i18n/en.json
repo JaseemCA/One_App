@@ -238,5 +238,18 @@
     "Service Remark":"Service Remark",
     "Not Saved":"Not Saved",
     "Saved":"Saved",
-    "Not Saved Last Change":"Not Saved Last Change, Would like to close without save?"
+    "Not Saved Last Change":"Not Saved Last Change, Would like to close without save?",
+    "Can Add Tab": "Can Add Tab",
+    "Can Remove This Tab": "Can Remove This Tab",
+    "Hide Settings Button": "Hide Settings Button",
+    "Hide Service Edit Button": "Hide Service Edit Button",
+    "Show Remarks Badge": "Show Remarks Badge",
+    "Enter UID": "Enter UID",
+    "APPLY": "Apply",
+    "Light": "Light",
+    "Dark": "Dark",
+    "System": "System",
+    "Hide Cancel Button In Next to Call": "Hide Cancel Button In Next to Call",
+    "Hide Hold Button In Next to Call": "Hide Hold Button In Next to Call",
+    "Hide Cancel Button In Today Appointments": "Hide Cancel Button In Today Appointments"
 }

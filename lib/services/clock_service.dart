@@ -26,9 +26,9 @@ class ClockService {
   static bool _reseted = false;
   static Timer? _timerStopWatch;
 
-  // Call this before any formatting
+
   static Future<void> initializeLocale() async {
-    await initializeDateFormatting('en'); // <-- Initialize locale here
+    await initializeDateFormatting('en'); 
   }
 
   static Future<void> _emitTime() async {

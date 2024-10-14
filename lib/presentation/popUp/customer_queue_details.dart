@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:oneappcounter/services/utility_services.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/services.dart';
@@ -51,13 +52,13 @@ class CustomerQueueDetails extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Expanded(
+                       Expanded(
                         child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(translate
                             ('Token Details'),
                             textAlign: TextAlign.left,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w400,
                             ),
@@ -89,9 +90,9 @@ class CustomerQueueDetails extends StatelessWidget {
     if (phone != null && phone!.isNotEmpty) {
       data.add(Row(
         children: [
-          const Expanded(
+           Expanded(
             flex: 2,
-            child: Text(('Phone: ')),
+            child: Text(translate('Phone: ')),
           ),
           Expanded(
             flex: 4,
@@ -101,7 +102,7 @@ class CustomerQueueDetails extends StatelessWidget {
             flex: 1,
             child: IconButton(
               onPressed: () {
-                copyText(context, '$phone', key: ('Phone'));
+                copyText(context, '$phone', key:translate ('Phone'));
               },
               icon: const Icon(Icons.content_copy),
             ),
@@ -112,9 +113,9 @@ class CustomerQueueDetails extends StatelessWidget {
     if (name != null && name!.isNotEmpty) {
       data.add(Row(
         children: [
-          const Expanded(
+           Expanded(
             flex: 2,
-            child: Text(('Name: ')),
+            child: Text(translate('Name: ')),
           ),
           Expanded(
             flex: 4,
@@ -124,7 +125,7 @@ class CustomerQueueDetails extends StatelessWidget {
             flex: 1,
             child: IconButton(
               onPressed: () {
-                copyText(context, '$name', key: ('Name'));
+                copyText(context, '$name', key:translate ('Name'));
               },
               icon: const Icon(Icons.content_copy),
             ),
@@ -135,9 +136,9 @@ class CustomerQueueDetails extends StatelessWidget {
     if (email != null && email!.isNotEmpty) {
       data.add(Row(
         children: [
-          const Expanded(
+           Expanded(
             flex: 2,
-            child: Text(('Email: ')),
+            child: Text(translate('Email: ')),
           ),
           Expanded(
             flex: 4,
@@ -147,7 +148,7 @@ class CustomerQueueDetails extends StatelessWidget {
             flex: 1,
             child: IconButton(
               onPressed: () {
-                copyText(context, '$email', key: ('Email'));
+                copyText(context, '$email', key:translate ('Email'));
               },
               icon: const Icon(Icons.content_copy),
             ),

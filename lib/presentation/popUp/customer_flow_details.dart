@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:oneappcounter/extention/string_casing_extention.dart';
 import 'package:oneappcounter/model/queue_appointment_model.dart';
 import 'package:oneappcounter/model/queue_model.dart';
@@ -50,7 +51,7 @@ class CustomerFlowDetails extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          '${('Customer Flow')} ($tokenNumber)',
+                          '${translate('Customer Flow')} ($tokenNumber)',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 18,
@@ -67,9 +68,9 @@ class CustomerFlowDetails extends StatelessWidget {
                       )
                     ],
                   ),
-                  const Row(
+                   Row(
                     children: [
-                      Expanded(
+                      const Expanded(
                           flex: 2,
                           child: Text(
                             '#',
@@ -80,9 +81,9 @@ class CustomerFlowDetails extends StatelessWidget {
                           )),
                       Expanded(
                         flex: 4,
-                        child: Text(
+                        child: Text(translate
                           ('Service'),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -90,9 +91,9 @@ class CustomerFlowDetails extends StatelessWidget {
                       ),
                       Expanded(
                         flex: 4,
-                        child: Text(
+                        child: Text(translate
                           ('Counter'),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -100,9 +101,9 @@ class CustomerFlowDetails extends StatelessWidget {
                       ),
                       Expanded(
                         flex: 4,
-                        child: Text(
+                        child: Text(translate
                           ('User'),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -110,9 +111,9 @@ class CustomerFlowDetails extends StatelessWidget {
                       ),
                       Expanded(
                         flex: 4,
-                        child: Text(
+                        child: Text(translate
                           ('Status'),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -170,7 +171,7 @@ class CustomerFlowDetails extends StatelessWidget {
                 child: Text(
                   item.called == true && item.call != null
                       ? item.call['counter']['name']
-                      : ('NIL'),
+                      :translate ('NIL'),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -186,7 +187,7 @@ class CustomerFlowDetails extends StatelessWidget {
                 child: Text(
                   item.called == true && item.call != null
                       ? item.call['user']['name']
-                      : ('NIL'),
+                      : translate('NIL'),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -204,7 +205,7 @@ class CustomerFlowDetails extends StatelessWidget {
                       ? item.call['status'] == null
                           ? 'Serving'
                           : item.call['status'].toString().toTitleCase()
-                      : ('Not Called'),
+                      :translate ('Not Called'),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -246,7 +247,7 @@ class CustomerFlowDetails extends StatelessWidget {
               child: Text(
                 item.called == true && item.call != null
                     ? item.call['counter']['name']
-                    : ('NIL'),
+                    :translate ('NIL'),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
@@ -259,7 +260,7 @@ class CustomerFlowDetails extends StatelessWidget {
               child: Text(
                 item.called == true && item.call != null
                     ? item.call['user']['name']
-                    : ('NIL'),
+                    :translate ('NIL'),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
@@ -274,7 +275,7 @@ class CustomerFlowDetails extends StatelessWidget {
                     ? item.call['status'] == null
                         ? 'Serving'
                         : item.call['status'].toString().toTitleCase()
-                    : ('Not Called'),
+                    : translate('Not Called'),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(

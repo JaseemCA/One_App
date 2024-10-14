@@ -243,5 +243,19 @@
     "Service Remark":"സേവന പരാമർശം",
     "Not Saved":"സംരക്ഷിച്ചിട്ടില്ല",
     "Saved":"സംരക്ഷിച്ചു",
-    "Not Saved Last Change":"അവസാനത്തെ മാറ്റം സംരക്ഷിച്ചിട്ടില്ല, സംരക്ഷിക്കാതെ അടയ്ക്കാൻ താൽപ്പര്യമുണ്ടോ?"
+    "Not Saved Last Change":"അവസാനത്തെ മാറ്റം സംരക്ഷിച്ചിട്ടില്ല, സംരക്ഷിക്കാതെ അടയ്ക്കാൻ താൽപ്പര്യമുണ്ടോ?",
+    "Can Add Tab": "ടാബ് ചേർക്കാം",
+    "Can Remove This Tab": "ഈ ടാബ് നീക്കം ചെയ്യാം",
+    "Hide Settings Button": "സെറ്റിംഗ്സ് ബട്ടൺ മറയ്ക്കുക",
+    "Hide Service Edit Button": "സർവീസ് എഡിറ്റ് ബട്ടൺ മറയ്ക്കുക",
+    "Show Remarks Badge": "നിരീക്ഷണ ബാഡ്ജ് കാണിക്കുക",
+    "Enter UID": "UID നൽകുക",
+    "APPLY": "അപ്ലൈ",
+    "Light": "ലൈറ്റ്",
+    "Dark": "ഡാർക്ക്",
+    "System": "സിസ്റ്റം",
+    "Hide Cancel Button In Next to Call": "കോളിന് സമീപമുള്ള റദ്ദാക്കൽ ബട്ടൺ മറയ്ക്കുക",
+    "Hide Hold Button In Next to Call": "കോളിന് സമീപമുള്ള ഹോൾഡ് ബട്ടൺ മറയ്ക്കുക",
+    "Hide Cancel Button In Today Appointments": "ഇന്നത്തെ നിയമനങ്ങളിൽ റദ്ദാക്കൽ ബട്ടൺ മറയ്ക്കുക"
+
 }

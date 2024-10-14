@@ -233,7 +233,6 @@ class _RemarksPopupState extends State<RemarksPopup> {
 
                                       isTextChanged = true;
                                       statusLabel!(() {});
-                                      // statusLabel
                                     },
                                     child: Text(
                                       translate('Service Remark'),

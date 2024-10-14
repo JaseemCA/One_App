@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:oneappcounter/core/config/constants.dart';
 // import 'package:oneappcounter/core/config/color/appcolors.dart';
 
@@ -60,18 +61,18 @@ class UtilityService {
                     ),
                   ),
                   const SizedBox(height: 18),
-                  const Text(
-                    'Loading...',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
+                  Text(
+                    translate('Loading...'),
+                    textAlign: TextAlign.center, 
+                    style: const TextStyle(
                       fontWeight: FontWeight.w500,
                       color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 15),
-                  const Text(
-                    'Please wait',
-                    style: TextStyle(
+                    Text(
+                    translate('Please wait'),
+                    style: const TextStyle(
                       fontWeight: FontWeight.w500,
                       color: Colors.white,
                     ),

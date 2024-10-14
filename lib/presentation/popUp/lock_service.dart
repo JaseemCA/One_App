@@ -4,6 +4,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:intl/intl.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_bloc.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_event.dart';
@@ -56,11 +57,11 @@ class _LockServiceState extends State<LockService> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Expanded(
-                        child: Text(
+                       Expanded(
+                        child: Text(translate
                           ('Hold Service'),
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style:const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w400,
                           ),
@@ -168,9 +169,9 @@ class _LockServiceState extends State<LockService> {
                           );
                         },
                         child: selectedTime.isEmpty
-                            ? const Text(('Expected Ending Time'))
+                            ?  Text(translate('Expected Ending Time'))
                             : Text(
-                                '${('Expected Ending Time')}: $selectedTime'),
+                                '${translate('Expected Ending Time')}: $selectedTime'),
                       );
                     },
                   ),
@@ -195,13 +196,13 @@ class _LockServiceState extends State<LockService> {
                           Navigator.pop(context);
                           return;
                         }
-                        UtilityService.toast(context, ('Something went wrong'));
+                        UtilityService.toast(context, translate('Something went wrong'));
                       } else {
                         UtilityService.toast(
-                            context, ('Fill all required fields'));
+                            context,translate ('Fill all required fields'));
                       }
                     },
-                    child: const Text(('HOLD')),
+                    child:  Text(translate('HOLD')),
                   )
                 ],
               ),

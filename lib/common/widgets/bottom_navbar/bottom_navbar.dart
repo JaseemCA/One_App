@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_bloc.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_event.dart';
 import 'package:oneappcounter/bloc/settings_bloc/settings_bloc_state.dart';
@@ -124,28 +125,28 @@ class _BottomTabScreen extends State<BottomTabScreen> {
             CounterSettingService.counterSettings?.hideCancelledAppointments !=
                 true)) {
       navItems.add(
-        const BottomNavigationBarItem(
-          icon: Icon(
+        BottomNavigationBarItem(
+          icon: const Icon(
             Icons.calendar_today_outlined,
             size: 25,
           ),
-          activeIcon: Icon(Icons.calendar_today_rounded),
-          label: 'Appointments',
+          activeIcon: const Icon(Icons.calendar_today_rounded),
+          label: translate('Appointments'),
         ),
       );
     }
 
     navItems.add(
-      const BottomNavigationBarItem(
-        icon: Icon(
+      BottomNavigationBarItem(
+        icon: const Icon(
           Icons.home_outlined,
           size: 25,
         ),
-        activeIcon: Icon(
+        activeIcon: const Icon(
           Icons.home,
           size: 25,
         ),
-        label: 'Home',
+        label: translate('Home'),
       ),
     );
 
@@ -155,29 +156,29 @@ class _BottomTabScreen extends State<BottomTabScreen> {
             CounterSettingService.counterSettings?.hideHoldedQueue == true &&
             CounterSettingService.counterSettings?.hideHoldedTokens == true &&
             CounterSettingService.counterSettings?.hideNextToCall == true)) {
-      navItems.add(const BottomNavigationBarItem(
-        icon: Icon(
+      navItems.add(BottomNavigationBarItem(
+        icon: const Icon(
           Icons.assignment_outlined,
           size: 25,
         ),
-        activeIcon: Icon(
+        activeIcon: const Icon(
           Icons.assignment,
           size: 25,
         ),
-        label: 'Tokens',
+        label: translate('Tokens'),
       ));
     }
     navItems.add(
-      const BottomNavigationBarItem(
-        icon: Icon(
+      BottomNavigationBarItem(
+        icon: const Icon(
           Icons.backup_table_sharp,
           size: 25,
         ),
-        activeIcon: Icon(
+        activeIcon: const Icon(
           Icons.backup_table_sharp,
           size: 25,
         ),
-        label: 'Tabs',
+        label: translate('Tabs'),
       ),
     );
     return navItems;
@@ -226,7 +227,7 @@ class _BottomTabScreen extends State<BottomTabScreen> {
                       CounterSettingService
                               .counterSettings?.hideCancelledAppointments ==
                           true))) {
-            return const ServiceCounterTab();
+            return ServiceCounterTab();
           } else if (CounterSettingService.counterSettings?.hideSideMenu !=
                   true &&
               (CounterSettingService.counterSettings?.hideTodayAppointments ==
@@ -258,13 +259,13 @@ class _BottomTabScreen extends State<BottomTabScreen> {
                       true &&
                   CounterSettingService.counterSettings?.hideServedInCalled ==
                       true)) {
-            return const ServiceCounterTab();
+            return ServiceCounterTab();
           }
           return const TokensPage();
         }
       case 3:
         {
-          return const ServiceCounterTab();
+          return ServiceCounterTab();
         }
       default:
         {

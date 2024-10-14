@@ -241,5 +241,18 @@
     "Service Remark":"Observação de serviço",
     "Not Saved":"Não salvo",
     "Saved":"Salvou",
-    "Not Saved Last Change":"Última alteração não salva, gostaria de fechar sem salvar?"
+    "Not Saved Last Change":"Última alteração não salva, gostaria de fechar sem salvar?",
+    "Can Add Tab": "Pode adicionar aba",
+    "Can Remove This Tab": "Pode remover esta aba",
+    "Hide Settings Button": "Ocultar botão de configurações",
+    "Hide Service Edit Button": "Ocultar botão de edição de serviço",
+    "Show Remarks Badge": "Mostrar badge de observações",
+    "Enter UID": "Insira o UID",
+    "APPLY": "Aplicar",
+    "Light": "Claro",
+    "Dark": "Escuro",
+    "System": "Sistema",
+    "Hide Cancel Button In Next to Call": "Ocultar botão de cancelar ao lado da chamada",
+    "Hide Hold Button In Next to Call": "Ocultar botão de espera ao lado da chamada",
+    "Hide Cancel Button In Today Appointments": "Ocultar botão de cancelar nas nomeações de hoje"
 }

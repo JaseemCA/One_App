@@ -54,6 +54,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:oneappcounter/bloc/appointment_page/bloc/appointment_bloc.dart';
 import 'package:oneappcounter/bloc/appointment_page/bloc/appointment_event.dart';
 import 'package:oneappcounter/bloc/appointment_page/bloc/appointment_state.dart';
@@ -117,9 +118,9 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: const Text(
+          title:  Text(translate
             ('Appointments'),
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w600,
               overflow: TextOverflow.ellipsis,
@@ -158,16 +159,16 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
     List<Tab> content = [];
     if (CounterSettingService.counterSettings?.hideTodayAppointments != true) {
       content.add(
-        const Tab(
-          child: Text(("TODAY'S")),
+         Tab(
+          child: Text(translate("TODAY'S")),
         ),
       );
     }
     if (CounterSettingService.counterSettings?.hideCancelledAppointments !=
         true) {
       content.add(
-        const Tab(
-          child: Text(("CANCELLED")),
+         Tab(
+          child: Text(translate("CANCELLED")),
         ),
       );
     }
@@ -230,7 +231,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                                   context: context,
                                   builder: (context) {
                                     return AlertDialog(
-                                      title: const Text(
+                                      title:  Text(translate
                                           ('Alert (Not transferred!)')),
                                       content: Text(
                                           '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred, Continue Calling?')}'),
@@ -239,7 +240,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                                           onPressed: () {
                                             Navigator.pop(context);
                                           },
-                                          child: const Text(('Cancel')),
+                                          child:  Text(translate('Cancel')),
                                         ),
                                         CountDownButton(
                                           onPressed: () async {
@@ -267,7 +268,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                                   context: context,
                                   builder: (context) {
                                     return AlertDialog(
-                                      title: const Text(
+                                      title:  Text(translate
                                           ('Transfer is required !')),
                                       content: Text(
                                           '${GeneralDataService.lastCalledToken!.tokenNumber} ${('Not transferred')}'),
@@ -276,7 +277,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                                           onPressed: () {
                                             Navigator.pop(context);
                                           },
-                                          child: const Text(('Close')),
+                                          child:  Text(translate('Close')),
                                         ),
                                       ],
                                     );
@@ -328,7 +329,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                                     onPressed: () {
                                       Navigator.pop(context);
                                     },
-                                    child: const Text(('Close'))),
+                                    child:  Text(translate('Close'))),
                                 TextButton(
                                     onPressed: () async {
                                       UtilityService.showLoadingAlert(context);
@@ -346,14 +347,14 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                                       }
                                       Navigator.pop(context);
                                       UtilityService.toast(
-                                          context, ('Something went wrong'));
+                                          context, translate ('Something went wrong'));
                                     },
                                     child: const Text(('Continue')))
                               ],
-                              title: const Text(
-                                  ('Confirm Cancelling Appointment')),
-                              content: Text(
-                                  '${('Do you want to cancel Appointment')} ${queueAppointment.tokenNumber}?'),
+                              title:  Text(
+                                translate  ('Confirm Cancelling Appointment')),
+                              content: Text(translate( '${('Do you want to cancel Appointment')} ${queueAppointment.tokenNumber}?')
+                                 ),
                             );
                           });
                     },
@@ -421,7 +422,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                                       onPressed: () {
                                         Navigator.pop(context);
                                       },
-                                      child: const Text(('Close'))),
+                                      child:  Text(translate('Close'))),
                                   TextButton(
                                       onPressed: () async {
                                         UtilityService.showLoadingAlert(
@@ -439,14 +440,14 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                                         }
                                         Navigator.pop(context);
                                         UtilityService.toast(
-                                            context, ('Something went wrong'));
+                                            context, translate('Something went wrong'));
                                       },
-                                      child: const Text(('Continue')))
+                                      child:  Text(translate('Continue')))
                                 ],
                                 title:
-                                    const Text(('Confirm adding appointment')),
-                                content: Text(
-                                    '${('Do you want to add canceled Appointment')} ${queueAppointment.tokenNumber}?'),
+                                     Text(translate('Confirm adding appointment')),
+                                content: Text(translate('${('Do you want to add canceled Appointment')} ${queueAppointment.tokenNumber}?')
+                                    ),
                               );
                             });
                       },
@@ -468,7 +469,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
       if (value is bool && value == false) {
         UtilityService.toast(
           context,
-          ("Something went wrong, can't fetch details"),
+         translate ("Something went wrong, can't fetch details"),
         );
         return;
       }
@@ -494,19 +495,19 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
       BlocProvider.of<SettingsBloc>(context).add(SwitchToHomePageEvent());
       return;
     }
-    UtilityService.toast(context, ('Something went wrong'));
+    UtilityService.toast(context,translate ('Something went wrong'));
   }
 
   ListView listViewNoDataFound() {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      children: const [
+      children:  [
         Center(
           child: Padding(
-            padding: EdgeInsets.only(top: 15.0),
-            child: Text(
+            padding: const EdgeInsets.only(top: 15.0),
+            child: Text(translate
               ('No Data!'),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
           ),
         )
