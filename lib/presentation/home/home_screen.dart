@@ -2284,9 +2284,7 @@ class _HomeScreenState extends State<HomeScreen> {
         : false;
   }
 
-  /// currentIndex = 1;
-  ///
-  void rebuildHoldUnholdButtons() {
+void rebuildHoldUnholdButtons() {
     lockServiceButtonState != null
         ? lockServiceButtonState!(
             () {},
@@ -2302,11 +2300,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-
     ClockService.updateDateTime();
-
-    // SocketService.registerEvents(isAll: true);
-
     homePageRebuild =
         SocketService.homePageRebuildRequiredController.stream.listen((event) {
       if (event is bool && event && isBuildPending == false) {
@@ -2324,13 +2318,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    // try {
-    //   SocketService.destorySocket();
-    // } catch (_) {}
     try {
       homePageRebuild.cancel();
     } catch (_) {}
-
     try {
       appBarRebuild.cancel();
     } catch (_) {}
@@ -2458,7 +2448,7 @@ class _HomeScreenState extends State<HomeScreen> {
         buildWhen: (previous, current) {
           if (previous is SettingsStateUpdating &&
               current is HomePageSettingsState) {
-            // log('inside bloc builder');
+          
             return true;
           }
           return false;
@@ -3760,7 +3750,7 @@ class _HomeScreenState extends State<HomeScreen> {
             style: OutlinedButton.styleFrom(
               shape: RoundedRectangleBorder(
                 borderRadius:
-                    BorderRadius.circular(7), // Set your desired radius here
+                    BorderRadius.circular(7), 
               ),
             ),
             onPressed: !isAllServiceOnHold()
