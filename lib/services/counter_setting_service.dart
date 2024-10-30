@@ -11,7 +11,6 @@ import 'package:oneappcounter/services/set_device_service.dart';
 import 'package:oneappcounter/services/storage_service.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
-
 class CounterSettingService {
   static CounterSettingsModel? counterSettings;
   static bool fullScreenEnabled = false;
@@ -120,4 +119,6 @@ class CounterSettingService {
       WakelockPlus.disable();
     }
   }
+
+  
 }

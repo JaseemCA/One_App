@@ -1997,6 +1997,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     'home': _isHomeRebuildNeededAfterPop
                   },
                 );
+                Navigator.pop(context);
               },
               icon: const Icon(
                 Icons.keyboard_arrow_down_outlined,
@@ -2143,7 +2144,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           controller: uidController,
                           keyboardType: TextInputType.number,
                           decoration:
-                               InputDecoration(hintText:translate('Enter UID')),
+                              InputDecoration(hintText: translate('Enter UID')),
                         ),
                       ),
                       Expanded(

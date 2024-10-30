@@ -21,9 +21,9 @@ class DeviceInfo extends Equatable {
   final String osArch;
   final String? osHostname;
   final String? osBuild;
-  final String? osKernel;
-  final String osSerial;
-  final String uuidOs;
+  final String? osKernal;
+  final String? osSerial;
+  final String? uuidOs;
   final String cpuManufacturer;
   final String cpuBrand;
   final String? cpuSpeed;
@@ -53,9 +53,9 @@ class DeviceInfo extends Equatable {
     required this.osArch,
     this.osHostname,
     this.osBuild,
-    this.osKernel,
-    required this.osSerial,
-    required this.uuidOs,
+    this.osKernal,
+    this.osSerial,
+    this.uuidOs,
     required this.cpuManufacturer,
     required this.cpuBrand,
     this.cpuSpeed,
@@ -87,7 +87,7 @@ class DeviceInfo extends Equatable {
         osArch,
         osHostname,
         osBuild,
-        osKernel,
+        osKernal,
         osSerial,
         uuidOs,
         cpuManufacturer,
@@ -121,7 +121,7 @@ class DeviceInfo extends Equatable {
       'osArch': osArch,
       'osHostname': osHostname,
       'osBuild': osBuild,
-      'osKernal': osKernel,
+      'osKernal': osKernal,
       'osSerial': osSerial,
       'uuidOs': uuidOs,
       'cpuManufacturer': cpuManufacturer,
@@ -156,7 +156,7 @@ class DeviceInfo extends Equatable {
       osArch: json['osArch'],
       osHostname: json['osHostname'],
       osBuild: json['osBuild'],
-      osKernel: json['osKernal'],
+      osKernal: json['osKernal'],
       osSerial: json['osSerial'],
       uuidOs: json['uuidOs'],
       cpuManufacturer: json['cpuManufacturer'],

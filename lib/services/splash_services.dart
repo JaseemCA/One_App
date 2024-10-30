@@ -67,6 +67,7 @@
 //   }
 // }
 import 'dart:async';
+import 'dart:developer';
 // import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:oneappcounter/model/splash_init_response.dart';
@@ -111,21 +112,21 @@ class SplashScreenService {
           decideLocation: 'login',
         );
 
-        // log("Fetching saved user data...");
+        log("Fetching saved user data...");
         await AuthService.getSavedData();
         if (AuthService.loginData != null &&
             AuthService.loginData!.accessToken.isNotEmpty) {
           splashScreenEvents.add('Fetching');
-          // log("User logged in. AccessToken found.");
+          log("User logged in. AccessToken found.");
 
           await AuthService.updateBranchDetails();
           splashScreenEvents.add('Validating device');
-          // log("Updated branch details.");
+          log("Updated branch details.");
 
           await ClockService.updateDateTime();
           splashScreenEvents.add('Fetching');
           await CounterSettingService.initSettingsData();
-          // log("Counter settings initialized.");
+          log("Counter settings initialized.");
 
           splashScreenEvents.add('Validating details');
           await GeneralDataService.initVals();
@@ -146,7 +147,7 @@ class SplashScreenService {
           await SetDeviceService.addCounterAppDetails();
           splashScreenEvents.add('');
 
-          // log("All services initialized. Navigating to Home.");
+          log("All services initialized. Navigating to Home.");
           spalshinitResponse = SplashInitResponse(
             processed: true,
             decideLocation: 'home',

@@ -23,7 +23,7 @@ class LanguageService {
         code: "pt",
         name: "Portuguese",
         dir: "ltr",
-        nativeName: "Português"),
+        nativeName: "Português")
   ];
 
   static Future<void> changeLocaleFn(BuildContext context) async {
